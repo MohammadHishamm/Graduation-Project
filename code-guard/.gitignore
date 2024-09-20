@@ -1,0 +1,47 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore node.js dependencies
+node_modules/
+
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
+# Ignore compiled Java class files
+*.class
+
+# Ignore log files
+*.log
+
+# Ignore environment files
+.env
+.env.local
+
+# Ignore IDE/editor configurations
+.idea/
+.vscode/
+*.sublime-workspace
+
+# Ignore build files
+build/
+dist/
+target/
+
+# Ignore generated documentation
+doc/
+*.html
+*.pdf
+
+# Ignore any temporary files or folders
+*.tmp
+*.swp
+*.bak
+
+# Ignore archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Ignore OS-specific files
+Thumbs.db
