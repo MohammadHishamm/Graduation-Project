@@ -1,7 +1,3 @@
-# Graduation-Project
-Graduation project 24/25 | Software Engineer | AI driven workspace for software developers | IDE's extention
-
-
 # Project Setup
 
 ## Initializing a Node.js Project
