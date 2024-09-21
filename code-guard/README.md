@@ -1,12 +1,36 @@
-# code-guard README
+# code-guard "code smells detector"
 
 This is the README for your extension "code-guard". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+1- Real-time Code Smell Detection:
+Automatically analyzes code, identifying common code smells.
 
-For example if there is an image subfolder under your extension project workspace:
+2- Code Smell Categorization:
+Organizes detected smells into categories, such as complexity, maintainability,
+and readability.
+
+3- Detailed Explanations & Suggestions:
+Provides concise explanations of detected smells and best-practice suggestions
+to resolve them.
+
+4- Customizable Thresholds:
+Users can set their own detection criteria for certain smells, such as method
+length or class size, tailoring the extension to their coding standards.
+
+5- Code Smell Dashboard:
+A comprehensive view that summarizes the total number and types of smells
+detected across the entire project, enabling developers to monitor progress over
+time.
+
+6- Quick-Fix Integrations:
+Suggests potential fixes for certain types of smells and offers one-click code
+refactoring options, simplifying the developer's workflow.
+
+7- Cross-Language Support:
+Compatible with multiple programming languages.
+
 
 \!\[feature X\]\(images/feature-x.png\)
 
