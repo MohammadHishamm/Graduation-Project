@@ -20,8 +20,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "code-guard.helloWorld",
-        "title": "Hello World"
+        "command": "extension.activateCommand",
+        "title": "Code-Guard: Activate"
+      },
+      {
+        "command": "extension.deactivateCommand",
+        "title": "Code-Guard: Deactivate"
       }
     ]
   },
