@@ -20,7 +20,6 @@ __pycache__/
 
 # Ignore IDE/editor configurations
 .idea/
-.vscode/
 *.sublime-workspace
 
 # Ignore build files
