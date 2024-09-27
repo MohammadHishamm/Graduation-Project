@@ -1,59 +1,51 @@
-# code-guard "code smells detector"
+# CodePure "Code Smells Detector"
 
-This is the README for your extension "code-guard". After writing up a brief description, we recommend including the following sections.
+*CodePure* is a powerful Visual Studio Code extension designed to help developers write cleaner, more maintainable code by automatically detecting and addressing common code smells. It enhances your coding workflow by providing insights and suggestions tailored to your coding standards.
 
 ## Features
 
-1- Real-time Code Smell Detection:
-Automatically analyzes code, identifying common code smells.
+1. **Real-time Code Smell Detection**: 
+   Automatically analyzes code, identifying common code smells as you type.
 
-2- Code Smell Categorization:
-Organizes detected smells into categories, such as complexity, maintainability,
-and readability.
+2. **Code Smell Categorization**: 
+   Organizes detected smells into categories, such as complexity, maintainability, and readability.
 
-3- Detailed Explanations & Suggestions:
-Provides concise explanations of detected smells and best-practice suggestions
-to resolve them.
+3. **Detailed Explanations & Suggestions**: 
+   Provides concise explanations of detected smells and best-practice suggestions to resolve them.
 
-4- Customizable Thresholds:
-Users can set their own detection criteria for certain smells, such as method
-length or class size, tailoring the extension to their coding standards.
+4. **Customizable Thresholds**: 
+   Users can set their own detection criteria for certain smells, such as method length or class size, tailoring the extension to their coding standards.
 
-5- Code Smell Dashboard:
-A comprehensive view that summarizes the total number and types of smells
-detected across the entire project, enabling developers to monitor progress over
-time.
+5. **Code Smell Dashboard**: 
+   A comprehensive view that summarizes the total number and types of smells detected across the entire project, enabling developers to monitor progress over time.
 
-6- Quick-Fix Integrations:
-Suggests potential fixes for certain types of smells and offers one-click code
-refactoring options, simplifying the developer's workflow.
+6. **Quick-Fix Integrations**: 
+   Suggests potential fixes for certain types of smells and offers one-click code refactoring options, simplifying the developer's workflow.
 
-7- Cross-Language Support:
-Compatible with multiple programming languages.
+7. **Cross-Language Support**: 
+   Compatible with multiple programming languages.
 
-
-\!\[feature X\]\(images/feature-x.png\)
+![feature X](images/feature-x.png)
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+This extension requires Visual Studio Code version 1.56.0 or higher. Ensure that you have the following dependencies installed:
+
+- Node.js (v14 or higher)
+- Relevant language support extensions for the programming languages you wish to analyze.
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+* `codepure.enable`: Enable or disable the *CodePure* extension.
+* `codepure.threshold`: Set customizable thresholds for code smell detection.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- Some users may experience lag during real-time analysis on very large codebases. We are working on optimizing performance.
 
 ## Release Notes
 
@@ -61,19 +53,19 @@ Users appreciate release notes as you update your extension.
 
 ### 1.0.0
 
-Initial release of ...
+Initial release of *CodePure* with core features.
 
 ### 1.0.1
 
-Fixed issue #.
+Fixed issue with incorrect categorization of certain code smells.
 
 ### 1.1.0
 
-Added features X, Y, and Z.
+Added customizable thresholds and improved dashboard functionalities.
 
 ---
 
-## Following extension guidelines
+## Following Extension Guidelines
 
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
 
@@ -87,7 +79,7 @@ You can author your README using Visual Studio Code. Here are some useful editor
 * Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
 * Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
 
-## For more information
+## For More Information
 
 * [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)

@@ -1,7 +1,8 @@
 {
-  "name": "code-guard",
-  "displayName": "Code Guard",
-  "description": "",
+  "name": "CodePure",
+  "displayName": "CodePure",
+  "description": "Code smells detector",
+  "publisher": "SWE11",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.93.0"
@@ -10,7 +11,7 @@
     "type": "git",
     "url": "https://github.com/MohammadHishamm/Graduation-Project"
   },
-  "icon": "Icon.png"
+  "icon": "Logo.png"
   ,
   "categories": [
     "Other"
@@ -21,11 +22,11 @@
     "commands": [
       {
         "command": "extension.activateCommand",
-        "title": "Code-Guard: Activate"
+        "title": "CodePure: Activate"
       },
       {
         "command": "extension.deactivateCommand",
-        "title": "Code-Guard: Deactivate"
+        "title": "CodePure: Deactivate"
       }
     ]
   },
