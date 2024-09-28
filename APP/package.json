@@ -1,12 +1,16 @@
 {
-  "name": "CodePure",
+  "name": "codepure",
   "displayName": "CodePure",
   "description": "Code smells detector",
-  "publisher": "SWE11",
   "version": "0.0.1",
+  "private": true,
   "engines": {
     "vscode": "^1.93.0"
   },
+  "vsce": {
+  "noVerify": true
+  }
+  ,
   "repository": {
     "type": "git",
     "url": "https://github.com/MohammadHishamm/Graduation-Project"
