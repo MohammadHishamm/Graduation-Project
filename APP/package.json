@@ -20,7 +20,12 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:python",
+    "onLanguage:java",
+    "onLanguage:cpp",
+    "onLanguage:csharp"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
