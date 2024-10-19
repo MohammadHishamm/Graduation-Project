@@ -27,7 +27,10 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 let isActive = true;
+let outputChannel;
 function activate(context) {
+    // Create an Output Channel for the extension
+    outputChannel = vscode.window.createOutputChannel("CodePure Output");
     const activateCommand = vscode.commands.registerCommand('extension.activateCommand', () => {
         if (!isActive) {
             isActive = true;
@@ -60,7 +63,7 @@ function activate(context) {
 }
 function isSupportedFileType(document) {
     const fileType = document.languageId;
-    const supportedFileTypes = ['python', 'java', 'cpp', 'csharp'];
+    const supportedFileTypes = ['python', 'java'];
     if (supportedFileTypes.includes(fileType)) {
         return true;
     }
@@ -71,8 +74,20 @@ function isSupportedFileType(document) {
 }
 function analyzeCode(code) {
     vscode.window.showInformationMessage('Analyzing code...');
+    // Show the analyzed code in the Output Panel
+    outputChannel.show(true); // Make sure the output panel is visible
+    outputChannel.appendLine('Code being analyzed:\n' + code); // Send code to the output channel
 }
 function deactivate() {
     // Optional cleanup logic
+    if (outputChannel) {
+        outputChannel.dispose(); // Dispose of the output channel
+    }
+}
+function analyzePythoncode() {
+    // Python AST analysis logic
+}
+function analyzeJavacode() {
+    // JavaParser analysis logic
 }
 //# sourceMappingURL=extension.js.map

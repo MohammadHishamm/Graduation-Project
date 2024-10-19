@@ -8,15 +8,13 @@
     "vscode": "^1.93.0"
   },
   "vsce": {
-  "noVerify": true
-  }
-  ,
+    "noVerify": true
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/MohammadHishamm/Graduation-Project"
   },
-  "icon": "Logo.png"
-  ,
+  "icon": "Logo.png",
   "categories": [
     "Other"
   ],
@@ -48,14 +46,17 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.93.0",
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
+    "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
-    "eslint": "^9.9.1",
-    "typescript": "^5.5.4",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.9.1",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "codepure": "file:"
   }
 }
