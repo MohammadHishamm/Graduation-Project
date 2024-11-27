@@ -1,12 +1,19 @@
 import * as vscode from 'vscode';
+// import { JavaMetricsExtractor } from './Java/extractJavaMetrics'; 
 
-let isActive = true; 
+
+let isActive = true;
 let outputChannel: vscode.OutputChannel;
+let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
-
     // Create an Output Channel for the extension
     outputChannel = vscode.window.createOutputChannel("CodePure Output");
+
+    // Create a Status Bar Item
+    statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1000);
+    statusBarItem.text = "CodePure: Ready";
+    statusBarItem.show();
 
     const activateCommand = vscode.commands.registerCommand('extension.activateCommand', () => {
         if (!isActive) {
@@ -28,50 +35,50 @@ export function activate(context: vscode.ExtensionContext) {
 
     vscode.workspace.onDidSaveTextDocument((document) => {
         if (isActive && isSupportedFileType(document)) {
-            analyzeCode(document.getText());
+            const code = document.getText();
+            analyzeCode(document, code);
         }
     });
 
-    vscode.workspace.onDidChangeTextDocument((event) => {
-        if (isActive && isSupportedFileType(event.document)) {
-            analyzeCode(event.document.getText());
-        }
-    });
-
-    context.subscriptions.push(activateCommand, deactivateCommand);
+    context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem);
 }
 
 function isSupportedFileType(document: vscode.TextDocument): boolean {
     const fileType = document.languageId;
-    const supportedFileTypes = ['python', 'java'];
+    const supportedFileTypes = ['java'];
 
     if (supportedFileTypes.includes(fileType)) {
         return true;
     } else {
-        vscode.window.showWarningMessage(`File type not supported: ${fileType}`);
+        vscode.window.showWarningMessage(`Unsupported file type: ${fileType}`);
         return false;
     }
 }
 
-function analyzeCode(code: string) {
-    vscode.window.showInformationMessage('Analyzing code...');
+async function analyzeCode(document: vscode.TextDocument, code: string) {
+    vscode.window.showInformationMessage('Analyzing Java code...');
+    outputChannel.appendLine("Analyzing Java code...");
+    outputChannel.appendLine("Code being analyzed:\n" + code);
 
-    // Show the analyzed code in the Output Panel
-    outputChannel.show(true); // Make sure the output panel is visible
-    outputChannel.appendLine('Code being analyzed:\n' + code); // Send code to the output channel
-}
-
-export function deactivate() {
-    // Optional cleanup logic
-    if (outputChannel) {
-        outputChannel.dispose(); // Dispose of the output channel
+    try {
+        //TODO
+            //metric functions 
+        outputChannel.show();
+    } catch (error) {
+        outputChannel.appendLine("Error during analysis:");
+        outputChannel.appendLine(`${error}`);
+    
     }
 }
 
-function analyzePythoncode(){
-    // Python AST analysis logic
-}
 
-function analyzeJavacode(){
-    // JavaParser analysis logic
+
+export function deactivate() {
+    // Cleanup logic for the extension
+    if (outputChannel) {
+        outputChannel.dispose();
+    }
+    if (statusBarItem) {
+        statusBarItem.dispose();
+    }
 }
