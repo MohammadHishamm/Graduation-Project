@@ -26,7 +26,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
-// import { JavaMetricsExtractor } from './Java/extractJavaMetrics'; 
+const ASTParser_1 = require("./Core/ASTParser");
+const MetricsFactory_1 = require("./Factory/MetricsFactory");
+const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
@@ -56,9 +58,12 @@ function activate(context) {
         }
     });
     vscode.workspace.onDidSaveTextDocument((document) => {
-        if (isActive && isSupportedFileType(document)) {
-            const code = document.getText();
-            analyzeJavaCode(document, code);
+        const problemschecker = new ProblemsChecker_1.ProblemsChecker(document);
+        if (!problemschecker.checkForErrors()) {
+            if (isActive && isSupportedFileType(document)) {
+                const code = document.getText();
+                analyzeJavaCode(document, code);
+            }
         }
     });
     context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem);
@@ -74,13 +79,24 @@ function isSupportedFileType(document) {
         return false;
     }
 }
-async function analyzeJavaCode(document, code) {
+async function analyzeJavaCode(document, sourceCode) {
     vscode.window.showInformationMessage('Analyzing Java code...');
     outputChannel.appendLine("Analyzing Java code...");
-    outputChannel.appendLine("Code being analyzed:\n" + code);
+    outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
     try {
-        //TODO
-        //metric functions 
+        // will be by the user need
+        const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity'];
+        // Initialize components
+        const parser = new ASTParser_1.ASTParser();
+        const rootNode = parser.parse(sourceCode);
+        // Calculate metrics
+        metricsToCalculate.forEach(metricName => {
+            const metricCalculator = MetricsFactory_1.MetricsFactory.createMetric(metricName);
+            if (metricCalculator) {
+                const value = metricCalculator.calculate(rootNode, sourceCode);
+                outputChannel.appendLine(`${value}`);
+            }
+        });
         outputChannel.show();
     }
     catch (error) {

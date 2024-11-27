@@ -9,8 +9,11 @@ export class CyclomaticComplexityMetric extends MetricCalculator {
                 complexity++;
             }
             if (currentNode.children) {
-                currentNode.children.forEach(traverse);
+                for (const child of currentNode.children) {
+                    traverse(child); // Recursively traverse child nodes
+                }
             }
+            
         };
 
         traverse(node);

@@ -1,7 +1,7 @@
 import Parser from 'tree-sitter';
 import Java from 'tree-sitter-java';
 
-export class AstParser 
+export class ASTParser 
 {
     public parser: Parser;
 

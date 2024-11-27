@@ -1,10 +1,13 @@
 import * as vscode from 'vscode';
-// import { JavaMetricsExtractor } from './Java/extractJavaMetrics'; 
+import { ASTParser } from './Core/ASTParser';
+import { MetricsFactory } from './Factory/MetricsFactory';
+import { ProblemsChecker } from './Validator/ProblemsChecker';
 
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
+
 
 export function activate(context: vscode.ExtensionContext) {
     // Create an Output Channel for the extension
@@ -34,9 +37,13 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     vscode.workspace.onDidSaveTextDocument((document) => {
-        if (isActive && isSupportedFileType(document)) {
-            const code = document.getText();
-            analyzeJavaCode(document, code);
+        const problemschecker = new ProblemsChecker(document);
+        if(!problemschecker.checkForErrors())
+        {
+            if (isActive && isSupportedFileType(document)) {
+                const code = document.getText();
+                analyzeJavaCode(document, code);
+            }
         }
     });
 
@@ -55,14 +62,29 @@ function isSupportedFileType(document: vscode.TextDocument): boolean {
     }
 }
 
-async function analyzeJavaCode(document: vscode.TextDocument, code: string) {
+async function analyzeJavaCode(document: vscode.TextDocument, sourceCode: string) {
     vscode.window.showInformationMessage('Analyzing Java code...');
     outputChannel.appendLine("Analyzing Java code...");
-    outputChannel.appendLine("Code being analyzed:\n" + code);
+    outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
 
     try {
-        //TODO
-            //metric functions 
+
+        
+        // will be by the user need
+        const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity'];
+
+        // Initialize components
+        const parser = new ASTParser();
+        const rootNode = parser.parse(sourceCode);
+
+        // Calculate metrics
+        metricsToCalculate.forEach(metricName => {
+            const metricCalculator = MetricsFactory.createMetric(metricName);
+            if (metricCalculator) {
+                const value = metricCalculator.calculate(rootNode, sourceCode);
+                outputChannel.appendLine(`${value}`);
+            }
+        });
         outputChannel.show();
     } catch (error) {
         outputChannel.appendLine("Error during analysis:");
