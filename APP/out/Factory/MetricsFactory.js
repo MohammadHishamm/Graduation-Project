@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
-const LOCMetric_1 = require("../metrics/LOCMetric");
-const MethodCountMetric_1 = require("../metrics/MethodCountMetric");
-const CyclomaticComplexityMetric_1 = require("../metrics/CyclomaticComplexityMetric");
+const LOCMetric_1 = require("../Metrics/LOCMetric");
+const MethodCountMetric_1 = require("../Metrics/MethodCountMetric");
+const CyclomaticComplexityMetric_1 = require("../Metrics/CyclomaticComplexityMetric");
 class MetricsFactory {
     static createMetric(metricName) {
         switch (metricName) {

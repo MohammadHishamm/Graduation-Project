@@ -36,7 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidSaveTextDocument((document) => {
         if (isActive && isSupportedFileType(document)) {
             const code = document.getText();
-            analyzeCode(document, code);
+            analyzeJavaCode(document, code);
         }
     });
 
@@ -55,7 +55,7 @@ function isSupportedFileType(document: vscode.TextDocument): boolean {
     }
 }
 
-async function analyzeCode(document: vscode.TextDocument, code: string) {
+async function analyzeJavaCode(document: vscode.TextDocument, code: string) {
     vscode.window.showInformationMessage('Analyzing Java code...');
     outputChannel.appendLine("Analyzing Java code...");
     outputChannel.appendLine("Code being analyzed:\n" + code);

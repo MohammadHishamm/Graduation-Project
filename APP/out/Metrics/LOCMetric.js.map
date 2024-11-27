@@ -1,0 +1,1 @@
+{"version":3,"file":"LOCMetric.js","sourceRoot":"","sources":["../../src/Metrics/LOCMetric.ts"],"names":[],"mappings":";;;AAAA,+DAA4D;AAE5D,MAAa,SAAU,SAAQ,mCAAgB;IAC3C,SAAS,CAAC,IAAS,EAAE,UAAkB;QACnC,OAAO,IAAI,CAAC,UAAU,CAAC,UAAU,CAAC,CAAC;IACvC,CAAC;CACJ;AAJD,8BAIC"}
