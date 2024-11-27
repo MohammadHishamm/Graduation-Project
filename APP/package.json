@@ -32,6 +32,10 @@
       {
         "command": "extension.deactivateCommand",
         "title": "CodePure: Deactivate"
+      },
+      {
+        "command": "extension.openDashboard",
+        "title": "CodePure: Open Dashboard"
       }
     ]
   },
