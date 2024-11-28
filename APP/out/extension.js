@@ -26,9 +26,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
-const ASTParser_1 = require("./Core/ASTParser");
 const MetricsFactory_1 = require("./Factory/MetricsFactory");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
+const javaParser_1 = require("./Languages/javaParser");
+const pythonParser_1 = require("./Languages/pythonParser");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
@@ -78,7 +79,7 @@ function activate(context) {
         if (!problemschecker.checkForErrors()) {
             if (isActive && isSupportedFileType(document)) {
                 const code = document.getText();
-                analyzeJavaCode(document, code);
+                analyzeCode(document, code);
             }
         }
     });
@@ -86,7 +87,7 @@ function activate(context) {
 }
 function isSupportedFileType(document) {
     const fileType = document.languageId;
-    const supportedFileTypes = ['java'];
+    const supportedFileTypes = ['java', 'python'];
     if (supportedFileTypes.includes(fileType)) {
         return true;
     }
@@ -95,7 +96,7 @@ function isSupportedFileType(document) {
         return false;
     }
 }
-async function analyzeJavaCode(document, sourceCode) {
+async function analyzeCode(document, sourceCode) {
     vscode.window.showInformationMessage('Analyzing Java code...');
     outputChannel.appendLine("Analyzing Java code...");
     outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
@@ -114,7 +115,14 @@ async function analyzeJavaCode(document, sourceCode) {
         // will be by the user need
         const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity'];
         // Initialize components
-        const parser = new ASTParser_1.ASTParser();
+        let parser;
+        if (document.languageId === "java") {
+            parser = new javaParser_1.javaParser();
+        }
+        else {
+            parser = new pythonParser_1.pythonParser();
+        }
+        parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
         // Calculate metrics
         metricsToCalculate.forEach(metricName => {

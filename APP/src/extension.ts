@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { ASTParser } from './Core/ASTParser';
 import { MetricsFactory } from './Factory/MetricsFactory';
 import { ProblemsChecker } from './Validator/ProblemsChecker';
+import { javaParser } from './Languages/javaParser';
+import { pythonParser } from './Languages/pythonParser';
 
 
 let isActive = true;
@@ -61,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
         {
             if (isActive && isSupportedFileType(document)) {
                 const code = document.getText();
-                analyzeJavaCode(document, code);
+                analyzeCode(document, code);
             }
         }
     });
@@ -71,9 +73,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 function isSupportedFileType(document: vscode.TextDocument): boolean {
     const fileType = document.languageId;
-    const supportedFileTypes = ['java'];
+    const supportedFileTypes = ['java','python'];
 
-    if (supportedFileTypes.includes(fileType)) {
+    if (supportedFileTypes.includes(fileType) ) {
+
         return true;
     } else {
         vscode.window.showWarningMessage(`Unsupported file type: ${fileType}`);
@@ -81,7 +84,7 @@ function isSupportedFileType(document: vscode.TextDocument): boolean {
     }
 }
 
-async function analyzeJavaCode(document: vscode.TextDocument, sourceCode: string) {
+async function analyzeCode(document: vscode.TextDocument, sourceCode: string) {
     vscode.window.showInformationMessage('Analyzing Java code...');
     outputChannel.appendLine("Analyzing Java code...");
     outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
@@ -104,9 +107,17 @@ async function analyzeJavaCode(document: vscode.TextDocument, sourceCode: string
 
         // will be by the user need
         const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity'];
-
         // Initialize components
-        const parser = new ASTParser();
+        let parser ;
+        if(document.languageId=== "java")
+            {
+                parser = new javaParser();
+            }
+            else{
+                 parser = new pythonParser();
+            }
+        
+        parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
 
         // Calculate metrics

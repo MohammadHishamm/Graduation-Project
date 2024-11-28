@@ -61,6 +61,7 @@
   "dependencies": {
     "codepure": "file:",
     "tree-sitter": "^0.21.1",
-    "tree-sitter-java": "^0.23.4"
+    "tree-sitter-java": "^0.23.4",
+    "tree-sitter-python": "^0.23.4"
   }
 }
