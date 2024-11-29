@@ -38,4 +38,4 @@ class PythonCognitiveComplexityMetric extends MetricCalculator_1.MetricCalculato
     }
 }
 exports.PythonCognitiveComplexityMetric = PythonCognitiveComplexityMetric;
-//# sourceMappingURL=PythonCOC.js.map
+//# sourceMappingURL=PythonCoC.js.map
