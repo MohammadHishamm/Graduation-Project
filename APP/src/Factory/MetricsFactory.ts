@@ -3,11 +3,11 @@ import { JavaLOCMetric } from '../Metrics/Java/JavaLOC';
 import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCC';
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
 import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCoC';
-import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCoC';
+// import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCoC';
 import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
 import {JavaNumberOfMethodsMetric} from '../Metrics/Java/JavaNOM';
 import {PythonLOCMetric} from '../Metrics/Python/PythonLOC';
-import { PythonNumberOfMethodsMetric } from '../Metrics/Python/PythonNOM';
+import { PythonNumberofAttributesMetric } from '../Metrics/Python/PythonNOM';
 
 export class MetricsFactory {
     public static createMetric(metricName: string, language: string): MetricCalculator | null {
@@ -44,7 +44,7 @@ export class MetricsFactory {
                         if (language === 'java') {
                             return new JavaNumberOfMethodsMetric();
                         } else {
-                            return new PythonNumberOfMethodsMetric();
+                            return new PythonNumberofAttributesMetric();
                         }
                 default:
                 return null;    
