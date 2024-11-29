@@ -3,7 +3,7 @@ import { MetricCalculator } from '../../Core/MetricCalculator';
 export class JavaCyclomaticComplexityMetric extends MetricCalculator {
     calculate(node: any): number {
         let complexity = 1; // Base complexity starts at 1
-
+        
         const traverse = (currentNode: any) => {
             // Increment for each control flow statement
             if ([
