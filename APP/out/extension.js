@@ -113,7 +113,7 @@ async function analyzeCode(document, sourceCode) {
         // // Send this data to the dashboard (webview) if it's open
         // vscode.commands.executeCommand('extension.openDashboard'); // Opens the dashboard
         // will be by the user need
-        const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity', 'CognetiveComplexity', 'NumberOfAttributes'];
+        const metricsToCalculate = ['LOC', 'CC', 'NOA', 'NOM'];
         // Initialize components
         let parser;
         if (document.languageId === "java") {
