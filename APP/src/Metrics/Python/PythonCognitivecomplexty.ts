@@ -1,7 +1,3 @@
-
-
-
-
 import { MetricCalculator } from '../../Core/MetricCalculator';
 
 export class PythonCyclomaticComplexityMetric extends MetricCalculator {
@@ -10,27 +6,25 @@ export class PythonCyclomaticComplexityMetric extends MetricCalculator {
 
         const traverse = (currentNode: any) => 
         {
+         
             console.log(`${currentNode.type}`);
             // Increment for control flow statements
             if (
                 [
-                    
                     'if_statement',     // for 'if'
-                    'elif_clause', // else if
+                    'elif_clause' ,// else if
+                    'else_clause', // else 
 
                     'for_statement',    // for 'for'
                     'while_statement',  // for 'while'
 
                     'with_statement',   // for 'with'
-                    'except_clause',     // for 'catch'
+                    'except_clause',  // for 'catch'
+                    'match ',   // for 'switchcase'
                     'raise_statement',  // for 'throw'
 
-                    'case', // for 'cases in the switch case'
-
-                    'break_statement', // for 'break'
-                    'continue_statement'// for 'continue'
-                    
-                    
+                    'break_statement',  // for 'break'
+                    'continue_statement'// for 'continue'        
                 ].includes(currentNode.type)
             ) {
                 complexity++;
@@ -39,13 +33,6 @@ export class PythonCyclomaticComplexityMetric extends MetricCalculator {
             if(currentNode.type === 'function_definition')
             {
                 complexity++;
-            }
-
-            // Increment for boolean operators (&&, ||)
-            if (currentNode.type === 'and' || currentNode.type === 'or') {
-             
-                    complexity++;
-                
             }
 
             // Recursively traverse child nodes
@@ -60,3 +47,4 @@ export class PythonCyclomaticComplexityMetric extends MetricCalculator {
         return complexity;
     }
 }
+
