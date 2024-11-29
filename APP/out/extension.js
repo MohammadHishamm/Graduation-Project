@@ -113,7 +113,7 @@ async function analyzeCode(document, sourceCode) {
         // // Send this data to the dashboard (webview) if it's open
         // vscode.commands.executeCommand('extension.openDashboard'); // Opens the dashboard
         // will be by the user need
-        const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity'];
+        const metricsToCalculate = ['LOC', 'MethodCount', 'CyclomaticComplexity', 'CognetiveComplexity'];
         // Initialize components
         let parser;
         if (document.languageId === "java") {
@@ -129,7 +129,7 @@ async function analyzeCode(document, sourceCode) {
             const metricCalculator = MetricsFactory_1.MetricsFactory.createMetric(metricName, document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
-                outputChannel.appendLine(`${value}`);
+                outputChannel.appendLine(`${metricName}: ${value}`);
             }
         });
         outputChannel.show();

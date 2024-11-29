@@ -5,6 +5,7 @@ const LOCMetric_1 = require("../Metrics/LOCMetric");
 const MethodCountMetric_1 = require("../Metrics/MethodCountMetric");
 const JavaCyclomaticComplexityMetric_1 = require("../Metrics/Java/JavaCyclomaticComplexityMetric");
 const PythonCyclomaticComplexityMetric_1 = require("../Metrics/Python/PythonCyclomaticComplexityMetric");
+const JavaCognitiveComplexityMetric_1 = require("../Metrics/Java/JavaCognitiveComplexityMetric");
 class MetricsFactory {
     static createMetric(metricName, language) {
         switch (metricName) {
@@ -22,6 +23,8 @@ class MetricsFactory {
                 else {
                     throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
                 }
+            case 'CognetiveComplexity':
+                return new JavaCognitiveComplexityMetric_1.JavaCognitiveComplexityMetric();
             default:
                 return null;
         }
