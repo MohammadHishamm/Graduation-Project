@@ -6,6 +6,7 @@ const JavaCC_1 = require("../Metrics/Java/JavaCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
+const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 class MetricsFactory {
     static createMetric(metricName, language) {
         switch (metricName) {
@@ -14,6 +15,7 @@ class MetricsFactory {
                     return new JavaLOC_1.JavaLOCMetric();
                 }
                 else if (language === 'python') {
+                    return new PythonLOC_1.PythonLOCMetric();
                 }
             case 'CC':
                 if (language === 'java') {
