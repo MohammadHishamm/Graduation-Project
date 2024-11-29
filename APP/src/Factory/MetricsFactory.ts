@@ -1,53 +1,61 @@
 import { MetricCalculator } from '../Core/MetricCalculator';
+
 import { JavaLOCMetric } from '../Metrics/Java/JavaLOC';
 import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCC';
-import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
-import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCoC';
-// import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCoC';
+import { JavaNumberOfAccessorMethods } from '../Metrics/Java/JavaNOAM';
+import { JavaCognitiveComplexityMetric } from '../Metrics/Java/JavaCoC';
 import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
-import {JavaNumberOfMethodsMetric} from '../Metrics/Java/JavaNOM';
-import {PythonLOCMetric} from '../Metrics/Python/PythonLOC';
+import { JavaNumberOfMethodsMetric } from '../Metrics/Java/JavaNOM';
+
+import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
+import { PythonLOCMetric } from '../Metrics/Python/PythonLOC';
 import { PythonNumberofAttributesMetric } from '../Metrics/Python/PythonNOA';
 
+
 export class MetricsFactory {
-    public static createMetric(metricName: string, language: string): MetricCalculator | null {
+    // Public static method to create a metric object based on the language and metric name
+    public static CreateMetric(metricName: string, language: string): MetricCalculator | null {
+        switch (language) {
+            case 'java':
+                return MetricsFactory.createJavaMetric(metricName);
+            case 'python':
+                return MetricsFactory.createPythonMetric(metricName);
+            default:
+                return null;  
+        }
+    }
+
+    // Dynamically create Java metric object
+    private static createJavaMetric(metricName: string): MetricCalculator | null {
         switch (metricName) {
             case 'LOC':
-                if(language==='java')
-                {
                 return new JavaLOCMetric();
-                } else if (language==='python')
-                {
-                return new PythonLOCMetric();    
-                }
             case 'CC':
-                if (language === 'java') {
-                    return new JavaCyclomaticComplexityMetric();
-                } else if (language === 'python') {
-                    return new PythonCyclomaticComplexityMetric();
-                } else {
-                    throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
-                }
-            // case 'CognitiveComplexity':
-            //     if(language==='java'){
-            //     return new JavaCognitiveComplexityMetric();
-            //     } else if (language==='python'){
-            //             return new PythonCognitiveComplexityMetric();
-            //     }     
-                case 'NOA':
-                    if (language === 'java') {
-                        return new JavaNumberOfAttributesMetric();
-                    } else {
-                        return new PythonNumberofAttributesMetric();
-                    }
-                case 'NOM':
-                        if (language === 'java') {
-                            return new JavaNumberOfMethodsMetric();
-                        } else {
-                            
-                        }
-                default:
-                return null;    
+                return new JavaCyclomaticComplexityMetric();
+            case 'NOA':
+                return new JavaNumberOfAttributesMetric();
+            case 'NOM':
+                return new JavaNumberOfMethodsMetric();
+            case 'NOAM':
+                return new JavaNumberOfAccessorMethods();
+            case 'CognitiveComplexity':
+                return new JavaCognitiveComplexityMetric();
+            default:
+                return null;
+        }
+    }
+
+    // Dynamically create Python metric object
+    private static createPythonMetric(metricName: string): MetricCalculator | null {
+        switch (metricName) {
+            case 'LOC':
+                return new PythonLOCMetric();
+            case 'CC':
+                return new PythonCyclomaticComplexityMetric();
+            case 'NOA':
+                return new PythonNumberofAttributesMetric();
+            default:
+                return null;
         }
     }
 }

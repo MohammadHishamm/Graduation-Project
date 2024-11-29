@@ -3,51 +3,53 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
 const JavaLOC_1 = require("../Metrics/Java/JavaLOC");
 const JavaCC_1 = require("../Metrics/Java/JavaCC");
-const PythonCC_1 = require("../Metrics/Python/PythonCC");
-// import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCoC';
+const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
+const JavaCoC_1 = require("../Metrics/Java/JavaCoC");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
+const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 class MetricsFactory {
-    static createMetric(metricName, language) {
+    // Public static method to create a metric object based on the language and metric name
+    static CreateMetric(metricName, language) {
+        switch (language) {
+            case 'java':
+                return MetricsFactory.createJavaMetric(metricName);
+            case 'python':
+                return MetricsFactory.createPythonMetric(metricName);
+            default:
+                return null;
+        }
+    }
+    // Dynamically create Java metric object
+    static createJavaMetric(metricName) {
         switch (metricName) {
             case 'LOC':
-                if (language === 'java') {
-                    return new JavaLOC_1.JavaLOCMetric();
-                }
-                else if (language === 'python') {
-                    return new PythonLOC_1.PythonLOCMetric();
-                }
+                return new JavaLOC_1.JavaLOCMetric();
             case 'CC':
-                if (language === 'java') {
-                    return new JavaCC_1.JavaCyclomaticComplexityMetric();
-                }
-                else if (language === 'python') {
-                    return new PythonCC_1.PythonCyclomaticComplexityMetric();
-                }
-                else {
-                    throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
-                }
-            // case 'CognitiveComplexity':
-            //     if(language==='java'){
-            //     return new JavaCognitiveComplexityMetric();
-            //     } else if (language==='python'){
-            //             return new PythonCognitiveComplexityMetric();
-            //     }     
+                return new JavaCC_1.JavaCyclomaticComplexityMetric();
             case 'NOA':
-                if (language === 'java') {
-                    return new JavaNOA_1.JavaNumberOfAttributesMetric();
-                }
-                else {
-                    return new PythonNOA_1.PythonNumberofAttributesMetric();
-                }
+                return new JavaNOA_1.JavaNumberOfAttributesMetric();
             case 'NOM':
-                if (language === 'java') {
-                    return new JavaNOM_1.JavaNumberOfMethodsMetric();
-                }
-                else {
-                }
+                return new JavaNOM_1.JavaNumberOfMethodsMetric();
+            case 'NOAM':
+                return new JavaNOAM_1.JavaNumberOfAccessorMethods();
+            case 'CognitiveComplexity':
+                return new JavaCoC_1.JavaCognitiveComplexityMetric();
+            default:
+                return null;
+        }
+    }
+    // Dynamically create Python metric object
+    static createPythonMetric(metricName) {
+        switch (metricName) {
+            case 'LOC':
+                return new PythonLOC_1.PythonLOCMetric();
+            case 'CC':
+                return new PythonCC_1.PythonCyclomaticComplexityMetric();
+            case 'NOA':
+                return new PythonNOA_1.PythonNumberofAttributesMetric();
             default:
                 return null;
         }

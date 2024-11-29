@@ -107,7 +107,7 @@ async function analyzeCode(document: vscode.TextDocument, sourceCode: string) {
         // vscode.commands.executeCommand('extension.openDashboard'); // Opens the dashboard
 
         // will be by the user need
-        const metricsToCalculate = ['LOC', 'CC','NOA','NOM'];
+        const metricsToCalculate = ['LOC', 'CC','NOA','NOM', 'NOAM'];
         // Initialize components
         let parser ;
         if(document.languageId=== "java")
@@ -123,7 +123,7 @@ async function analyzeCode(document: vscode.TextDocument, sourceCode: string) {
 
         // Calculate metrics
         metricsToCalculate.forEach(metricName => {
-            const metricCalculator = MetricsFactory.createMetric(metricName,document.languageId);
+            const metricCalculator = MetricsFactory.CreateMetric(metricName,document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
                 outputChannel.appendLine(`${metricName}: ${value}`);

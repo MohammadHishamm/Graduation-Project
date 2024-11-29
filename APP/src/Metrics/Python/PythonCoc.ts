@@ -7,7 +7,7 @@ export class PythonCognitiveComplexityMetric extends MetricCalculator {
         const traverse = (currentNode: any) => 
         {
          
-            console.log(`${currentNode.type}`);
+
             // Increment for control flow statements
             if (
                 [
