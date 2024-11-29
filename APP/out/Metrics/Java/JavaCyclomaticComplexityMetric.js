@@ -4,7 +4,7 @@ exports.JavaCyclomaticComplexityMetric = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class JavaCyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
-        let complexity = 1; // Base complexity starts at 1
+        let complexity = 0;
         const traverse = (currentNode) => {
             // Increment for each control flow statement
             if ([
@@ -25,6 +25,9 @@ class JavaCyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculator
                 const conditionText = currentNode.text || ''; // Assume 'text' contains the source code of the condition
                 const booleanOperators = (conditionText.match(/&&|\|\|/g) || []).length;
                 complexity += booleanOperators;
+            }
+            if (currentNode.type === 'method_declaration') {
+                complexity++;
             }
             // Increment for ternary conditional expressions (?:)
             if (currentNode.type === 'ternary_expression') {

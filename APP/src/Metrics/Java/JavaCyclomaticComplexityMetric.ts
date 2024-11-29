@@ -1,10 +1,16 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import * as vscode from 'vscode';
+
+
 
 export class JavaCyclomaticComplexityMetric extends MetricCalculator {
     calculate(node: any): number {
-        let complexity = 1; // Base complexity starts at 1
-        
+        let complexity = 0; 
+    
+     
         const traverse = (currentNode: any) => {
+  
+        
             // Increment for each control flow statement
             if ([
                 'if_statement', 
@@ -27,6 +33,10 @@ export class JavaCyclomaticComplexityMetric extends MetricCalculator {
                 complexity += booleanOperators;
             }
 
+            if(currentNode.type === 'method_declaration')
+            {
+                complexity++;
+            }
             // Increment for ternary conditional expressions (?:)
             if (currentNode.type === 'ternary_expression') {
                 complexity++;
