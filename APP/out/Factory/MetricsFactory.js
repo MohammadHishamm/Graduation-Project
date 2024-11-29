@@ -7,6 +7,7 @@ const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
+const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 class MetricsFactory {
     static createMetric(metricName, language) {
         switch (metricName) {
@@ -45,7 +46,7 @@ class MetricsFactory {
                     return new JavaNOM_1.JavaNumberOfMethodsMetric();
                 }
                 else {
-                    throw new Error(`Unsupported language for Number of Attributes: ${language}`);
+                    return new PythonNOM_1.PythonNumberOfMethodsMetric();
                 }
             default:
                 return null;
