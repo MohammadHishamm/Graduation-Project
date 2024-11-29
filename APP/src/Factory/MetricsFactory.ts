@@ -1,5 +1,5 @@
 import { MetricCalculator } from '../Core/MetricCalculator';
-import { LOCMetric } from '../Metrics/LOCMetric';
+import { JavaLOCMetric } from '../Metrics/Java/JavaLOCMetric';
 import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCyclomaticComplexityMetric';
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCyclomaticComplexityMetric';
 import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCognitiveComplexityMetric';
@@ -11,7 +11,13 @@ export class MetricsFactory {
     public static createMetric(metricName: string, language: string): MetricCalculator | null {
         switch (metricName) {
             case 'LOC':
-                return new LOCMetric();
+                if(language==='java')
+                {
+                return new JavaLOCMetric();
+                } else if (language==='python')
+                {
+                    
+                }
             case 'CC':
                 if (language === 'java') {
                     return new JavaCyclomaticComplexityMetric();

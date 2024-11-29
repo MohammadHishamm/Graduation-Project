@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
-const LOCMetric_1 = require("../Metrics/LOCMetric");
+const JavaLOCMetric_1 = require("../Metrics/Java/JavaLOCMetric");
 const JavaCyclomaticComplexityMetric_1 = require("../Metrics/Java/JavaCyclomaticComplexityMetric");
 const PythonCyclomaticComplexityMetric_1 = require("../Metrics/Python/PythonCyclomaticComplexityMetric");
 const JavaNumberOfAttributes_1 = require("../Metrics/Java/JavaNumberOfAttributes");
@@ -10,7 +10,11 @@ class MetricsFactory {
     static createMetric(metricName, language) {
         switch (metricName) {
             case 'LOC':
-                return new LOCMetric_1.LOCMetric();
+                if (language === 'java') {
+                    return new JavaLOCMetric_1.JavaLOCMetric();
+                }
+                else if (language === 'python') {
+                }
             case 'CC':
                 if (language === 'java') {
                     return new JavaCyclomaticComplexityMetric_1.JavaCyclomaticComplexityMetric();
