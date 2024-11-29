@@ -24,7 +24,7 @@ export class PythonCyclomaticComplexityMetric extends MetricCalculator {
                 complexity++;
             }
 
-            if(currentNode.type === 'def')
+            if(currentNode.type === 'function_definition')
             {
                 complexity++;
             }
