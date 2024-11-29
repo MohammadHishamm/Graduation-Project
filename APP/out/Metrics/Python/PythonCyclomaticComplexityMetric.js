@@ -11,11 +11,11 @@ class PythonCyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculat
                 'if_statement', // for 'if'
                 'for_statement', // for 'for'
                 'while_statement', // for 'while'
-                'try_statement', // for 'try'
                 'with_statement', // for 'with'
                 'except_clause', // for 'catch'
                 'raise_statement', // for 'throw'
                 'break_statement', // for 'break'
+                'case', // for 'cases in the switch case'
                 'continue_statement' // for 'continue'
             ].includes(currentNode.type)) {
                 complexity++;

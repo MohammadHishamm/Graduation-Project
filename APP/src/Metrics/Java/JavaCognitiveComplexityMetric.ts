@@ -18,7 +18,7 @@ export class JavaCognitiveComplexityMetric extends MetricCalculator {
             if (['if_statement', 'else_if_statement', 'else_statement', 'ternary_operator'].includes(currentNode.type)) {
                 complexity++; // Increment for 'if', 'else if', 'else', and ternary operator
             }
-
+        
             if (currentNode.type === 'switch_statement') {
                 complexity++; // Increment for 'switch'
             }
