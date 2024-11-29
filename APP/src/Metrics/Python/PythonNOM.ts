@@ -1,32 +1,36 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
 
-export class PythonNumberOfMethodsMetric extends MetricCalculator {
-    calculate(node: any, sourceCode: string): number {
-        let numberOfMethods = 0;
-
+export class PythonNumberofAttributesMetric extends MetricCalculator {
+    calculate(node: any): number {
+        let numberOfAttributes = 0;
+        let classTrigger = false;
+        
         const traverse = (currentNode: any) => {
-            // Check if the current node is a class definition
-            if (currentNode.type === 'class_definition') {
-                // Iterate over the children of the class
-                for (const child of currentNode.namedChildren) {
-                    // Check for method definitions (function definitions inside the class)
-                    if (child.type === 'function_definition') {
-                        numberOfMethods++;
-                    }
-                }
+            console.log(`${currentNode.type}`);
+            // Check if the current node represents a class declaration
+            if (currentNode.type === 'class_definition'  ) 
+            {
+                classTrigger = true;
             }
 
-            // Recursively traverse child nodes
-            if (currentNode.namedChildren) {
-                for (const child of currentNode.namedChildren) {
-                    traverse(child);
-                }
+            if(currentNode.type === 'function_definition' )
+            {
+                classTrigger = false;
+            }
+
+            if(currentNode.type === 'assignment' && classTrigger)
+            {
+                numberOfAttributes++;
+            }
+      
+            
+            // Recursively traverse the children nodes
+            if (currentNode.children) {
+                currentNode.children.forEach((child: any) => traverse(child));
             }
         };
 
-        // Start traversing from the root node
         traverse(node);
-
-        return numberOfMethods;
+        return numberOfAttributes;  // Return the total number of class-level attributes
     }
 }
