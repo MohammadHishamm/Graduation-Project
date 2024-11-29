@@ -7,6 +7,7 @@ const JavaCyclomaticComplexityMetric_1 = require("../Metrics/Java/JavaCyclomatic
 const PythonCyclomaticComplexityMetric_1 = require("../Metrics/Python/PythonCyclomaticComplexityMetric");
 const JavaCognitiveComplexityMetric_1 = require("../Metrics/Java/JavaCognitiveComplexityMetric");
 const PythonCognitivecomplexty_1 = require("../Metrics/Python/PythonCognitivecomplexty");
+const JavaNumberOfAttributes_1 = require("../Metrics/Java/JavaNumberOfAttributes");
 class MetricsFactory {
     static createMetric(metricName, language) {
         switch (metricName) {
@@ -30,6 +31,13 @@ class MetricsFactory {
                 }
                 else if (language === 'python') {
                     return new PythonCognitivecomplexty_1.PythonCognitiveComplexityMetric();
+                }
+            case 'NumberOfAttributes':
+                if (language === 'java') {
+                    return new JavaNumberOfAttributes_1.JavaNumberOfAttributesMetric();
+                }
+                else {
+                    throw new Error(`Unsupported language for Number of Attributes: ${language}`);
                 }
             default:
                 return null;

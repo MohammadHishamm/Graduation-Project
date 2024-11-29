@@ -5,6 +5,7 @@ import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCyclomaticCo
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCyclomaticComplexityMetric';
 import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCognitiveComplexityMetric';
 import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCognitivecomplexty';
+import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNumberOfAttributes';
 
 export class MetricsFactory {
     public static createMetric(metricName: string, language: string): MetricCalculator | null {
@@ -27,8 +28,14 @@ export class MetricsFactory {
                 } else if (language==='python'){
                         return new PythonCognitiveComplexityMetric();
                 }     
-            default:
-                return null;
+                case 'NumberOfAttributes':
+                    if (language === 'java') {
+                        return new JavaNumberOfAttributesMetric();
+                    } else {
+                        throw new Error(`Unsupported language for Number of Attributes: ${language}`);
+                    }
+                default:
+                    return null;
         }
     }
 }
