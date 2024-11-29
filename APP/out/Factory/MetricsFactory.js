@@ -19,21 +19,21 @@ class MetricsFactory {
             //     } else {
             //         throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
             //     }
-            case 'CognetiveComplexity':
+            case 'CC':
                 if (language === 'java') {
                     return new JavaCognitiveComplexityMetric_1.JavaCognitiveComplexityMetric();
                 }
                 else if (language === 'python') {
                     return new PythonCognitivecomplexty_1.PythonCognitiveComplexityMetric();
                 }
-            case 'NumberOfAttributes':
+            case 'NOA':
                 if (language === 'java') {
                     return new JavaNumberOfAttributes_1.JavaNumberOfAttributesMetric();
                 }
                 else {
                     throw new Error(`Unsupported language for Number of Attributes: ${language}`);
                 }
-            case 'NumberOfMethods':
+            case 'NOM':
                 if (language === 'java') {
                     return new JavaNumberOfMethods_1.JavaNumberOfMethodsMetric();
                 }
