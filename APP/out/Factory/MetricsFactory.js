@@ -4,10 +4,11 @@ exports.MetricsFactory = void 0;
 const JavaLOC_1 = require("../Metrics/Java/JavaLOC");
 const JavaCC_1 = require("../Metrics/Java/JavaCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
+// import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCoC';
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
-const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
+const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 class MetricsFactory {
     static createMetric(metricName, language) {
         switch (metricName) {
@@ -39,14 +40,13 @@ class MetricsFactory {
                     return new JavaNOA_1.JavaNumberOfAttributesMetric();
                 }
                 else {
-                    throw new Error(`Unsupported language for Number of Attributes: ${language}`);
+                    return new PythonNOA_1.PythonNumberofAttributesMetric();
                 }
             case 'NOM':
                 if (language === 'java') {
                     return new JavaNOM_1.JavaNumberOfMethodsMetric();
                 }
                 else {
-                    return new PythonNOM_1.PythonNumberOfMethodsMetric();
                 }
             default:
                 return null;

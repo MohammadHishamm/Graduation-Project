@@ -7,7 +7,7 @@ import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCoC';
 import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
 import {JavaNumberOfMethodsMetric} from '../Metrics/Java/JavaNOM';
 import {PythonLOCMetric} from '../Metrics/Python/PythonLOC';
-import { PythonNumberofAttributesMetric } from '../Metrics/Python/PythonNOM';
+import { PythonNumberofAttributesMetric } from '../Metrics/Python/PythonNOA';
 
 export class MetricsFactory {
     public static createMetric(metricName: string, language: string): MetricCalculator | null {
@@ -38,13 +38,13 @@ export class MetricsFactory {
                     if (language === 'java') {
                         return new JavaNumberOfAttributesMetric();
                     } else {
-                        throw new Error(`Unsupported language for Number of Attributes: ${language}`);
+                        return new PythonNumberofAttributesMetric();
                     }
                 case 'NOM':
                         if (language === 'java') {
                             return new JavaNumberOfMethodsMetric();
                         } else {
-                            return new PythonNumberofAttributesMetric();
+                            
                         }
                 default:
                 return null;    
