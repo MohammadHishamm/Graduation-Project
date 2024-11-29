@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JavaNumberOfAccessorMethods = void 0;
+exports.PythonNumberOfAccessorMethods = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-class JavaNumberOfAccessorMethods extends MetricCalculator_1.MetricCalculator {
+class PythonNumberOfAccessorMethods extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
         let accessorCounter = 0;
         let valid = false;
         const traverse = (currentNode) => {
             // Check if the current node is a class definition
-            if (currentNode.type === "class_declaration") {
+            if (currentNode.type === "class_definition") {
                 valid = true;
             }
             // Count getter and setter methods (functions with 'get' or 'set' prefix)
-            if (valid && currentNode.type === 'method_declaration') {
+            if (valid && currentNode.type === 'function_definition') {
                 if (currentNode.text.includes("get") || currentNode.text.includes("set")) {
                     accessorCounter++;
                 }
@@ -26,5 +26,5 @@ class JavaNumberOfAccessorMethods extends MetricCalculator_1.MetricCalculator {
         return accessorCounter;
     }
 }
-exports.JavaNumberOfAccessorMethods = JavaNumberOfAccessorMethods;
-//# sourceMappingURL=JavaNOAM.js.map
+exports.PythonNumberOfAccessorMethods = PythonNumberOfAccessorMethods;
+//# sourceMappingURL=PythonNOAM.js.map

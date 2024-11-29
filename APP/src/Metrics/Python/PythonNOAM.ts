@@ -1,23 +1,24 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
 
-export class JavaNumberOfAccessorMethods extends MetricCalculator {
+export class PythonNumberOfAccessorMethods extends MetricCalculator {
     calculate(node: any): number {
         let accessorCounter = 0;
         let valid = false;
 
         const traverse = (currentNode: any) => {
             // Check if the current node is a class definition
-            if (currentNode.type === "class_declaration") {
+            if (currentNode.type === "class_definition") {
                 valid = true;
             }
 
             // Count getter and setter methods (functions with 'get' or 'set' prefix)
-            if (valid && currentNode.type === 'method_declaration') 
-            { 
-                if (currentNode.text.includes("get") || currentNode.text.includes("set")) 
-                {   
-                    accessorCounter++;
-                }
+            if (valid && currentNode.type === 'function_definition') 
+            {
+                    if (currentNode.text.includes("get") || currentNode.text.includes("set")) 
+                    {
+                       
+                        accessorCounter++;
+                    }
             }
 
 

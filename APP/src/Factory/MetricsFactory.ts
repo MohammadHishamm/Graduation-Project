@@ -10,6 +10,9 @@ import { JavaNumberOfMethodsMetric } from '../Metrics/Java/JavaNOM';
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
 import { PythonLOCMetric } from '../Metrics/Python/PythonLOC';
 import { PythonNumberofAttributesMetric } from '../Metrics/Python/PythonNOA';
+import { PythonNumberOfAccessorMethods } from '../Metrics/Python/PythonNOAM';
+import { PythonNumberOfMethodsMetric } from '../Metrics/Python/PythonNOM';
+
 
 
 export class MetricsFactory {
@@ -54,6 +57,10 @@ export class MetricsFactory {
                 return new PythonCyclomaticComplexityMetric();
             case 'NOA':
                 return new PythonNumberofAttributesMetric();
+            case 'NOM':
+                return new PythonNumberOfMethodsMetric();
+            case 'NOAM':
+                return new PythonNumberOfAccessorMethods();
             default:
                 return null;
         }

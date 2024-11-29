@@ -3,29 +3,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PythonNumberOfMethodsMetric = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class PythonNumberOfMethodsMetric extends MetricCalculator_1.MetricCalculator {
-    calculate(node, sourceCode) {
-        let numberOfMethods = 0;
+    calculate(node) {
+        let NumberOfMethods = 0;
+        let classTrigger = false;
         const traverse = (currentNode) => {
-            // Check if the current node is a class definition
+            console.log(`${currentNode.type}`);
+            // Check if the current node represents a class declaration
             if (currentNode.type === 'class_definition') {
-                // Iterate over the children of the class
-                for (const child of currentNode.namedChildren) {
-                    // Check for method definitions (function definitions inside the class)
-                    if (child.type === 'function_definition') {
-                        numberOfMethods++;
-                    }
-                }
+                classTrigger = true;
             }
-            // Recursively traverse child nodes
-            if (currentNode.namedChildren) {
-                for (const child of currentNode.namedChildren) {
-                    traverse(child);
-                }
+            if (currentNode.type === 'function_definition' && classTrigger) {
+                NumberOfMethods++;
+            }
+            console.log(`${currentNode.type}`);
+            // Recursively traverse the children nodes
+            if (currentNode.children) {
+                currentNode.children.forEach((child) => traverse(child));
             }
         };
-        // Start traversing from the root node
         traverse(node);
-        return numberOfMethods;
+        return NumberOfMethods; // Return the total number of class-level attributes
     }
 }
 exports.PythonNumberOfMethodsMetric = PythonNumberOfMethodsMetric;

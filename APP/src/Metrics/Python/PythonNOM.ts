@@ -1,8 +1,8 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
 
-export class PythonNumberofAttributesMetric extends MetricCalculator {
+export class PythonNumberOfMethodsMetric extends MetricCalculator {
     calculate(node: any): number {
-        let numberOfAttributes = 0;
+        let NumberOfMethods= 0;
         let classTrigger = false;
         
         const traverse = (currentNode: any) => {
@@ -13,14 +13,9 @@ export class PythonNumberofAttributesMetric extends MetricCalculator {
                 classTrigger = true;
             }
 
-            if(currentNode.type === 'function_definition' )
+            if(currentNode.type === 'function_definition' && classTrigger)
             {
-                classTrigger = false;
-            }
-
-            if(currentNode.type === 'assignment' && classTrigger)
-            {
-                numberOfAttributes++;
+                NumberOfMethods++;
             }
       
             console.log(`${currentNode.type}`);
@@ -31,6 +26,6 @@ export class PythonNumberofAttributesMetric extends MetricCalculator {
         };
 
         traverse(node);
-        return numberOfAttributes;  // Return the total number of class-level attributes
+        return NumberOfMethods;  // Return the total number of class-level attributes
     }
 }

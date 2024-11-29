@@ -10,6 +10,8 @@ const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
+const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
+const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 class MetricsFactory {
     // Public static method to create a metric object based on the language and metric name
     static CreateMetric(metricName, language) {
@@ -50,6 +52,10 @@ class MetricsFactory {
                 return new PythonCC_1.PythonCyclomaticComplexityMetric();
             case 'NOA':
                 return new PythonNOA_1.PythonNumberofAttributesMetric();
+            case 'NOM':
+                return new PythonNOM_1.PythonNumberOfMethodsMetric();
+            case 'NOAM':
+                return new PythonNOAM_1.PythonNumberOfAccessorMethods();
             default:
                 return null;
         }
