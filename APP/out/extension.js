@@ -126,7 +126,7 @@ async function analyzeCode(document, sourceCode) {
         const rootNode = parser.parse(sourceCode);
         // Calculate metrics
         metricsToCalculate.forEach(metricName => {
-            const metricCalculator = MetricsFactory_1.MetricsFactory.createMetric(metricName);
+            const metricCalculator = MetricsFactory_1.MetricsFactory.createMetric(metricName, document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
                 outputChannel.appendLine(`${value}`);

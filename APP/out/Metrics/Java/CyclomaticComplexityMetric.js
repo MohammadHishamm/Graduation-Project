@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyclomaticComplexityMetric = void 0;
-const MetricCalculator_1 = require("../Core/MetricCalculator");
+const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class CyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
         let complexity = 1; // Base complexity starts at 1

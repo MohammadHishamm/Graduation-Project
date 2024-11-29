@@ -4,6 +4,7 @@ import { MetricsFactory } from './Factory/MetricsFactory';
 import { ProblemsChecker } from './Validator/ProblemsChecker';
 import { javaParser } from './Languages/javaParser';
 import { pythonParser } from './Languages/pythonParser';
+import { language } from 'tree-sitter-java';
 
 
 let isActive = true;
@@ -122,7 +123,7 @@ async function analyzeCode(document: vscode.TextDocument, sourceCode: string) {
 
         // Calculate metrics
         metricsToCalculate.forEach(metricName => {
-            const metricCalculator = MetricsFactory.createMetric(metricName);
+            const metricCalculator = MetricsFactory.createMetric(metricName,document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
                 outputChannel.appendLine(`${value}`);

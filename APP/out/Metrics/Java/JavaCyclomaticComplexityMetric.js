@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CyclomaticComplexityMetric = void 0;
-const MetricCalculator_1 = require("../Core/MetricCalculator");
-class CyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculator {
+exports.JavaCyclomaticComplexityMetric = void 0;
+const MetricCalculator_1 = require("../../Core/MetricCalculator");
+class JavaCyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
         let complexity = 1; // Base complexity starts at 1
         const traverse = (currentNode) => {
@@ -41,5 +41,5 @@ class CyclomaticComplexityMetric extends MetricCalculator_1.MetricCalculator {
         return complexity;
     }
 }
-exports.CyclomaticComplexityMetric = CyclomaticComplexityMetric;
-//# sourceMappingURL=CyclomaticComplexityMetric.js.map
+exports.JavaCyclomaticComplexityMetric = JavaCyclomaticComplexityMetric;
+//# sourceMappingURL=JavaCyclomaticComplexityMetric.js.map
