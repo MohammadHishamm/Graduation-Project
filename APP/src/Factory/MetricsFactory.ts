@@ -4,6 +4,7 @@ import { MethodCountMetric } from '../Metrics/MethodCountMetric';
 import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCyclomaticComplexityMetric';
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCyclomaticComplexityMetric';
 import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCognitiveComplexityMetric';
+import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCognitivecomplexty';
 
 export class MetricsFactory {
     public static createMetric(metricName: string, language: string): MetricCalculator | null {
@@ -21,7 +22,11 @@ export class MetricsFactory {
                     throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
                 }
             case 'CognetiveComplexity':
-                return new JavaCognitiveComplexityMetric();     
+                if(language==='java'){
+                return new JavaCognitiveComplexityMetric();
+                } else if (language==='python'){
+                        return new PythonCognitiveComplexityMetric();
+                }     
             default:
                 return null;
         }

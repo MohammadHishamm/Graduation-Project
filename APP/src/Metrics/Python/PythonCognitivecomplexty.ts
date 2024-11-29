@@ -1,6 +1,6 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
 
-export class PythonCyclomaticComplexityMetric extends MetricCalculator {
+export class PythonCognitiveComplexityMetric extends MetricCalculator {
     calculate(node: any): number {
         let complexity = 0; 
 

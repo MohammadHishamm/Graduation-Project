@@ -6,58 +6,35 @@ class PythonCognitiveComplexityMetric extends MetricCalculator_1.MetricCalculato
     calculate(node) {
         let complexity = 0;
         const traverse = (currentNode) => {
-            // Increment for flow-breaking statements
+            console.log(`${currentNode.type}`);
+            // Increment for control flow statements
             if ([
-                'if_statement', // 'if'
-                'elif_clause', // 'elif'
-                'else_clause', // 'else'
-                'conditional_expression', // Ternary operator
+                'if_statement', // for 'if'
+                'elif_clause', // else if
+                'else_clause', // else 
+                'for_statement', // for 'for'
+                'while_statement', // for 'while'
+                'with_statement', // for 'with'
+                'except_clause', // for 'catch'
+                'match ', // for 'switchcase'
+                'raise_statement', // for 'throw'
+                'break_statement', // for 'break'
+                'continue_statement' // for 'continue'        
             ].includes(currentNode.type)) {
-                complexity++; // Increment for flow-breaking statements
-            }
-            if (currentNode.type === 'for_statement') {
-                complexity++; // Increment for loops
-            }
-            if (currentNode.type === 'while_statement') {
-                complexity++; // Increment for while loops
-            }
-            if (currentNode.type === 'try_clause' || currentNode.type === 'except_clause' || currentNode.type === 'finally_clause') {
-                complexity++; // Increment for try-except-finally blocks
-            }
-            // Increment for logical operators like `and` and `or` (binary logical expressions)
-            if (currentNode.type === 'logical_and_expression' || currentNode.type === 'logical_or_expression') {
                 complexity++;
             }
-            // Check for recursion in function calls (function calls that refer to themselves)
-            if (currentNode.type === 'call' && this.isRecursion(currentNode)) {
-                complexity++; // Increment for recursive function calls
-            }
-            // Check for function definitions and increment for each method
             if (currentNode.type === 'function_definition') {
-                complexity++; // Increment for each function definition (recursion cycles too)
+                complexity++;
             }
-            // Traverse child nodes
+            // Recursively traverse child nodes
             if (currentNode.children) {
                 for (const child of currentNode.children) {
-                    traverse(child); // Recursively traverse child nodes
+                    traverse(child);
                 }
             }
         };
         traverse(node);
         return complexity;
-    }
-    // Helper function to detect recursion in function calls
-    isRecursion(node) {
-        // Check if the function call is referring to the current function
-        // You can improve this by matching the function's name with the called function's name
-        if (node.children) {
-            // Assuming the first child is the function name, this can vary based on your AST structure
-            const functionName = node.children.find((child) => child.type === 'identifier');
-            if (functionName && functionName.text === 'factorial') { // Replace 'factorial' with actual function name
-                return true;
-            }
-        }
-        return false;
     }
 }
 exports.PythonCognitiveComplexityMetric = PythonCognitiveComplexityMetric;
