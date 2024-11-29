@@ -12,20 +12,20 @@ export class MetricsFactory {
         switch (metricName) {
             case 'LOC':
                 return new LOCMetric();
-            // case 'CyclomaticComplexity':
-            //     if (language === 'java') {
-            //         return new JavaCyclomaticComplexityMetric();
-            //     } else if (language === 'python') {
-            //         return new PythonCyclomaticComplexityMetric();
-            //     } else {
-            //         throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
-            //     }
             case 'CC':
-                if(language==='java'){
-                return new JavaCognitiveComplexityMetric();
-                } else if (language==='python'){
-                        return new PythonCognitiveComplexityMetric();
-                }     
+                if (language === 'java') {
+                    return new JavaCyclomaticComplexityMetric();
+                } else if (language === 'python') {
+                    return new PythonCyclomaticComplexityMetric();
+                } else {
+                    throw new Error(`Unsupported language for Cyclomatic Complexity: ${language}`);
+                }
+            // case 'CognitiveComplexity':
+            //     if(language==='java'){
+            //     return new JavaCognitiveComplexityMetric();
+            //     } else if (language==='python'){
+            //             return new PythonCognitiveComplexityMetric();
+            //     }     
                 case 'NOA':
                     if (language === 'java') {
                         return new JavaNumberOfAttributesMetric();
