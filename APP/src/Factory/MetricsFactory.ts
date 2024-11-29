@@ -1,11 +1,11 @@
 import { MetricCalculator } from '../Core/MetricCalculator';
-import { JavaLOCMetric } from '../Metrics/Java/JavaLOCMetric';
-import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCyclomaticComplexityMetric';
-import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCyclomaticComplexityMetric';
-import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCognitiveComplexityMetric';
-import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCognitivecomplexty';
-import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNumberOfAttributes';
-import {JavaNumberOfMethodsMetric} from '../Metrics/Java/JavaNumberOfMethods';
+import { JavaLOCMetric } from '../Metrics/Java/JavaLOC';
+import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCC';
+import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
+import {JavaCognitiveComplexityMetric} from '../Metrics/Java/JavaCoC';
+import {PythonCognitiveComplexityMetric} from '../Metrics/Python/PythonCoc';
+import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
+import {JavaNumberOfMethodsMetric} from '../Metrics/Java/JavaNOM';
 
 export class MetricsFactory {
     public static createMetric(metricName: string, language: string): MetricCalculator | null {
@@ -16,7 +16,7 @@ export class MetricsFactory {
                 return new JavaLOCMetric();
                 } else if (language==='python')
                 {
-                    
+
                 }
             case 'CC':
                 if (language === 'java') {
