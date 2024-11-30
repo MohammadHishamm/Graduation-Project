@@ -6,6 +6,11 @@ import { JavaNumberOfAccessorMethods } from '../Metrics/Java/JavaNOAM';
 import { JavaCognitiveComplexityMetric } from '../Metrics/Java/JavaCoC';
 import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
 import { JavaNumberOfMethodsMetric } from '../Metrics/Java/JavaNOM';
+import { JavaNumberOfPublicAttributesM } from '../Metrics/Java/JavaNOPA';
+import { JavaNumberOfAbstractClassesM } from '../Metrics/Java/JavaNAbsm';
+import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
+
+
 
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
 import { PythonLOCMetric } from '../Metrics/Python/PythonLOC';
@@ -41,6 +46,12 @@ export class MetricsFactory {
                 return new JavaNumberOfMethodsMetric();
             case 'NOAM':
                 return new JavaNumberOfAccessorMethods();
+            case 'NOPA':
+                return new JavaNumberOfPublicAttributesM();   
+            case 'NAbsm':
+                return new JavaNumberOfAbstractClassesM();       
+            case 'NProtM':
+                return new JavaNumberOfProtectedMethodsMetric();    
             case 'CognitiveComplexity':
                 return new JavaCognitiveComplexityMetric();
             default:
