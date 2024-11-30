@@ -41,9 +41,8 @@
         "command": "extension.openDashboard",
         "title": "CodePure: Open Dashboard"
       }
-    ] ,     
-    "keybindings": 
-    [
+    ],
+    "keybindings": [
       {
         "command": "extension.activateCommand",
         "key": "ctrl+shift+a",
@@ -61,8 +60,7 @@
         "key": "ctrl+shift+v",
         "mac": "cmd+shift+v",
         "when": "editorTextFocus"
-      }
-      ,
+      },
       {
         "command": "extension.analyzeSelectedCode",
         "key": "ctrl+n",
@@ -75,7 +73,7 @@
         {
           "command": "extension.analyzeSelectedCode",
           "when": "editorHasSelection",
-          "group": "navigation"  
+          "group": "navigation"
         }
       ]
     }

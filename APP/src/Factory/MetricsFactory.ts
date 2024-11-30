@@ -9,6 +9,8 @@ import { JavaNumberOfMethodsMetric } from '../Metrics/Java/JavaNOM';
 import { JavaNumberOfPublicAttributesM } from '../Metrics/Java/JavaNOPA';
 import { JavaNumberOfAbstractClassesM } from '../Metrics/Java/JavaNAbsm';
 import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
+import { JavaFanOutMetric } from '../Metrics/Java/JavaFANOUT';
+
 
 
 
@@ -54,6 +56,8 @@ export class MetricsFactory {
                 return new JavaNumberOfProtectedMethodsMetric();    
             case 'CognitiveComplexity':
                 return new JavaCognitiveComplexityMetric();
+            case 'FANOUT':    
+                return new JavaFanOutMetric();
             default:
                 return null;
         }
