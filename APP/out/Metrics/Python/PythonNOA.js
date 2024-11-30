@@ -18,7 +18,6 @@ class PythonNumberofAttributesMetric extends MetricCalculator_1.MetricCalculator
             if (currentNode.type === 'assignment' && classTrigger) {
                 numberOfAttributes++;
             }
-            console.log(`${currentNode.type}`);
             // Recursively traverse the children nodes
             if (currentNode.children) {
                 currentNode.children.forEach((child) => traverse(child));

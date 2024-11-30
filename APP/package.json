@@ -30,6 +30,10 @@
         "title": "CodePure: Activate"
       },
       {
+        "command": "extension.analyzeSelectedCode",
+        "title": "CodePure: Analyze Selected Code"
+      },
+      {
         "command": "extension.deactivateCommand",
         "title": "CodePure: Deactivate"
       },
@@ -58,7 +62,16 @@
         "mac": "cmd+shift+v",
         "when": "editorTextFocus"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "extension.analyzeSelectedCode",
+          "when": "editorHasSelection",
+          "group": "navigation"  
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

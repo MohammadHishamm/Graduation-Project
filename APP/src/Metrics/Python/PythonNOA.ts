@@ -23,7 +23,7 @@ export class PythonNumberofAttributesMetric extends MetricCalculator {
                 numberOfAttributes++;
             }
       
-            console.log(`${currentNode.type}`);
+      
             // Recursively traverse the children nodes
             if (currentNode.children) {
                 currentNode.children.forEach((child: any) => traverse(child));

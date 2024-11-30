@@ -24,7 +24,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
-exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const MetricsFactory_1 = require("./Factory/MetricsFactory");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
@@ -74,6 +73,23 @@ function activate(context) {
             }
         });
     });
+    // Register the command for analyzing selected code
+    const analyzeSelectedCodeCommand = vscode.commands.registerCommand('extension.analyzeSelectedCode', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showInformationMessage('No active editor found!');
+            return;
+        }
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+        if (!selectedText) {
+            vscode.window.showInformationMessage('No text selected!');
+            return;
+        }
+        // Analyze the selected code
+        analyzeCode(editor.document, selectedText);
+    });
+    // Trigger analysis on document save
     vscode.workspace.onDidSaveTextDocument((document) => {
         const problemschecker = new ProblemsChecker_1.ProblemsChecker(document);
         if (!problemschecker.checkForErrors()) {
@@ -83,8 +99,25 @@ function activate(context) {
             }
         }
     });
-    context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, openDashboardCommand);
+    // Add context menu item for "Analyze Selected Code"
+    const analyzeSelectedCodeContextMenuCommand = vscode.commands.registerCommand('extension.analyzeSelectedCode', async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showInformationMessage('No active editor found!');
+            return;
+        }
+        const selection = editor.selection;
+        const selectedText = editor.document.getText(selection);
+        if (!selectedText) {
+            vscode.window.showInformationMessage('No text selected!');
+            return;
+        }
+        // Analyze the selected code
+        analyzeCode(editor.document, selectedText);
+    });
+    context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, openDashboardCommand, analyzeSelectedCodeCommand, analyzeSelectedCodeContextMenuCommand);
 }
+// Function to check if the file type is supported
 function isSupportedFileType(document) {
     const fileType = document.languageId;
     const supportedFileTypes = ['java', 'python'];
@@ -96,27 +129,15 @@ function isSupportedFileType(document) {
         return false;
     }
 }
+// Function to analyze code
 async function analyzeCode(document, sourceCode) {
-    vscode.window.showInformationMessage('Analyzing Java code...');
-    outputChannel.appendLine("Analyzing Java code...");
+    vscode.window.showInformationMessage('Analyzing code...');
+    outputChannel.appendLine("Analyzing code...");
     outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
     try {
-        // const metrics = [
-        //     { name: 'LOC', value: 200, threshold: 150 },
-        //     { name: 'NOM', value: 12, threshold: 10 }
-        // ];
-        // const smells = [
-        //     { name: 'God Class', count: 5 },
-        //     { name: 'Feature Envy', count: 3 },
-        //     { name: 'Long Method', count: 7 }
-        // ];
-        // // Send this data to the dashboard (webview) if it's open
-        // vscode.commands.executeCommand('extension.openDashboard'); // Opens the dashboard
-        // will be by the user need
         const metricsToCalculate = ['LOC', 'CC', 'NOA', 'NOM', 'NOAM'];
-        // Initialize components
         let parser;
-        if (document.languageId === "java") {
+        if (document.languageId === 'java') {
             parser = new javaParser_1.javaParser();
         }
         else {
@@ -149,7 +170,6 @@ function getDashboardHtml() {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>CodePure Dashboard</title>
             <style>
-                /* General Styles */
                 body {
                     font-family: 'Arial', sans-serif;
                     margin: 0;
@@ -179,8 +199,6 @@ function getDashboardHtml() {
                     margin-bottom: 20px;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
-
-                /* Table Styles */
                 table {
                     width: 100%;
                     border-collapse: collapse;
@@ -195,14 +213,10 @@ function getDashboardHtml() {
                     background-color: #f4f4f4;
                     font-weight: bold;
                 }
-
-                /* Chart Container */
                 .chart-container {
                     position: relative;
                     height: 300px;
                 }
-
-                /* Feedback Section */
                 .feedback {
                     display: flex;
                     flex-direction: column;
@@ -233,7 +247,6 @@ function getDashboardHtml() {
         <body>
             <header>CodePure Dashboard</header>
             <div class="container">
-                <!-- Metrics Section -->
                 <div class="section">
                     <h2>Metrics Summary</h2>
                     <table>
@@ -244,97 +257,33 @@ function getDashboardHtml() {
                                 <th>Threshold</th>
                             </tr>
                         </thead>
-                        <tbody id="metricsTable">
-                            <!-- Metrics rows will be dynamically added here -->
-                        </tbody>
+                        <tbody id="metricsTable"></tbody>
                     </table>
                 </div>
-
-                <!-- Code Smells Chart -->
                 <div class="section">
                     <h2>Code Smells Distribution</h2>
                     <div class="chart-container">
                         <canvas id="smellsChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Feedback Section -->
                 <div class="section">
                     <h2>Feedback</h2>
                     <div class="feedback">
-                        <textarea id="feedbackInput" rows="4" placeholder="Enter your feedback here..."></textarea>
-                        <button onclick="sendFeedback()">Submit Feedback</button>
+                        <textarea id="feedbackInput" rows="4" placeholder="Provide your feedback"></textarea>
+                        <button id="submitFeedback">Submit Feedback</button>
                     </div>
                 </div>
             </div>
-
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
-                // Example Data
-                const exampleMetrics = [
-                    { name: 'Lines of Code (LOC)', value: 200, threshold: 150 },
-                    { name: 'Number of Methods (NOM)', value: 12, threshold: 10 }
-                ];
-                const exampleSmells = [
-                    { name: 'God Class', count: 5 },
-                    { name: 'Feature Envy', count: 3 },
-                    { name: 'Long Method', count: 7 }
-                ];
-
-                // Populate Metrics Table
-                const metricsTable = document.getElementById('metricsTable');
-                exampleMetrics.forEach(metric => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = \`
-                        <td>\${metric.name}</td>
-                        <td>\${metric.value}</td>
-                        <td>\${metric.threshold}</td>
-                    \`;
-                    metricsTable.appendChild(row);
+                const vscode = acquireVsCodeApi();
+                const feedbackButton = document.getElementById('submitFeedback');
+                feedbackButton.addEventListener('click', () => {
+                    const feedbackText = document.getElementById('feedbackInput').value;
+                    vscode.postMessage({ type: 'feedback', feedback: feedbackText });
                 });
-
-                // Render Code Smells Chart
-                const ctx = document.getElementById('smellsChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: exampleSmells.map(smell => smell.name),
-                        datasets: [{
-                            label: 'Detected Smells',
-                            data: exampleSmells.map(smell => smell.count),
-                            backgroundColor: ['#007acc', '#ff6f61', '#4caf50'],
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                        },
-                    },
-                });
-
-                // Send Feedback Function
-                function sendFeedback() {
-                    const feedback = document.getElementById('feedbackInput').value;
-                    if (feedback) {
-                        alert(\`Feedback submitted: \${feedback}\`);
-                        document.getElementById('feedbackInput').value = '';
-                    } else {
-                        alert('Please enter feedback before submitting.');
-                    }
-                }
             </script>
         </body>
         </html>
     `;
-}
-function deactivate() {
-    // Cleanup logic for the extension
-    if (outputChannel) {
-        outputChannel.dispose();
-    }
-    if (statusBarItem) {
-        statusBarItem.dispose();
-    }
 }
 //# sourceMappingURL=extension.js.map
