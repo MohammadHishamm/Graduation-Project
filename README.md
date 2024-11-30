@@ -1,6 +1,5 @@
 # Graduation-Project
-Graduation project 24/25 | Software Engineer | AI driven workspace for software developers | IDE's extention
-
+Graduation project 24/25 | Software Engineer | AI driven workspace for software developers | IDE's extension
 
 # Class Metrics
 
@@ -29,6 +28,8 @@ Graduation project 24/25 | Software Engineer | AI driven workspace for software 
 | **BUR (Base Unique Ratio)** | Ratio of unique methods in the class compared to the base class.      |         |
 | **NProtM (Number of Protected Members)** | Protected fields or methods in the class.                        | Finished|
 | **NAbsm (Number of Abstract Methods)** | Abstract methods within the class.                               | Finished|
-| **CC (Cyclomatic Complexity)** | Measures decision-making complexity in the class.                    |         |
+| **CC (Cyclomatic Complexity)** | Measures decision-making complexity in the class.                    | Finished|
 | **AFTD (Access to Foreign Data)** | Accesses to fields from other classes.                             |         |
 | **DAC (Data Abstraction Coupling)** | Dependencies on external data structures or classes.              |         |
+| **Total Metrics** | Total number of metrics.                                                   | 26      |
+| **Finished Metrics** | Number of metrics completed.                                              | 9      |
