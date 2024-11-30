@@ -37,6 +37,27 @@
         "command": "extension.openDashboard",
         "title": "CodePure: Open Dashboard"
       }
+    ] ,     
+    "keybindings": 
+    [
+      {
+        "command": "extension.activateCommand",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.deactivateCommand",
+        "key": "ctrl+shift+d",
+        "mac": "cmd+shift+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "extension.openDashboard",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorTextFocus"
+      }
     ]
   },
   "scripts": {
