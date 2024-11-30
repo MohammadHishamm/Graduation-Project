@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
-import { ASTParser } from './Core/ASTParser';
 import { MetricsFactory } from './Factory/MetricsFactory';
 import { ProblemsChecker } from './Validator/ProblemsChecker';
 import { javaParser } from './Languages/javaParser';
 import { pythonParser } from './Languages/pythonParser';
-import { language } from 'tree-sitter-java';
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
@@ -37,6 +35,42 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+                // Register the command for analyzing selected code
+        const analyzeSelectedCodeCommand = vscode.commands.registerCommand('extension.analyzeSelectedCode', async () => 
+        {
+            
+            const editor = vscode.window.activeTextEditor;
+            
+            if (!editor) {
+                vscode.window.showInformationMessage('No active editor found!');
+                return;
+            }
+
+            const selection = editor.selection;
+            const selectedText = editor.document.getText(selection);
+
+            if (!selectedText) {
+                vscode.window.showInformationMessage('No text selected!');
+                return;
+            }
+
+            const problemschecker = new ProblemsChecker(editor.document);
+            if (!problemschecker.checkForErrors()) {
+                if (isActive && isSupportedFileType(editor.document)) 
+                {
+                    // Call the analyzeCode function (stub in this example)
+                    const analysisResult = await analyzeCode(editor.document, selectedText);
+
+                    // Highlight the selected code
+                    highlightCode(editor, selection);
+
+                    // Show a hover message on the highlighted text
+                    registerHoverProvider(context, editor.document.uri, selection, analysisResult);
+                }
+                }
+
+        });
+
     // Command to open the dashboard
     const openDashboardCommand = vscode.commands.registerCommand('extension.openDashboard', () => {
         const panel = vscode.window.createWebviewPanel(
@@ -57,56 +91,18 @@ export function activate(context: vscode.ExtensionContext) {
         });
     });
 
-    // Register the command for analyzing selected code
-    const analyzeSelectedCodeCommand = vscode.commands.registerCommand('extension.analyzeSelectedCode', async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showInformationMessage('No active editor found!');
-            return;
-        }
-
-        const selection = editor.selection;
-        const selectedText = editor.document.getText(selection);
-
-        if (!selectedText) {
-            vscode.window.showInformationMessage('No text selected!');
-            return;
-        }
-
-        // Analyze the selected code
-        analyzeCode(editor.document, selectedText);
-    });
 
     // Trigger analysis on document save
-    vscode.workspace.onDidSaveTextDocument((document) => {
+    vscode.workspace.onDidSaveTextDocument(async (document) => {
         const problemschecker = new ProblemsChecker(document);
         if (!problemschecker.checkForErrors()) {
             if (isActive && isSupportedFileType(document)) {
                 const code = document.getText();
-                analyzeCode(document, code);
+                await analyzeCode(document, code);
             }
         }
     });
 
-    // Add context menu item for "Analyze Selected Code"
-    const analyzeSelectedCodeContextMenuCommand = vscode.commands.registerCommand('extension.analyzeSelectedCode', async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showInformationMessage('No active editor found!');
-            return;
-        }
-
-        const selection = editor.selection;
-        const selectedText = editor.document.getText(selection);
-
-        if (!selectedText) {
-            vscode.window.showInformationMessage('No text selected!');
-            return;
-        }
-
-        // Analyze the selected code
-        analyzeCode(editor.document, selectedText);
-    });
 
     context.subscriptions.push(
         activateCommand, 
@@ -115,11 +111,24 @@ export function activate(context: vscode.ExtensionContext) {
         statusBarItem, 
         openDashboardCommand, 
         analyzeSelectedCodeCommand,
-        analyzeSelectedCodeContextMenuCommand
     );
 }
 
-// Function to check if the file type is supported
+
+function highlightCode(editor: vscode.TextEditor, selection: vscode.Selection) 
+{
+    const decorationType = vscode.window.createTextEditorDecorationType
+    ({
+        backgroundColor: 'rgba(255, 215, 0, 0.3)',
+    });
+    editor.setDecorations(decorationType, [selection]);
+
+    setTimeout(() => {
+        decorationType.dispose();
+    }, 8000); 
+}
+
+
 function isSupportedFileType(document: vscode.TextDocument): boolean {
     const fileType = document.languageId;
     const supportedFileTypes = ['java', 'python'];
@@ -132,12 +141,43 @@ function isSupportedFileType(document: vscode.TextDocument): boolean {
     }
 }
 
-// Function to analyze code
-async function analyzeCode(document: vscode.TextDocument, sourceCode: string) {
+
+
+function registerHoverProvider(
+    context: vscode.ExtensionContext,
+    documentUri: vscode.Uri,
+    selection: vscode.Selection,
+    message: string
+) {
+    const hoverProvider = vscode.languages.registerHoverProvider(
+        { scheme: 'file', pattern: documentUri.fsPath },
+        {
+            provideHover(document, position) {
+                if (selection.contains(position)) {
+                    return new vscode.Hover(message);
+                }
+                return undefined;
+            },
+        }
+    );
+
+   
+    context.subscriptions.push(hoverProvider);
+
+   
+    setTimeout(() => {
+        hoverProvider.dispose();
+    }, 8000); 
+}
+async function analyzeCode(
+    document: vscode.TextDocument,
+    sourceCode: string
+): Promise<string> {
     vscode.window.showInformationMessage('Analyzing code...');
     outputChannel.appendLine("Analyzing code...");
     outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
 
+    const analysisResults: string[] = [];
     try {
         const metricsToCalculate = ['LOC', 'CC', 'NOA', 'NOM', 'NOAM'];
         let parser;
@@ -155,15 +195,23 @@ async function analyzeCode(document: vscode.TextDocument, sourceCode: string) {
             const metricCalculator = MetricsFactory.CreateMetric(metricName, document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
+                analysisResults.push(`${metricName}: ${value}`);
                 outputChannel.appendLine(`${metricName}: ${value}`);
             }
         });
+
         outputChannel.show();
+
+        // Combine the results into a string
+        return `Analysis Results:\n${analysisResults.join('\n')}`;
     } catch (error) {
-        outputChannel.appendLine("Error during analysis:");
-        outputChannel.appendLine(`${error}`);
+        const errorMessage = `Error during analysis:\n${error}`;
+        outputChannel.appendLine(errorMessage);
+        return errorMessage;
     }
 }
+
+
 
 // Create HTML content for the dashboard
 function getDashboardHtml(): string {

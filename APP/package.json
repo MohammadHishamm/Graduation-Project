@@ -62,6 +62,13 @@
         "mac": "cmd+shift+v",
         "when": "editorTextFocus"
       }
+      ,
+      {
+        "command": "extension.analyzeSelectedCode",
+        "key": "ctrl+n",
+        "mac": "cmd+n",
+        "when": "editorTextFocus"
+      }
     ],
     "menus": {
       "editor/context": [
