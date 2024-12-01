@@ -10,7 +10,7 @@ import { JavaNumberOfPublicAttributesM } from '../Metrics/Java/JavaNOPA';
 import { JavaNumberOfAbstractClassesM } from '../Metrics/Java/JavaNAbsm';
 import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
 import { JavaFanOutMetric } from '../Metrics/Java/JavaFANOUT';
-
+import {JavaWeightOfClassMetric} from '../Metrics/Java/JavaWOC';
 
 
 
@@ -58,6 +58,8 @@ export class MetricsFactory {
                 return new JavaCognitiveComplexityMetric();
             case 'FANOUT':    
                 return new JavaFanOutMetric();
+            case 'WOC':    
+                return new JavaWeightOfClassMetric();        
             default:
                 return null;
         }

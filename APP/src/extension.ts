@@ -179,7 +179,7 @@ async function analyzeCode(
 
     const analysisResults: string[] = [];
     try {
-        const metricsToCalculate = ['LOC', 'CC', 'NOA', 'NOM', 'NOAM' , 'NOPA' , 'NAbsm' , 'NProtM','FANOUT'];
+        const metricsToCalculate = ['LOC', 'CC', 'NOA', 'NOM', 'NOAM' , 'NOPA' , 'NAbsm' , 'NProtM','FANOUT','WOC'];
         let parser;
         if (document.languageId === 'java') {
             parser = new javaParser();
