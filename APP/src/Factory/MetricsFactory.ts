@@ -2,7 +2,7 @@ import { MetricCalculator } from '../Core/MetricCalculator';
 
 import { JavaWeightedMethodCount } from '../Metrics/Java/JavaWMC';
 import { JavaCognitiveComplexityMetric } from '../Metrics/Java/JavaCoC';
-import { JavaLOCMetric } from '../Metrics/Java/JavaLOC';
+import { JavaLOCMetric } from '../Metrics/Java/JavaLOCC';
 import { JavaNumberOfAbstractClassesM } from '../Metrics/Java/JavaNAbsm';
 import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
 import { JavaNumberOfAccessorMethods } from '../Metrics/Java/JavaNOAM';

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
 const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
 const JavaCoC_1 = require("../Metrics/Java/JavaCoC");
-const JavaLOC_1 = require("../Metrics/Java/JavaLOC");
+const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
@@ -35,7 +35,7 @@ class MetricsFactory {
     static createJavaMetric(metricName) {
         switch (metricName) {
             case 'LOC':
-                return new JavaLOC_1.JavaLOCMetric();
+                return new JavaLOCC_1.JavaLOCMetric();
             case 'WMC':
                 return new JavaWMC_1.JavaWeightedMethodCount();
             case `WOC`:
