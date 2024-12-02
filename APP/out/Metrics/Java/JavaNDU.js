@@ -1,43 +1,11 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NDUCalculation = void 0;
-const tree_sitter_1 = __importDefault(require("tree-sitter"));
-const tree_sitter_java_1 = __importStar(require("tree-sitter-java"));
-class NDUCalculation {
-    parser;
-    constructor() {
-        this.parser = new tree_sitter_1.default();
-        this.parser.setLanguage(tree_sitter_java_1.default); // Initialize Tree-sitter for Java
-    }
-    // Parses the given code and returns a syntax tree
-    parseCode(code) {
-        return this.parser.parse(code);
+const tree_sitter_java_1 = require("tree-sitter-java");
+const MetricCalculator_1 = require("../../Core/MetricCalculator");
+class NDUCalculation extends MetricCalculator_1.MetricCalculator {
+    calculate(node) {
+        return this.extractComponents(node.tree);
     }
     // Extract components and calculate NDU
     extractComponents(tree) {
@@ -47,12 +15,7 @@ class NDUCalculation {
         const methods = this.extractMethods(rootNode, classes, outerClass);
         const fields = this.extractFields(rootNode, outerClass);
         const ndu = this.calculateNDU(methods, fields);
-        return {
-            classes,
-            methods,
-            fields,
-            weight: ndu,
-        };
+        return ndu;
     }
     // Extract only outer class information
     extractClasses(rootNode) {

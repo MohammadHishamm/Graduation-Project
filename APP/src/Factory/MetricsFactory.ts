@@ -11,6 +11,7 @@ import { JavaNumberOfPublicAttributesM } from '../Metrics/Java/JavaNOPA';
 import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
 import { JavaWeightOfAClass } from '../Metrics/Java/JavaWOC';
 import { JavaAverageMethodWeight } from '../Metrics/Java/JavaAMW';
+import {NDUCalculation} from '../Metrics/Java/JavaNDU';
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 
 
@@ -60,6 +61,8 @@ export class MetricsFactory {
                 return new JavaNumberOfProtectedMethodsMetric();    
             case 'CognitiveComplexity':
                 return new JavaCognitiveComplexityMetric();
+            case 'NDU':
+                return new NDUCalculation();
             case 'FANOUT':    
             const javaCode = `
 
@@ -101,6 +104,7 @@ export class MetricsFactory {
             // console.log('Fields:', components.fields);
             // console.log('WOC:', components.weight);
             // console.log('Fields:', components.weight);
+            
             default:
                 return null;
         }

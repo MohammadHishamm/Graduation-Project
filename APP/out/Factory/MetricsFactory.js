@@ -12,6 +12,7 @@ const JavaNOPA_1 = require("../Metrics/Java/JavaNOPA");
 const JavaNProtM_1 = require("../Metrics/Java/JavaNProtM");
 const JavaWOC_1 = require("../Metrics/Java/JavaWOC");
 const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
+const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
@@ -55,6 +56,8 @@ class MetricsFactory {
                 return new JavaNProtM_1.JavaNumberOfProtectedMethodsMetric();
             case 'CognitiveComplexity':
                 return new JavaCoC_1.JavaCognitiveComplexityMetric();
+            case 'NDU':
+                return new JavaNDU_1.NDUCalculation();
             case 'FANOUT':
                 const javaCode = `
 

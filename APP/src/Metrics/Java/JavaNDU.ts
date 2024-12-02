@@ -1,23 +1,19 @@
 import Parser from 'tree-sitter';
 import Java, { name } from 'tree-sitter-java';
 import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../../Interface/ParsedComponentsNDU'; // Import the interface
+import { MetricCalculator } from '../../Core/MetricCalculator';
 
-export class NDUCalculation {
+export class NDUCalculation extends MetricCalculator {
 
-    private parser: Parser;
-
-    constructor() {
-        this.parser = new Parser();
-        this.parser.setLanguage(Java); // Initialize Tree-sitter for Java
+    
+    calculate(node: any): number 
+    {
+        return this.extractComponents(node.tree);
     }
-
-    // Parses the given code and returns a syntax tree
-    parseCode(code: string): Parser.Tree {
-        return this.parser.parse(code);
-    }
+    
 
     // Extract components and calculate NDU
-    extractComponents(tree: Parser.Tree): ParsedComponents {
+    extractComponents(tree: Parser.Tree): number {
         const rootNode = tree.rootNode;
 
         const classes = this.extractClasses(rootNode);
@@ -27,12 +23,8 @@ export class NDUCalculation {
 
         const ndu = this.calculateNDU(methods, fields);
 
-        return {
-            classes,
-            methods,
-            fields,
-            weight: ndu,
-        };
+        return ndu;
+        
     }
 
     // Extract only outer class information
