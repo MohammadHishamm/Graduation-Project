@@ -12,7 +12,7 @@ class JavaNumberOfMethodsMetric extends MetricCalculator_1.MetricCalculator {
                 const classBody = currentNode.children.find((child) => child.type === 'class_body');
                 if (classBody && classBody.children) {
                     for (const child of classBody.children) {
-                        if (child.type === 'method_declaration') {
+                        if (child.type === 'method_declaration' || child.type === 'constructor_declaration') {
                             methodCount++;
                         }
                     }

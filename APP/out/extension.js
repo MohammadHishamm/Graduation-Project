@@ -150,7 +150,7 @@ async function analyzeCode(document, sourceCode) {
     outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
     const analysisResults = [];
     try {
-        const metricsToCalculate = ['LOC', 'CC', 'NOA', 'NOM', 'NOAM', 'NOPA', 'NAbsm', 'NProtM', 'FANOUT', 'WOC'];
+        const metricsToCalculate = ['LOC', `AMW`, 'WMC', `WOC`, 'NOA', 'NOM', 'NOAM', 'NOPA', 'NAbsm', 'NProtM', 'FANOUT'];
         let parser;
         if (document.languageId === 'java') {
             parser = new javaParser_1.javaParser();

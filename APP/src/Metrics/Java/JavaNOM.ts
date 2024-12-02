@@ -3,8 +3,7 @@ import { MetricCalculator } from '../../Core/MetricCalculator';
 export class JavaNumberOfMethodsMetric extends MetricCalculator {
     calculate(node: any): number {
         let methodCount = 0;
-
-        
+ 
             const traverse = (currentNode: any) => {
                 // Check if the current node represents a class declaration
                 if (currentNode.type === 'class_declaration') {
@@ -12,7 +11,8 @@ export class JavaNumberOfMethodsMetric extends MetricCalculator {
                     const classBody = currentNode.children.find((child: any) => child.type === 'class_body');
                     if (classBody && classBody.children) {
                         for (const child of classBody.children) {
-                            if (child.type === 'method_declaration') {
+                            if (child.type === 'method_declaration' || child.type === 'constructor_declaration' ) 
+                            {
                                 methodCount++;
                             }
                         }

@@ -1,19 +1,12 @@
 import Parser from 'tree-sitter';
+import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../Interface/ParsedComponents'; // Import the interfac
 
-import { MetricCalculator } from '../../Core/MetricCalculator';
-import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../../Interface/ParsedComponents'; // Import the interfac
-
-
-export class JavaWeightOfAClass extends MetricCalculator
+//TODO 
+// for the future
+export class ExtractComponentsFromCode 
 {
-
-    calculate(node: any): number 
-    {
-        return this.extractComponents(node.tree);
-    }
-
     // Extract components and classify methods
-    extractComponents(tree: Parser.Tree): number {
+    extractComponents(tree: Parser.Tree): ParsedComponents {
         const rootNode = tree.rootNode;
 
         const classes = this.extractClasses(rootNode);
@@ -23,10 +16,15 @@ export class JavaWeightOfAClass extends MetricCalculator
         const filteredFields = this.filterPublicNonEncapsulatedFields(fields, methods);
         const weight = this.calculateWeight(methods, filteredFields);
 
-        return weight;
+        return {
+            classes,
+            methods,
+            fields,
+            weight,
+        };
     }
 
-    private extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] {
+    public extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] {
         const classNodes = rootNode.descendantsOfType('class_declaration');
         return classNodes.map((node) => ({
             name: node.childForFieldName('name')?.text ?? 'Unknown',
@@ -34,7 +32,7 @@ export class JavaWeightOfAClass extends MetricCalculator
             endPosition: node.endPosition,
         }));
     }
-    private extractMethods(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): MethodInfo[] {
+    public extractMethods(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): MethodInfo[] {
         const methodNodes = rootNode.descendantsOfType('method_declaration');
         return methodNodes.map((node) => {
             // Dynamically find modifiers as a child node
@@ -46,7 +44,7 @@ export class JavaWeightOfAClass extends MetricCalculator
             const parentClass = this.findParentClass(node, classes);
 
             const isConstructor = parentClass ? parentClass.name === name : false;
-            const isAccessor = this.isAccessor(name, params);
+            const isAccessor = this.isAccessor(name);
 
             return {
                 name,
@@ -59,7 +57,7 @@ export class JavaWeightOfAClass extends MetricCalculator
         });
     }
 
-    private extractFields(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): FieldInfo[] {
+    public extractFields(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): FieldInfo[] {
         // Find all the field declaration nodes in the syntax tree
         const fieldNodes = rootNode.descendantsOfType('field_declaration');
 
@@ -92,14 +90,14 @@ export class JavaWeightOfAClass extends MetricCalculator
     }
 
 
-    private filterPublicNonEncapsulatedFields(fields: FieldInfo[], methods: MethodInfo[]): FieldInfo[] {
+    public filterPublicNonEncapsulatedFields(fields: FieldInfo[], methods: MethodInfo[]): FieldInfo[] {
         return fields.filter(field => field.modifiers.includes('public') && !this.hasGetterSetter(field.name, methods));
     }
 
 
 
     // Check if the field has getter or setter methods
-    private hasGetterSetter(fieldName: string, methods: MethodInfo[]): boolean {
+    public hasGetterSetter(fieldName: string, methods: MethodInfo[]): boolean {
         const getterPattern = new RegExp(`get${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}\\(`);
         const setterPattern = new RegExp(`set${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}\\(`);
 
@@ -108,7 +106,7 @@ export class JavaWeightOfAClass extends MetricCalculator
 
 
     // Calculate the weight of the class
-    private calculateWeight(methods: MethodInfo[], fields: FieldInfo[]): number {
+    public calculateWeight(methods: MethodInfo[], fields: FieldInfo[]): number {
         let nom = 0; // Numerator: public methods (non-constructor and non-accessor) + public attributes
         let den = 0; // Denominator: public methods that are not accessors
 
@@ -141,7 +139,7 @@ export class JavaWeightOfAClass extends MetricCalculator
     }
 
 
-    private findParentClass(node: Parser.SyntaxNode, classes: ClassInfo[]): ClassInfo | null {
+    public findParentClass(node: Parser.SyntaxNode, classes: ClassInfo[]): ClassInfo | null {
         for (const cls of classes) {
             if (
                 node.startPosition.row >= cls.startPosition.row &&
@@ -153,7 +151,7 @@ export class JavaWeightOfAClass extends MetricCalculator
         return null;
     }
 
-    private isAccessor(methodName: string, parameters: string): boolean {
+    public isAccessor(methodName: string): boolean {
         // Check for getter or setter patterns
         const isGetter = /^get[A-Z]/.test(methodName);
         const isSetter = /^set[A-Z]/.test(methodName);
@@ -161,3 +159,5 @@ export class JavaWeightOfAClass extends MetricCalculator
         return isGetter || isSetter;
     }
 }
+
+

@@ -1,17 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
-const JavaLOC_1 = require("../Metrics/Java/JavaLOC");
-const JavaCC_1 = require("../Metrics/Java/JavaCC");
-const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
+const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
 const JavaCoC_1 = require("../Metrics/Java/JavaCoC");
+const JavaLOC_1 = require("../Metrics/Java/JavaLOC");
+const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
+const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
 const JavaNOPA_1 = require("../Metrics/Java/JavaNOPA");
-const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
 const JavaNProtM_1 = require("../Metrics/Java/JavaNProtM");
-const JavaFANOUT_1 = require("../Metrics/Java/JavaFANOUT");
 const JavaWOC_1 = require("../Metrics/Java/JavaWOC");
+const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
+// import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
@@ -34,8 +35,12 @@ class MetricsFactory {
         switch (metricName) {
             case 'LOC':
                 return new JavaLOC_1.JavaLOCMetric();
-            case 'CC':
-                return new JavaCC_1.JavaCyclomaticComplexityMetric();
+            case 'WMC':
+                return new JavaWMC_1.JavaWeightedMethodCount();
+            case `WOC`:
+                return new JavaWOC_1.JavaWeightOfAClass();
+            case `AMW`:
+                return new JavaAMW_1.JavaAverageMethodWeight();
             case 'NOA':
                 return new JavaNOA_1.JavaNumberOfAttributesMetric();
             case 'NOM':
@@ -51,9 +56,44 @@ class MetricsFactory {
             case 'CognitiveComplexity':
                 return new JavaCoC_1.JavaCognitiveComplexityMetric();
             case 'FANOUT':
-                return new JavaFANOUT_1.JavaFanOutMetric();
-            case 'WOC':
-                return new JavaWOC_1.JavaWeightOfClassMetric();
+                const javaCode = `
+
+
+
+            package test;
+
+            public class NestedClassesAndComplexFormatting {
+            
+                private int value = 10;
+            
+                public class InnerClass {
+                    public void display() {
+                        System.out.println("Inner class value: " + value);
+                    }
+                }
+            
+                public static class StaticNestedClass {
+                    public static void printStaticMessage() {
+                        System.out.println("Static Nested Class");
+                    }
+                }
+            
+                public void complexFormatting() {
+                    int x = 5; if (x > 0) { for (int i = 0; i < x; i++) { System.out.println("i: " + i); } }
+                }
+            }
+            
+            
+
+`;
+            // const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+            // const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+            // const components = parser.extractComponents(tree); // Extract classes, methods, and fields
+            // console.log('Classes:', components.classes);
+            // console.log('Methods:', components.methods);
+            // console.log('Fields:', components.fields);
+            // console.log('WOC:', components.weight);
+            // console.log('Fields:', components.weight);
             default:
                 return null;
         }

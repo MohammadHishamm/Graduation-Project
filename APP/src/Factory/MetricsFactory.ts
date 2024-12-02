@@ -1,17 +1,17 @@
 import { MetricCalculator } from '../Core/MetricCalculator';
 
-import { JavaLOCMetric } from '../Metrics/Java/JavaLOC';
-import { JavaCyclomaticComplexityMetric } from '../Metrics/Java/JavaCC';
-import { JavaNumberOfAccessorMethods } from '../Metrics/Java/JavaNOAM';
+import { JavaWeightedMethodCount } from '../Metrics/Java/JavaWMC';
 import { JavaCognitiveComplexityMetric } from '../Metrics/Java/JavaCoC';
+import { JavaLOCMetric } from '../Metrics/Java/JavaLOC';
+import { JavaNumberOfAbstractClassesM } from '../Metrics/Java/JavaNAbsm';
 import { JavaNumberOfAttributesMetric } from '../Metrics/Java/JavaNOA';
+import { JavaNumberOfAccessorMethods } from '../Metrics/Java/JavaNOAM';
 import { JavaNumberOfMethodsMetric } from '../Metrics/Java/JavaNOM';
 import { JavaNumberOfPublicAttributesM } from '../Metrics/Java/JavaNOPA';
-import { JavaNumberOfAbstractClassesM } from '../Metrics/Java/JavaNAbsm';
 import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
-import { JavaFanOutMetric } from '../Metrics/Java/JavaFANOUT';
-import {JavaWeightOfClassMetric} from '../Metrics/Java/JavaWOC';
-
+import { JavaWeightOfAClass } from '../Metrics/Java/JavaWOC';
+import { JavaAverageMethodWeight } from '../Metrics/Java/JavaAMW';
+// import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 
 
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
@@ -40,8 +40,12 @@ export class MetricsFactory {
         switch (metricName) {
             case 'LOC':
                 return new JavaLOCMetric();
-            case 'CC':
-                return new JavaCyclomaticComplexityMetric();
+            case 'WMC':
+                return new JavaWeightedMethodCount();
+            case `WOC`:
+                return new JavaWeightOfAClass();
+            case `AMW`:
+                return new JavaAverageMethodWeight();
             case 'NOA':
                 return new JavaNumberOfAttributesMetric();
             case 'NOM':
@@ -57,9 +61,46 @@ export class MetricsFactory {
             case 'CognitiveComplexity':
                 return new JavaCognitiveComplexityMetric();
             case 'FANOUT':    
-                return new JavaFanOutMetric();
-            case 'WOC':    
-                return new JavaWeightOfClassMetric();        
+            const javaCode = `
+
+
+
+            package test;
+
+            public class NestedClassesAndComplexFormatting {
+            
+                private int value = 10;
+            
+                public class InnerClass {
+                    public void display() {
+                        System.out.println("Inner class value: " + value);
+                    }
+                }
+            
+                public static class StaticNestedClass {
+                    public static void printStaticMessage() {
+                        System.out.println("Static Nested Class");
+                    }
+                }
+            
+                public void complexFormatting() {
+                    int x = 5; if (x > 0) { for (int i = 0; i < x; i++) { System.out.println("i: " + i); } }
+                }
+            }
+            
+            
+
+`;
+            // const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+            // const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+            
+            // const components = parser.extractComponents(tree); // Extract classes, methods, and fields
+            
+            // console.log('Classes:', components.classes);
+            // console.log('Methods:', components.methods);
+            // console.log('Fields:', components.fields);
+            // console.log('WOC:', components.weight);
+            // console.log('Fields:', components.weight);
             default:
                 return null;
         }
