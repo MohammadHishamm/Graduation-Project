@@ -133,8 +133,6 @@ export class JavaWeightOfAClass extends MetricCalculator
             return 0; // If no valid public elements, return 0
         }
 
-        console.log(`${den}`);
-        console.log(`${nom}`);
         let x: number;
         x = den / nom;
         return 1 - x;
