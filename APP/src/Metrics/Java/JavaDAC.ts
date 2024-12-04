@@ -41,9 +41,20 @@ export class JavaDataAbstractionCoupling extends MetricCalculator
     
             // Check if the method is overridden by looking for '@Override' in the modifiers
             const isOverridden = modifiers.includes('@Override');
-    
-            // Strip '@Override' and keep only the access modifier (e.g., 'public')
-            const accessModifier = modifiers.replace('@Override', '').trim().split(' ')[0];
+            
+            // Remove '@Override' and 'static' from the modifiers to focus on the access modifier only
+            let accessModifier = modifiers.replace('@Override', '').replace('static', '').trim();
+            
+            // Determine the access modifier
+            if (accessModifier.includes('public')) {
+                accessModifier = 'public';
+            } else if (accessModifier.includes('private')) {
+                accessModifier = 'private';
+            } else if (accessModifier.includes('protected')) {
+                accessModifier = 'protected';
+            } else {
+                accessModifier = 'public';  // Default to public if no access modifier is found
+            }
     
             const name = node.childForFieldName('name')?.text ?? 'Unknown';
             const params = node.childForFieldName('parameters')?.text ?? '';
@@ -54,7 +65,7 @@ export class JavaDataAbstractionCoupling extends MetricCalculator
     
             return {
                 name,
-                modifiers: accessModifier, // Use only the access modifier (e.g., 'public')
+                modifiers: accessModifier,  // Only 'public', 'private', or 'protected' are kept
                 isConstructor,
                 isAccessor,
                 isOverridden,  // Add the isOverridden field to the return value
@@ -63,7 +74,7 @@ export class JavaDataAbstractionCoupling extends MetricCalculator
             };
         });
     }
-
+    
 
 
     private extractFields(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): FieldInfo[] {
@@ -115,26 +126,13 @@ export class JavaDataAbstractionCoupling extends MetricCalculator
     
             // Extract generic types if present (e.g., "List<Book>")
             const genericMatch = fieldType.match(/^(\w+)<(.+)>$/);
-            if (genericMatch) 
+            if (!genericMatch) 
             {
-                // const containerType = genericMatch[1]; // e.g., "List"
-                const genericType = genericMatch[2];  // e.g., "Book"
-    
-                // Check the generic type
-                if (!primitiveTypes.has(genericType.toLowerCase()) && !usedClassTypes.has(genericType)) 
-                {
-                    usedClassTypes.add(genericType);
-                    DAC++; 
-                }
-            } 
-            else 
-            {
-                // If no generics, process as a single type
                 if (!primitiveTypes.has(fieldType.toLowerCase()) && !usedClassTypes.has(fieldType)) {
                     usedClassTypes.add(fieldType);
                     DAC++; 
                 }
-            }
+            } 
         }
     
         return DAC; // Return the final count

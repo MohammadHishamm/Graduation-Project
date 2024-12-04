@@ -77,8 +77,8 @@ export class MetricsFactory {
 
 public class Dog extends Animal {
     // Overriding the makeSound method from Animal class
-    @Override
-    public void makeSound() {
+    
+    static public void makeSound() {
         System.out.println("Dog barks");
     }
 }
