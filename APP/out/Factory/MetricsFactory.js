@@ -17,6 +17,7 @@ const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
 const ECFCode_1 = require("../Core/ECFCode");
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
+const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
@@ -65,6 +66,8 @@ class MetricsFactory {
                 return new JavaCoC_1.JavaCognitiveComplexityMetric();
             case 'NDU':
                 return new JavaNDU_1.NDUCalculation();
+            case 'NAS':
+                return new JavaNAS_1.JavaNumberOfAddedServices();
             case 'FANOUT':
                 const javaCode = `
 

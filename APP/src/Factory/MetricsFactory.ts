@@ -16,7 +16,7 @@ import {JavaAccessToForeignData} from '../Metrics/Java/JavaAFTD ';
 import {ExtractComponentsFromCode }  from '../Core/ECFCode';
 import {JavaDataAbstractionCoupling }  from '../Metrics/Java/JavaDAC';
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
-
+import { JavaNumberOfAddedServices } from '../Metrics/Java/JavaNAS';
 
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
 import { PythonLOCMetric } from '../Metrics/Python/PythonLOC';
@@ -70,6 +70,8 @@ export class MetricsFactory {
                 return new JavaCognitiveComplexityMetric();
             case 'NDU':
                 return new NDUCalculation();
+            case 'NAS':
+                return new JavaNumberOfAddedServices();
             case 'FANOUT':    
             const javaCode = `
 
