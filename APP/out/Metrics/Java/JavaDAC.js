@@ -1,20 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JavaWeightOfAClass = void 0;
+exports.JavaDataAbstractionCoupling = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
+class JavaDataAbstractionCoupling extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
         return this.extractComponents(node.tree);
     }
-    // Extract components and classify methods
+    // Extract components and calculate ATFD
     extractComponents(tree) {
         const rootNode = tree.rootNode;
         const classes = this.extractClasses(rootNode);
-        const methods = this.extractMethods(rootNode, classes);
         const fields = this.extractFields(rootNode, classes);
-        const filteredFields = this.filterPublicNonEncapsulatedFields(fields, methods);
-        const weight = this.calculateWeight(methods, filteredFields);
-        return weight;
+        // Identify foreign field accesses
+        const DAC = this.findDataAbstractionCoupling(fields);
+        // Return the count of distinct foreign classes
+        return DAC;
     }
     extractClasses(rootNode) {
         const classNodes = rootNode.descendantsOfType('class_declaration');
@@ -75,38 +75,36 @@ class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
             };
         });
     }
-    filterPublicNonEncapsulatedFields(fields, methods) {
-        return fields.filter(field => field.modifiers.includes('public') && !this.hasGetterSetter(field.name, methods));
-    }
-    // Check if the field has getter or setter methods
-    hasGetterSetter(fieldName, methods) {
-        const getterPattern = new RegExp(`get${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}\\(`);
-        const setterPattern = new RegExp(`set${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}\\(`);
-        return methods.some(method => getterPattern.test(method.name) || setterPattern.test(method.name));
-    }
-    // Calculate the weight of the class
-    calculateWeight(methods, fields) {
-        let nom = 0; // Numerator: public methods (non-constructor and non-accessor) + public attributes
-        let den = 0; // Denominator: public methods that are not accessors
-        methods.forEach(method => {
-            if (!method.isConstructor && method.modifiers.includes('public')) {
-                ++nom;
-                if (method.isAccessor) {
-                    ++den;
+    findDataAbstractionCoupling(Fields) {
+        let DAC = 0; // Initialize DAC counter
+        const usedClassTypes = new Set(); // To track unique types
+        // List of primitive types to ignore
+        const primitiveTypes = new Set([
+            "int", "float", "double", "boolean", "char", "byte",
+            "short", "long", "void", "string"
+        ]);
+        for (const field of Fields) {
+            const fieldType = field.type;
+            // Extract generic types if present (e.g., "List<Book>")
+            const genericMatch = fieldType.match(/^(\w+)<(.+)>$/);
+            if (genericMatch) {
+                // const containerType = genericMatch[1]; // e.g., "List"
+                const genericType = genericMatch[2]; // e.g., "Book"
+                // Check the generic type
+                if (!primitiveTypes.has(genericType.toLowerCase()) && !usedClassTypes.has(genericType)) {
+                    usedClassTypes.add(genericType);
+                    DAC++;
                 }
             }
-        });
-        fields.forEach(field => {
-            if (field.modifiers.includes('public')) {
-                ++nom;
+            else {
+                // If no generics, process as a single type
+                if (!primitiveTypes.has(fieldType.toLowerCase()) && !usedClassTypes.has(fieldType)) {
+                    usedClassTypes.add(fieldType);
+                    DAC++;
+                }
             }
-        });
-        if (nom === 0) {
-            return 0; // If no valid public elements, return 0
         }
-        let x;
-        x = den / nom;
-        return 1 - x;
+        return DAC; // Return the final count
     }
     findParentClass(node, classes) {
         for (const cls of classes) {
@@ -124,5 +122,5 @@ class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
         return isGetter || isSetter;
     }
 }
-exports.JavaWeightOfAClass = JavaWeightOfAClass;
-//# sourceMappingURL=JavaWOC.js.map
+exports.JavaDataAbstractionCoupling = JavaDataAbstractionCoupling;
+//# sourceMappingURL=JavaDAC.js.map

@@ -36,25 +36,33 @@ export class JavaWeightOfAClass extends MetricCalculator
             endPosition: node.endPosition,
         }));
     }
+
     private extractMethods(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): MethodInfo[] {
         const methodNodes = rootNode.descendantsOfType('method_declaration');
         return methodNodes.map((node) => {
             // Dynamically find modifiers as a child node
             const modifiersNode = node.children.find((child) => child.type === 'modifiers');
             const modifiers = modifiersNode ? modifiersNode.text : '';
-
+    
+            // Check if the method is overridden by looking for '@Override' in the modifiers
+            const isOverridden = modifiers.includes('@Override');
+    
+            // Strip '@Override' and keep only the access modifier (e.g., 'public')
+            const accessModifier = modifiers.replace('@Override', '').trim().split(' ')[0];
+    
             const name = node.childForFieldName('name')?.text ?? 'Unknown';
             const params = node.childForFieldName('parameters')?.text ?? '';
             const parentClass = this.findParentClass(node, classes);
-
+    
             const isConstructor = parentClass ? parentClass.name === name : false;
-            const isAccessor = this.isAccessor(name, params);
-
+            const isAccessor = this.isAccessor(name);
+    
             return {
                 name,
-                modifiers,
+                modifiers: accessModifier, // Use only the access modifier (e.g., 'public')
                 isConstructor,
                 isAccessor,
+                isOverridden,  // Add the isOverridden field to the return value
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,
             };
@@ -154,7 +162,7 @@ export class JavaWeightOfAClass extends MetricCalculator
         return null;
     }
 
-    private isAccessor(methodName: string, parameters: string): boolean {
+    private isAccessor(methodName: string): boolean {
         // Check for getter or setter patterns
         const isGetter = /^get[A-Z]/.test(methodName);
         const isSetter = /^set[A-Z]/.test(methodName);

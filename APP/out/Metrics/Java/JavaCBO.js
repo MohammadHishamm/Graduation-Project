@@ -33,7 +33,7 @@ class JavaCouplingBetweenObjects extends MetricCalculator_1.MetricCalculator {
             if (currentNode.type === 'class_declaration') {
                 // console.log(`${currentNode.text}`);
             }
-            console.log(`${currentNode.text}`);
+            // console.log(`${currentNode.text}`);
             // Continue traversing through child nodes
             if (currentNode.children) {
                 for (const child of currentNode.children) {

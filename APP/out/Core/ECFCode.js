@@ -1,9 +1,22 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExtractComponentsFromCode = void 0;
+const tree_sitter_1 = __importDefault(require("tree-sitter"));
+const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
 //TODO 
 // for the future
 class ExtractComponentsFromCode {
+    parser;
+    constructor() {
+        this.parser = new tree_sitter_1.default();
+        this.parser.setLanguage(tree_sitter_java_1.default); // Use Java grammar
+    }
+    parseCode(sourceCode) {
+        return this.parser.parse(sourceCode).rootNode.tree; // Parse Python source code
+    }
     // Extract components and classify methods
     extractComponents(tree) {
         const rootNode = tree.rootNode;
@@ -33,6 +46,10 @@ class ExtractComponentsFromCode {
             // Dynamically find modifiers as a child node
             const modifiersNode = node.children.find((child) => child.type === 'modifiers');
             const modifiers = modifiersNode ? modifiersNode.text : '';
+            // Check if the method is overridden by looking for '@Override' in the modifiers
+            const isOverridden = modifiers.includes('@Override');
+            // Strip '@Override' and keep only the access modifier (e.g., 'public')
+            const accessModifier = modifiers.replace('@Override', '').trim().split(' ')[0];
             const name = node.childForFieldName('name')?.text ?? 'Unknown';
             const params = node.childForFieldName('parameters')?.text ?? '';
             const parentClass = this.findParentClass(node, classes);
@@ -40,9 +57,10 @@ class ExtractComponentsFromCode {
             const isAccessor = this.isAccessor(name);
             return {
                 name,
-                modifiers,
+                modifiers: accessModifier, // Use only the access modifier (e.g., 'public')
                 isConstructor,
                 isAccessor,
+                isOverridden, // Add the isOverridden field to the return value
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,
             };
@@ -53,7 +71,7 @@ class ExtractComponentsFromCode {
         const fieldNodes = rootNode.descendantsOfType('field_declaration');
         return fieldNodes.map((node) => {
             // Log node to inspect its children (useful for debugging)
-            console.log('Field Node:', node.toString());
+            // console.log('Field Node:', node.toString());
             // The modifiers are usually on the first child (public, private, etc.)
             const modifiersNode = node.child(0); // Use child(0) to access the first child
             const modifiers = modifiersNode ? modifiersNode.text : '';
@@ -67,6 +85,7 @@ class ExtractComponentsFromCode {
             return {
                 name,
                 modifiers,
+                type,
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,
             };
@@ -101,8 +120,6 @@ class ExtractComponentsFromCode {
         if (nom === 0) {
             return 0; // If no valid public elements, return 0
         }
-        console.log(`${den}`);
-        console.log(`${nom}`);
         let x;
         x = den / nom;
         return 1 - x;

@@ -48,30 +48,39 @@ export class ExtractComponentsFromCode
             endPosition: node.endPosition,
         }));
     }
-    public extractMethods(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): MethodInfo[] {
+    
+    private extractMethods(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): MethodInfo[] {
         const methodNodes = rootNode.descendantsOfType('method_declaration');
         return methodNodes.map((node) => {
             // Dynamically find modifiers as a child node
             const modifiersNode = node.children.find((child) => child.type === 'modifiers');
             const modifiers = modifiersNode ? modifiersNode.text : '';
-
+    
+            // Check if the method is overridden by looking for '@Override' in the modifiers
+            const isOverridden = modifiers.includes('@Override');
+    
+            // Strip '@Override' and keep only the access modifier (e.g., 'public')
+            const accessModifier = modifiers.replace('@Override', '').trim().split(' ')[0];
+    
             const name = node.childForFieldName('name')?.text ?? 'Unknown';
             const params = node.childForFieldName('parameters')?.text ?? '';
             const parentClass = this.findParentClass(node, classes);
-
+    
             const isConstructor = parentClass ? parentClass.name === name : false;
             const isAccessor = this.isAccessor(name);
-
+    
             return {
                 name,
-                modifiers,
+                modifiers: accessModifier, // Use only the access modifier (e.g., 'public')
                 isConstructor,
                 isAccessor,
+                isOverridden,  // Add the isOverridden field to the return value
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,
             };
         });
     }
+    
 
     public extractFields(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): FieldInfo[] {
         // Find all the field declaration nodes in the syntax tree

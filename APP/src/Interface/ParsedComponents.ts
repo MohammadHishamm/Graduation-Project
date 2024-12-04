@@ -19,6 +19,7 @@ export interface MethodInfo {
     modifiers: string;
     isConstructor: boolean;
     isAccessor: boolean;
+    isOverridden: boolean;
     startPosition: Parser.Point;
     endPosition: Parser.Point;
 }

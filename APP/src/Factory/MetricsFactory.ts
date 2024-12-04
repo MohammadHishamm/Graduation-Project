@@ -73,37 +73,11 @@ export class MetricsFactory {
             case 'FANOUT':    
             const javaCode = `
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Member {
-    private String id;
-    private String name;
-    private List<Book> borrowedBooks ;
-    private Book b;
-
-    public Member(String id, String name) {
-        this.id = id;
-        this.name = name;
-        b.getClass();
-      
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void borrowBook(Book book) {
-        borrowedBooks.add(book);
-    }
-
-    public void returnBook(Book book) {
-        borrowedBooks.remove(book);
-        book.setLent(false);
+public class Dog extends Animal {
+    // Overriding the makeSound method from Animal class
+    @Override
+    public void makeSound() {
+        System.out.println("Dog barks");
     }
 }
 
@@ -115,9 +89,9 @@ public class Member {
             
             const components = parser.extractComponents(tree); // Extract classes, methods, and fields
             
-            // console.log('Classes:', components.classes);
-            // console.log('Methods:', components.methods);
-            // console.log('Fields:', components.fields);
+            console.log('Classes:', components.classes);
+            console.log('Methods:', components.methods);
+            console.log('Fields:', components.fields);
             // console.log('WOC:', components.weight);
             // console.log('Fields:', components.weight);
             

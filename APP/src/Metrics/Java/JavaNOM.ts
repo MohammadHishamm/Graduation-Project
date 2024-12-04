@@ -6,6 +6,8 @@ export class JavaNumberOfMethodsMetric extends MetricCalculator {
  
             const traverse = (currentNode: any) => {
                 // Check if the current node represents a class declaration
+
+                
                 if (currentNode.type === 'class_declaration') {
                     // Traverse only the class's body to count field declarations
                     const classBody = currentNode.children.find((child: any) => child.type === 'class_body');
