@@ -23,13 +23,17 @@ const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
+//import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
+const JavaBUR_1 = require("../Metrics/Java/JavaBUR");
+const JavaNOD_1 = require("../Metrics/Java/JavaNOD");
+const JavaNODD_1 = require("../Metrics/Java/JavaNODD");
 class MetricsFactory {
     // Public static method to create a metric object based on the language and metric name
     static CreateMetric(metricName, language) {
         switch (language) {
-            case 'java':
+            case "java":
                 return MetricsFactory.createJavaMetric(metricName);
-            case 'python':
+            case "python":
                 return MetricsFactory.createPythonMetric(metricName);
             default:
                 return null;
@@ -38,9 +42,9 @@ class MetricsFactory {
     // Dynamically create Java metric object
     static createJavaMetric(metricName) {
         switch (metricName) {
-            case 'LOC':
+            case "LOC":
                 return new JavaLOCC_1.JavaLOCMetric();
-            case 'WMC':
+            case "WMC":
                 return new JavaWMC_1.JavaWeightedMethodCount();
             case `WOC`:
                 return new JavaWOC_1.JavaWeightOfAClass();
@@ -50,25 +54,31 @@ class MetricsFactory {
                 return new JavaAFTD_1.JavaAccessToForeignData();
             case `DAC`:
                 return new JavaDAC_1.JavaDataAbstractionCoupling();
-            case 'NOA':
+            case "NOA":
                 return new JavaNOA_1.JavaNumberOfAttributesMetric();
-            case 'NOM':
+            case "NOM":
                 return new JavaNOM_1.JavaNumberOfMethodsMetric();
-            case 'NOAM':
+            case "NOAM":
                 return new JavaNOAM_1.JavaNumberOfAccessorMethods();
-            case 'NOPA':
+            case "NOPA":
                 return new JavaNOPA_1.JavaNumberOfPublicAttributesM();
-            case 'NAbsm':
+            case "NAbsm":
                 return new JavaNAbsm_1.JavaNumberOfAbstractClassesM();
-            case 'NProtM':
+            case "NProtM":
                 return new JavaNProtM_1.JavaNumberOfProtectedMethodsMetric();
-            case 'CognitiveComplexity':
+            case "CognitiveComplexity":
                 return new JavaCoC_1.JavaCognitiveComplexityMetric();
-            case 'NDU':
+            case "NDU":
                 return new JavaNDU_1.NDUCalculation();
-            case 'NAS':
+            case "NAS":
                 return new JavaNAS_1.JavaNumberOfAddedServices();
-            case 'FANOUT':
+            case "BUR":
+                return new JavaBUR_1.BURCalculation();
+            case "NOD":
+                return new JavaNOD_1.NODCalculation();
+            case "NODD":
+                return new JavaNODD_1.NODDCalculation();
+            case "FANOUT":
                 const javaCode = `
 
 public class Dog extends Animal {
@@ -79,15 +89,15 @@ public class Dog extends Animal {
     }
 }
 
-            
+           
 
 `;
                 const parser = new ECFCode_1.ExtractComponentsFromCode(); // Create an instance of CodeParser
                 const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
                 const components = parser.extractComponents(tree); // Extract classes, methods, and fields
-                console.log('Classes:', components.classes);
-                console.log('Methods:', components.methods);
-                console.log('Fields:', components.fields);
+                console.log("Classes:", components.classes);
+                console.log("Methods:", components.methods);
+                console.log("Fields:", components.fields);
             // console.log('WOC:', components.weight);
             // console.log('Fields:', components.weight);
             default:
@@ -97,15 +107,15 @@ public class Dog extends Animal {
     // Dynamically create Python metric object
     static createPythonMetric(metricName) {
         switch (metricName) {
-            case 'LOC':
+            case "LOC":
                 return new PythonLOC_1.PythonLOCMetric();
-            case 'CC':
+            case "CC":
                 return new PythonCC_1.PythonCyclomaticComplexityMetric();
-            case 'NOA':
+            case "NOA":
                 return new PythonNOA_1.PythonNumberofAttributesMetric();
-            case 'NOM':
+            case "NOM":
                 return new PythonNOM_1.PythonNumberOfMethodsMetric();
-            case 'NOAM':
+            case "NOAM":
                 return new PythonNOAM_1.PythonNumberOfAccessorMethods();
             default:
                 return null;
