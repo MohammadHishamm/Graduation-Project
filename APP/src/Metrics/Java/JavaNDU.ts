@@ -107,8 +107,12 @@ export class NDUCalculation extends MetricCalculator {
     }
 
     // Check if a method is an accessor (getter or setter)
-    private isAccessor(methodName: string): boolean {
-        return /^get[A-Z]/.test(methodName) || /^set[A-Z]/.test(methodName);
+    public isAccessor(methodName: string): boolean {
+        // Check for getter or setter patterns (case-insensitive)
+        const isGetter = /^get[A-Za-z]/.test(methodName);
+        const isSetter = /^set[A-Za-z]/.test(methodName);
+    
+        return isGetter || isSetter;
     }
 
     // Find the parent class for a given node

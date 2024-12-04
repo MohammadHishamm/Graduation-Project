@@ -119,9 +119,9 @@ class JavaDataAbstractionCoupling extends MetricCalculator_1.MetricCalculator {
         return null;
     }
     isAccessor(methodName) {
-        // Check for getter or setter patterns
-        const isGetter = /^get[A-Z]/.test(methodName);
-        const isSetter = /^set[A-Z]/.test(methodName);
+        // Check for getter or setter patterns (case-insensitive)
+        const isGetter = /^get[A-Za-z]/.test(methodName);
+        const isSetter = /^set[A-Za-z]/.test(methodName);
         return isGetter || isSetter;
     }
 }

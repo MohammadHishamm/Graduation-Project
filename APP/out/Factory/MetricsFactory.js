@@ -16,7 +16,6 @@ const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
 const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
 const ECFCode_1 = require("../Core/ECFCode");
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
-// import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
@@ -70,26 +69,37 @@ class MetricsFactory {
                 return new JavaNAS_1.JavaNumberOfAddedServices();
             case 'FANOUT':
                 const javaCode = `
+public class Librarian {
+    private String name;
 
-public class Dog extends Animal {
-    // Overriding the makeSound method from Animal class
-    
-    static public void makeSound() {
-        System.out.println("Dog barks");
-    }
-}
+    public Librarian(String name) {
+        this.name = name;
 
+        if (name == "") {
             
 
-`;
+        }      
+    }
+
+    public String setname()
+    {
+        return name;
+    }
+
+    public String getName7() {
+        return name;
+    }
+
+
+}
+
+                `;
                 const parser = new ECFCode_1.ExtractComponentsFromCode(); // Create an instance of CodeParser
                 const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
                 const components = parser.extractComponents(tree); // Extract classes, methods, and fields
-                console.log('Classes:', components.classes);
-                console.log('Methods:', components.methods);
-                console.log('Fields:', components.fields);
-            // console.log('WOC:', components.weight);
-            // console.log('Fields:', components.weight);
+            // console.log('Classes:', components.classes);
+            // console.log('Methods:', components.methods);
+            // console.log('Fields:', components.fields);
             default:
                 return null;
         }

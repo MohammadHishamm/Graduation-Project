@@ -148,8 +148,6 @@ export class JavaAccessToForeignData extends MetricCalculator {
         return false; // Return null if no method body is found
     }
     
-
-
     private isForeignClass(targetClass: ClassInfo, currentClass: ClassInfo | null): boolean {
         if (!currentClass) {return true;} // No parent class context, treat as foreign
         return targetClass.name !== currentClass.name; // Foreign if names are different

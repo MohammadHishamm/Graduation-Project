@@ -11,11 +11,10 @@ import { JavaNumberOfPublicAttributesM } from '../Metrics/Java/JavaNOPA';
 import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
 import { JavaWeightOfAClass } from '../Metrics/Java/JavaWOC';
 import { JavaAverageMethodWeight } from '../Metrics/Java/JavaAMW';
-import {NDUCalculation} from '../Metrics/Java/JavaNDU';
-import {JavaAccessToForeignData} from '../Metrics/Java/JavaAFTD ';
-import {ExtractComponentsFromCode }  from '../Core/ECFCode';
-import {JavaDataAbstractionCoupling }  from '../Metrics/Java/JavaDAC';
-// import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
+import { NDUCalculation } from '../Metrics/Java/JavaNDU';
+import { JavaAccessToForeignData } from '../Metrics/Java/JavaAFTD ';
+import { ExtractComponentsFromCode } from '../Core/ECFCode';
+import { JavaDataAbstractionCoupling } from '../Metrics/Java/JavaDAC';
 import { JavaNumberOfAddedServices } from '../Metrics/Java/JavaNAS';
 
 import { PythonCyclomaticComplexityMetric } from '../Metrics/Python/PythonCC';
@@ -35,7 +34,7 @@ export class MetricsFactory {
             case 'python':
                 return MetricsFactory.createPythonMetric(metricName);
             default:
-                return null;  
+                return null;
         }
     }
 
@@ -61,43 +60,54 @@ export class MetricsFactory {
             case 'NOAM':
                 return new JavaNumberOfAccessorMethods();
             case 'NOPA':
-                return new JavaNumberOfPublicAttributesM();   
+                return new JavaNumberOfPublicAttributesM();
             case 'NAbsm':
-                return new JavaNumberOfAbstractClassesM();       
+                return new JavaNumberOfAbstractClassesM();
             case 'NProtM':
-                return new JavaNumberOfProtectedMethodsMetric();    
+                return new JavaNumberOfProtectedMethodsMetric();
             case 'CognitiveComplexity':
                 return new JavaCognitiveComplexityMetric();
             case 'NDU':
                 return new NDUCalculation();
             case 'NAS':
                 return new JavaNumberOfAddedServices();
-            case 'FANOUT':    
-            const javaCode = `
+            case 'FANOUT':
+                const javaCode = 
+                `
+public class Librarian {
+    private String name;
 
-public class Dog extends Animal {
-    // Overriding the makeSound method from Animal class
-    
-    static public void makeSound() {
-        System.out.println("Dog barks");
+    public Librarian(String name) {
+        this.name = name;
+
+        if (name == "") {
+            
+
+        }      
     }
+
+    public String setname()
+    {
+        return name;
+    }
+
+    public String getName7() {
+        return name;
+    }
+
+
 }
 
-            
+                `;
 
-`;
-            const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
-            const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
-            
-            const components = parser.extractComponents(tree); // Extract classes, methods, and fields
-            
-            console.log('Classes:', components.classes);
-            console.log('Methods:', components.methods);
-            console.log('Fields:', components.fields);
-            // console.log('WOC:', components.weight);
-            // console.log('Fields:', components.weight);
-            
-            
+                const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+                const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+
+                const components = parser.extractComponents(tree); // Extract classes, methods, and fields
+
+                // console.log('Classes:', components.classes);
+                // console.log('Methods:', components.methods);
+                // console.log('Fields:', components.fields);
             default:
                 return null;
         }
