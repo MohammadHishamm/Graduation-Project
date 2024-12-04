@@ -8,8 +8,9 @@ export class JavaWeightedMethodCount extends MetricCalculator {
         let complexity = 0; 
     
      
-        const traverse = (currentNode: any) => {
- 
+        const traverse = (currentNode: any) => 
+        {
+            // console.log(`${currentNode.type}`);            
             // Increment for each control flow statement
             if ([
                 'if_statement', 

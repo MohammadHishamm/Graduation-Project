@@ -1,10 +1,26 @@
 import Parser from 'tree-sitter';
 import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../Interface/ParsedComponents'; // Import the interfac
+import java from 'tree-sitter-java';
 
 //TODO 
 // for the future
 export class ExtractComponentsFromCode 
 {
+ 
+    public parser: Parser;
+
+    constructor() {
+        this.parser = new Parser();
+        this.parser.setLanguage(java); // Use Java grammar
+    }
+
+
+    public parseCode(sourceCode: string): any 
+    {
+        return this.parser.parse(sourceCode).rootNode.tree; // Parse Python source code
+        
+    }
+
     // Extract components and classify methods
     extractComponents(tree: Parser.Tree): ParsedComponents {
         const rootNode = tree.rootNode;
@@ -63,7 +79,7 @@ export class ExtractComponentsFromCode
 
         return fieldNodes.map((node) => {
             // Log node to inspect its children (useful for debugging)
-            console.log('Field Node:', node.toString());
+            // console.log('Field Node:', node.toString());
 
             // The modifiers are usually on the first child (public, private, etc.)
             const modifiersNode = node.child(0); // Use child(0) to access the first child
@@ -83,6 +99,7 @@ export class ExtractComponentsFromCode
             return {
                 name,
                 modifiers,
+                type,
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,
             };
@@ -131,8 +148,6 @@ export class ExtractComponentsFromCode
             return 0; // If no valid public elements, return 0
         }
 
-        console.log(`${den}`);
-        console.log(`${nom}`);
         let x: number;
         x = den / nom;
         return 1 - x;

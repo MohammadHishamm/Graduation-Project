@@ -12,6 +12,9 @@ import { JavaNumberOfProtectedMethodsMetric } from '../Metrics/Java/JavaNProtM';
 import { JavaWeightOfAClass } from '../Metrics/Java/JavaWOC';
 import { JavaAverageMethodWeight } from '../Metrics/Java/JavaAMW';
 import {NDUCalculation} from '../Metrics/Java/JavaNDU';
+import {JavaAccessToForeignData} from '../Metrics/Java/JavaAFTD ';
+import {ExtractComponentsFromCode }  from '../Core/ECFCode';
+import {JavaDataAbstractionCoupling }  from '../Metrics/Java/JavaDAC';
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 
 
@@ -47,6 +50,10 @@ export class MetricsFactory {
                 return new JavaWeightOfAClass();
             case `AMW`:
                 return new JavaAverageMethodWeight();
+            case `AFTD`:
+                return new JavaAccessToForeignData();
+            case `DAC`:
+                return new JavaDataAbstractionCoupling();
             case 'NOA':
                 return new JavaNumberOfAttributesMetric();
             case 'NOM':
@@ -66,44 +73,54 @@ export class MetricsFactory {
             case 'FANOUT':    
             const javaCode = `
 
+import java.util.ArrayList;
+import java.util.List;
 
+public class Member {
+    private String id;
+    private String name;
+    private List<Book> borrowedBooks ;
+    private Book b;
 
-            package test;
+    public Member(String id, String name) {
+        this.id = id;
+        this.name = name;
+        b.getClass();
+      
+    }
 
-            public class NestedClassesAndComplexFormatting {
-            
-                private int value = 10;
-            
-                public class InnerClass {
-                    public void display() {
-                        System.out.println("Inner class value: " + value);
-                    }
-                }
-            
-                public static class StaticNestedClass {
-                    public static void printStaticMessage() {
-                        System.out.println("Static Nested Class");
-                    }
-                }
-            
-                public void complexFormatting() {
-                    int x = 5; if (x > 0) { for (int i = 0; i < x; i++) { System.out.println("i: " + i); } }
-                }
-            }
-            
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void borrowBook(Book book) {
+        borrowedBooks.add(book);
+    }
+
+    public void returnBook(Book book) {
+        borrowedBooks.remove(book);
+        book.setLent(false);
+    }
+}
+
             
 
 `;
-            // const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
-            // const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+            const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+            const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
             
-            // const components = parser.extractComponents(tree); // Extract classes, methods, and fields
+            const components = parser.extractComponents(tree); // Extract classes, methods, and fields
             
             // console.log('Classes:', components.classes);
             // console.log('Methods:', components.methods);
             // console.log('Fields:', components.fields);
             // console.log('WOC:', components.weight);
             // console.log('Fields:', components.weight);
+            
             
             default:
                 return null;

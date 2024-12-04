@@ -25,6 +25,7 @@ export interface MethodInfo {
 
 export interface FieldInfo {
     name: string;
+    type: string;
     modifiers: string;
     startPosition: Parser.Point;
     endPosition: Parser.Point;
