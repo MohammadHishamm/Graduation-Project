@@ -1,10 +1,12 @@
 import Parser from 'tree-sitter';
 
+import { FolderExtractComponentsFromCode } from '../../Core/FECFCode';
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../../Interface/ParsedComponents';
+import { ClassInfo, FieldInfo, MethodInfo } from '../../Interface/ParsedComponents';
 
-export class JavaNumberOfAddedServices extends MetricCalculator 
-{
+export class JavaNumberOfAddedServices extends MetricCalculator {
+
+
     calculate(node: any): number {
         return this.extractComponents(node.tree);
     }
@@ -14,22 +16,34 @@ export class JavaNumberOfAddedServices extends MetricCalculator
         const rootNode = tree.rootNode;
 
         const classes = this.extractClasses(rootNode);
-        const methods = this.extractMethods(rootNode , classes);
+        const methods = this.extractMethods(rootNode, classes);
 
-        // Identify foreign field accesses
-        const NAS = this.findNAS(methods);
+        this.findNAS(methods, rootNode).then((number) => {
+            console.log( "NAS:" , number);
+        });
 
         // Return the count of distinct foreign classes
-        return NAS;
+        return 0;
     }
 
     private extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] {
         const classNodes = rootNode.descendantsOfType('class_declaration');
-        return classNodes.map((node) => ({
-            name: node.childForFieldName('name')?.text ?? 'Unknown',
-            startPosition: node.startPosition,
-            endPosition: node.endPosition,
-        }));
+        return classNodes.map((node) => {
+            // Find the class name
+            const className = node.childForFieldName('name')?.text ?? 'Unknown';
+
+            // Check if the class extends another class
+            const extendsNode = node.childForFieldName('extends');
+            const extendedClass = extendsNode ? extendsNode.text : null;
+
+
+            // Return the class information along with inheritance details
+            return {
+                name: className,
+                startPosition: node.startPosition,
+                endPosition: node.endPosition,
+            };
+        });
     }
 
     private extractMethods(rootNode: Parser.SyntaxNode, classes: ClassInfo[]): MethodInfo[] {
@@ -38,13 +52,13 @@ export class JavaNumberOfAddedServices extends MetricCalculator
             // Dynamically find modifiers as a child node
             const modifiersNode = node.children.find((child) => child.type === 'modifiers');
             const modifiers = modifiersNode ? modifiersNode.text : '';
-    
+
             // Check if the method is overridden by looking for '@Override' in the modifiers
             const isOverridden = modifiers.includes('@Override');
-            
+
             // Remove '@Override' and 'static' from the modifiers to focus on the access modifier only
             let accessModifier = modifiers.replace('@Override', '').replace('static', '').trim();
-            
+
             // Determine the access modifier
             if (accessModifier.includes('public')) {
                 accessModifier = 'public';
@@ -55,14 +69,14 @@ export class JavaNumberOfAddedServices extends MetricCalculator
             } else {
                 accessModifier = 'public';  // Default to public if no access modifier is found
             }
-    
+
             const name = node.childForFieldName('name')?.text ?? 'Unknown';
             const params = node.childForFieldName('parameters')?.text ?? '';
             const parentClass = this.findParentClass(node, classes);
-    
+
             const isConstructor = parentClass ? parentClass.name === name : false;
             const isAccessor = this.isAccessor(name);
-    
+
             return {
                 name,
                 modifiers: accessModifier,  // Only 'public', 'private', or 'protected' are kept
@@ -74,7 +88,7 @@ export class JavaNumberOfAddedServices extends MetricCalculator
             };
         });
     }
-    
+
 
 
 
@@ -112,24 +126,80 @@ export class JavaNumberOfAddedServices extends MetricCalculator
     }
 
 
-    private findNAS(methods: MethodInfo[]): number {
+    private async findNAS(methods: MethodInfo[], rootNode: Parser.SyntaxNode): Promise<number> {
         let NAS = 0;
+        let FECFcode = new FolderExtractComponentsFromCode();
+        let extendedClass;
+        // Await the result of the asynchronous method to get the array of FileParsedComponents
+        const fileParsedComponents = await FECFcode.parseAllJavaFiles();
 
-        for (const method of methods) {
-            if (
-                method.modifiers.includes('public') && // Only public methods
-                !method.isOverridden && // Exclude overridden methods
-                !method.isConstructor && // Exclude constructors
-                !method.isAccessor // Exclude getters and setters
-            ) {
-                NAS++;
+
+        const classNodes = rootNode.descendantsOfType('class_declaration');
+        classNodes.forEach((node) => {
+            // Try to find the 'superclass' node
+            const extendsNode = node.childForFieldName('superclass');
+        
+            if (extendsNode) {
+                // Extract the text and trim 'extends' from the start
+                extendedClass = extendsNode.text.trim().replace(/^extends\s*/, ''); 
+            }
+        });
+        
+        if (extendedClass) {
+
+            
+            for (const method of methods) 
+            {
+                if(method.isOverridden)
+                {
+                    let found = false;
+                    for (const fileComponents of fileParsedComponents) {
+                        for (const classGroup of fileComponents.classes) {
+                            if (extendedClass === classGroup.name) {
+                                for (const classMethod of classGroup.methods) {
+                                    if (classMethod.name === method.name)
+                                    {
+                                        found = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if(!found)
+                    {
+                        NAS++;
+                    }
+                }
+                else
+                {
+                    if(
+                        method.modifiers.includes('public') && // Only public methods
+                        !method.isConstructor && // Exclude constructors
+                        !method.isAccessor // Exclude getters and setters
+                    ) {
+                        NAS++;
+                    }
+                }
+            }
+        }
+        else {
+
+            for (const method of methods) {
+                if (
+                    method.modifiers.includes('public') && // Only public methods
+                    !method.isConstructor && // Exclude constructors
+                    !method.isAccessor // Exclude getters and setters
+                ) {
+                    NAS++;
+                }
             }
         }
 
         return NAS;
     }
-    
-    
+
+
 
     private findParentClass(node: Parser.SyntaxNode, classes: ClassInfo[]): ClassInfo | null {
         for (const cls of classes) {
@@ -148,7 +218,7 @@ export class JavaNumberOfAddedServices extends MetricCalculator
         // Check for getter or setter patterns (case-insensitive)
         const isGetter = /^get[A-Za-z]/.test(methodName);
         const isSetter = /^set[A-Za-z]/.test(methodName);
-    
+
         return isGetter || isSetter;
     }
 }

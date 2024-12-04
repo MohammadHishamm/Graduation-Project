@@ -117,24 +117,24 @@ export class JavaAccessToForeignData extends MetricCalculator {
     private findForeignClassesAccessed(methods: MethodInfo[], classNode: Parser.SyntaxNode , Fields: FieldInfo[]): number {
         let ATFD = 0;
 
-        methods.forEach((method) => {
-            // Find the corresponding method node in the classNode (AST)
-            const methodNode = classNode.descendantsOfType('method').find((node) => node.text === method.name);
+        // methods.forEach((method) => {
+        //     // Find the corresponding method node in the classNode (AST)
+        //     const methodNode = classNode.descendantsOfType('method').find((node) => node.text === method.name);
     
-            if (methodNode) {
-                // Perform your logic with the methodNode
-                console.log(`Found method: ${method.name}`);
-                console.log(`Method Node:`, methodNode);
+        //     if (methodNode) {
+        //         // Perform your logic with the methodNode
+        //         console.log(`Found method: ${method.name}`);
+        //         console.log(`Method Node:`, methodNode);
                 
-                // Example: Extract method body (if it's a block)
-                const methodBody = methodNode.children.find((child) => child.type === 'block');
-                if (methodBody) {
-                    console.log('Method body:', methodBody);
-                }
-            } else {
-                console.log(`Method ${method.name} not found in AST.`);
-            }
-        });
+        //         // Example: Extract method body (if it's a block)
+        //         const methodBody = methodNode.children.find((child) => child.type === 'block');
+        //         if (methodBody) {
+        //             console.log('Method body:', methodBody);
+        //         }
+        //     } else {
+        //         console.log(`Method ${method.name} not found in AST.`);
+        //     }
+        // });
 
         return ATFD;
     }

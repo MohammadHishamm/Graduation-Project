@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaNumberOfAddedServices = void 0;
+const FECFCode_1 = require("../../Core/FECFCode");
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
@@ -11,18 +12,27 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
         const rootNode = tree.rootNode;
         const classes = this.extractClasses(rootNode);
         const methods = this.extractMethods(rootNode, classes);
-        // Identify foreign field accesses
-        const NAS = this.findNAS(methods);
+        this.findNAS(methods, rootNode).then((number) => {
+            console.log("NAS:", number);
+        });
         // Return the count of distinct foreign classes
-        return NAS;
+        return 0;
     }
     extractClasses(rootNode) {
         const classNodes = rootNode.descendantsOfType('class_declaration');
-        return classNodes.map((node) => ({
-            name: node.childForFieldName('name')?.text ?? 'Unknown',
-            startPosition: node.startPosition,
-            endPosition: node.endPosition,
-        }));
+        return classNodes.map((node) => {
+            // Find the class name
+            const className = node.childForFieldName('name')?.text ?? 'Unknown';
+            // Check if the class extends another class
+            const extendsNode = node.childForFieldName('extends');
+            const extendedClass = extendsNode ? extendsNode.text : null;
+            // Return the class information along with inheritance details
+            return {
+                name: className,
+                startPosition: node.startPosition,
+                endPosition: node.endPosition,
+            };
+        });
     }
     extractMethods(rootNode, classes) {
         const methodNodes = rootNode.descendantsOfType('method_declaration');
@@ -88,15 +98,58 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
             };
         });
     }
-    findNAS(methods) {
+    async findNAS(methods, rootNode) {
         let NAS = 0;
-        for (const method of methods) {
-            if (method.modifiers.includes('public') && // Only public methods
-                !method.isOverridden && // Exclude overridden methods
-                !method.isConstructor && // Exclude constructors
-                !method.isAccessor // Exclude getters and setters
-            ) {
-                NAS++;
+        let FECFcode = new FECFCode_1.FolderExtractComponentsFromCode();
+        let extendedClass;
+        // Await the result of the asynchronous method to get the array of FileParsedComponents
+        const fileParsedComponents = await FECFcode.parseAllJavaFiles();
+        const classNodes = rootNode.descendantsOfType('class_declaration');
+        classNodes.forEach((node) => {
+            // Try to find the 'superclass' node
+            const extendsNode = node.childForFieldName('superclass');
+            if (extendsNode) {
+                // Extract the text and trim 'extends' from the start
+                extendedClass = extendsNode.text.trim().replace(/^extends\s*/, '');
+            }
+        });
+        if (extendedClass) {
+            for (const method of methods) {
+                if (method.isOverridden) {
+                    let found = false;
+                    for (const fileComponents of fileParsedComponents) {
+                        for (const classGroup of fileComponents.classes) {
+                            if (extendedClass === classGroup.name) {
+                                for (const classMethod of classGroup.methods) {
+                                    if (classMethod.name === method.name) {
+                                        found = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!found) {
+                        NAS++;
+                    }
+                }
+                else {
+                    if (method.modifiers.includes('public') && // Only public methods
+                        !method.isConstructor && // Exclude constructors
+                        !method.isAccessor // Exclude getters and setters
+                    ) {
+                        NAS++;
+                    }
+                }
+            }
+        }
+        else {
+            for (const method of methods) {
+                if (method.modifiers.includes('public') && // Only public methods
+                    !method.isConstructor && // Exclude constructors
+                    !method.isAccessor // Exclude getters and setters
+                ) {
+                    NAS++;
+                }
             }
         }
         return NAS;
