@@ -93,6 +93,8 @@ public class Dog extends Animal {
     static public void makeSound() {
         System.out.println("Dog barks");
     }
+
+
 }
 
            
