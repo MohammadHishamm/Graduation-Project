@@ -206,7 +206,6 @@ async function analyzeCode(
       "FANOUT",
       "NDU",
       "NAS",
-
       "BUR",
       "NOD",
       "NODD",

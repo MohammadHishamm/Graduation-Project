@@ -200,7 +200,14 @@ export class TCCCalculation extends MetricCalculator {
     const nummeth = methods.length;
 
     const tcc = ((pairs - 1) * pairs) / (nummeth * (nummeth - 1));
+     
+    if(nummeth === 0 || nummeth=== 1)
+    {
+        return nummeth;
+    }
+    else{
     return tcc;
+    }
   }
 
   // Method to extract the fields used in a specific method

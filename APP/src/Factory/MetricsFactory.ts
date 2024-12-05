@@ -14,9 +14,15 @@ import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
 import { NDUCalculation } from "../Metrics/Java/JavaNDU";
 import { JavaAccessToForeignData } from "../Metrics/Java/JavaAFTD ";
 import { ExtractComponentsFromCode } from "../Core/ECFCode";
-import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
+//import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
+import {TCCCalculation} from "../Metrics/Java/JavaTCC";
+
+
+
+
+
 
 import { PythonCyclomaticComplexityMetric } from "../Metrics/Python/PythonCC";
 import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
@@ -58,7 +64,7 @@ export class MetricsFactory {
       case `AFTD`:
         return new JavaAccessToForeignData();
       case `DAC`:
-        return new JavaDataAbstractionCoupling();
+        //return new JavaDataAbstractionCoupling();
       case "NOA":
         return new JavaNumberOfAttributesMetric();
       case "NOM":
@@ -83,6 +89,8 @@ export class MetricsFactory {
         return new NODCalculation();
       case "NODD":
         return new NODDCalculation();
+      case "TCC":
+        return new TCCCalculation();  
 
       case "FANOUT":
         const javaCode = `

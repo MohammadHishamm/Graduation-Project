@@ -15,9 +15,10 @@ const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
 const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
 const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
 const ECFCode_1 = require("../Core/ECFCode");
-const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
+//import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
+const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
@@ -53,7 +54,7 @@ class MetricsFactory {
             case `AFTD`:
                 return new JavaAFTD_1.JavaAccessToForeignData();
             case `DAC`:
-                return new JavaDAC_1.JavaDataAbstractionCoupling();
+            //return new JavaDataAbstractionCoupling();
             case "NOA":
                 return new JavaNOA_1.JavaNumberOfAttributesMetric();
             case "NOM":
@@ -78,6 +79,8 @@ class MetricsFactory {
                 return new JavaNOD_1.NODCalculation();
             case "NODD":
                 return new JavaNODD_1.NODDCalculation();
+            case "TCC":
+                return new JavaTCC_1.TCCCalculation();
             case "FANOUT":
                 const javaCode = `
 

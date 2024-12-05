@@ -147,7 +147,12 @@ class TCCCalculation extends MetricCalculator_1.MetricCalculator {
         // Calculate and return TCC
         const nummeth = methods.length;
         const tcc = ((pairs - 1) * pairs) / (nummeth * (nummeth - 1));
-        return tcc;
+        if (nummeth === 0 || nummeth === 1) {
+            return nummeth;
+        }
+        else {
+            return tcc;
+        }
     }
     // Method to extract the fields used in a specific method
     getFieldsUsedInMethod(rootNode, method) {
