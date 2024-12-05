@@ -39,35 +39,35 @@ function activate(context) {
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1000);
     statusBarItem.text = "CodePure: Ready";
     statusBarItem.show();
-    const activateCommand = vscode.commands.registerCommand('extension.activateCommand', () => {
+    const activateCommand = vscode.commands.registerCommand("extension.activateCommand", () => {
         if (!isActive) {
             isActive = true;
-            vscode.window.showInformationMessage('CodePure Activated!');
+            vscode.window.showInformationMessage("CodePure Activated!");
         }
         else {
-            vscode.window.showWarningMessage('CodePure is already active!');
+            vscode.window.showWarningMessage("CodePure is already active!");
         }
     });
-    const deactivateCommand = vscode.commands.registerCommand('extension.deactivateCommand', () => {
+    const deactivateCommand = vscode.commands.registerCommand("extension.deactivateCommand", () => {
         if (isActive) {
             isActive = false;
-            vscode.window.showInformationMessage('CodePure Deactivated!');
+            vscode.window.showInformationMessage("CodePure Deactivated!");
         }
         else {
-            vscode.window.showWarningMessage('CodePure is not active!');
+            vscode.window.showWarningMessage("CodePure is not active!");
         }
     });
     // Register the command for analyzing selected code
-    const analyzeSelectedCodeCommand = vscode.commands.registerCommand('extension.analyzeSelectedCode', async () => {
+    const analyzeSelectedCodeCommand = vscode.commands.registerCommand("extension.analyzeSelectedCode", async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            vscode.window.showInformationMessage('No active editor found!');
+            vscode.window.showInformationMessage("No active editor found!");
             return;
         }
         const selection = editor.selection;
         const selectedText = editor.document.getText(selection);
         if (!selectedText) {
-            vscode.window.showInformationMessage('No text selected!');
+            vscode.window.showInformationMessage("No text selected!");
             return;
         }
         const problemschecker = new ProblemsChecker_1.ProblemsChecker(editor.document);
@@ -83,17 +83,17 @@ function activate(context) {
         }
     });
     // Command to open the dashboard
-    const openDashboardCommand = vscode.commands.registerCommand('extension.openDashboard', () => {
-        const panel = vscode.window.createWebviewPanel('codePureDashboard', // Identifier for the webview panel
-        'CodePure Dashboard', // Title of the panel
+    const openDashboardCommand = vscode.commands.registerCommand("extension.openDashboard", () => {
+        const panel = vscode.window.createWebviewPanel("codePureDashboard", // Identifier for the webview panel
+        "CodePure Dashboard", // Title of the panel
         vscode.ViewColumn.One, // Display in the first column
         { enableScripts: true } // Enable JavaScript in the webview
         );
         // Set the HTML content for the dashboard
         panel.webview.html = getDashboardHtml();
         // Listen for messages from the webview (e.g., feedback)
-        panel.webview.onDidReceiveMessage(message => {
-            if (message.type === 'feedback') {
+        panel.webview.onDidReceiveMessage((message) => {
+            if (message.type === "feedback") {
                 vscode.window.showInformationMessage(`Feedback received: ${message.feedback}`);
             }
         });
@@ -112,7 +112,7 @@ function activate(context) {
 }
 function highlightCode(editor, selection) {
     const decorationType = vscode.window.createTextEditorDecorationType({
-        backgroundColor: 'rgba(255, 215, 0, 0.3)',
+        backgroundColor: "rgba(255, 215, 0, 0.3)",
     });
     editor.setDecorations(decorationType, [selection]);
     setTimeout(() => {
@@ -121,7 +121,7 @@ function highlightCode(editor, selection) {
 }
 function isSupportedFileType(document) {
     const fileType = document.languageId;
-    const supportedFileTypes = ['java', 'python'];
+    const supportedFileTypes = ["java", "python"];
     if (supportedFileTypes.includes(fileType)) {
         return true;
     }
@@ -131,7 +131,7 @@ function isSupportedFileType(document) {
     }
 }
 function registerHoverProvider(context, documentUri, selection, message) {
-    const hoverProvider = vscode.languages.registerHoverProvider({ scheme: 'file', pattern: documentUri.fsPath }, {
+    const hoverProvider = vscode.languages.registerHoverProvider({ scheme: "file", pattern: documentUri.fsPath }, {
         provideHover(document, position) {
             if (selection.contains(position)) {
                 return new vscode.Hover(message);
@@ -145,15 +145,34 @@ function registerHoverProvider(context, documentUri, selection, message) {
     }, 8000);
 }
 async function analyzeCode(document, sourceCode) {
-    vscode.window.showInformationMessage('Analyzing code...');
+    vscode.window.showInformationMessage("Analyzing code...");
     outputChannel.appendLine("Analyzing code...");
     outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
     const analysisResults = [];
     try {
-        const metricsToCalculate = ['LOC', `AMW`, 'AFTD', 'DAC', 'WMC', `WOC`, 'NOA', 'NOM', 'NOAM', 'NOPA',
-            'NAbsm', 'NProtM', 'FANOUT', 'NDU', 'TCC'];
+        const metricsToCalculate = [
+            "LOC",
+            `AMW`,
+            "AFTD",
+            "DAC",
+            "WMC",
+            `WOC`,
+            "NOA",
+            "NOM",
+            "NOAM",
+            "NOPA",
+            "NAbsm",
+            "NProtM",
+            "FANOUT",
+            "NDU",
+            "NAS",
+            "BUR",
+            "NOD",
+            "NODD",
+            "TCC",
+        ];
         let parser;
-        if (document.languageId === 'java') {
+        if (document.languageId === "java") {
             parser = new javaParser_1.javaParser();
         }
         else {
@@ -162,7 +181,7 @@ async function analyzeCode(document, sourceCode) {
         parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
         // Calculate metrics
-        metricsToCalculate.forEach(metricName => {
+        metricsToCalculate.forEach((metricName) => {
             const metricCalculator = MetricsFactory_1.MetricsFactory.CreateMetric(metricName, document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
@@ -172,7 +191,7 @@ async function analyzeCode(document, sourceCode) {
         });
         outputChannel.show();
         // Combine the results into a string
-        return `Analysis Results:\n${analysisResults.join('\n')}`;
+        return `Analysis Results:\n${analysisResults.join("\n")}`;
     }
     catch (error) {
         const errorMessage = `Error during analysis:\n${error}`;

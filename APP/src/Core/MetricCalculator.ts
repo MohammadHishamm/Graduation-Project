@@ -1,6 +1,3 @@
-
 export abstract class MetricCalculator {
-    
-    abstract calculate(node: any, sourceCode: string): number;
-
+  abstract calculate(node: any, sourceCode: string): number;
 }

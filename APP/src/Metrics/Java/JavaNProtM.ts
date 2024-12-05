@@ -12,7 +12,7 @@ export class JavaNumberOfProtectedMethodsMetric extends MetricCalculator {
                 if (classBody && classBody.children) {
                     for (const child of classBody.children) {
                         // Check for method declarations
-                        if (child.type === 'method_declaration' || child.type === 'field_declaration') {
+                        if (child.type === 'method_declaration' ) {
                             // Check for the "protected" modifier in the method
                             const modifiers = child.children.find((subChild: any) => subChild.type === 'modifiers');
                             if (modifiers && modifiers.children.some((modifier: any) => modifier.type === 'protected')) {
