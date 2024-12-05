@@ -20,13 +20,13 @@ export interface MethodInfo {
     isConstructor: boolean;
     isAccessor: boolean;
     isOverridden: boolean;
+    isStatic: boolean;  // Added isStatic property to the interface
     startPosition: Parser.Point;
     endPosition: Parser.Point;
 }
 
 export interface FieldInfo {
     name: string;
-    type?: string;
     modifiers: string;
     startPosition: Parser.Point;
     endPosition: Parser.Point;

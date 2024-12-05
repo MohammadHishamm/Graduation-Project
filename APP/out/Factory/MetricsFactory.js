@@ -15,7 +15,8 @@ const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
 const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
 const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
 const ECFCode_1 = require("../Core/ECFCode");
-const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
+//import {JavaDataAbstractionCoupling }  from '../Metrics/Java/JavaDAC';
+const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
@@ -47,8 +48,8 @@ class MetricsFactory {
                 return new JavaAMW_1.JavaAverageMethodWeight();
             case `AFTD`:
                 return new JavaAFTD_1.JavaAccessToForeignData();
-            case `DAC`:
-                return new JavaDAC_1.JavaDataAbstractionCoupling();
+            // case `DAC`:
+            //     return new JavaDataAbstractionCoupling();
             case 'NOA':
                 return new JavaNOA_1.JavaNumberOfAttributesMetric();
             case 'NOM':
@@ -65,6 +66,9 @@ class MetricsFactory {
                 return new JavaCoC_1.JavaCognitiveComplexityMetric();
             case 'NDU':
                 return new JavaNDU_1.NDUCalculation();
+            case 'TCC':
+                return new JavaTCC_1.TCCCalculation();
+            case 'FANOUT':
             case 'FANOUT':
                 const javaCode = `
 
