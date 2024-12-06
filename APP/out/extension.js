@@ -91,7 +91,7 @@ function activate(context) {
     });
     // Command to open the dashboard
     const openDashboardCommand = vscode.commands.registerCommand("extension.openDashboard", async () => {
-        dashboard_1.openDashboard;
+        (0, dashboard_1.openDashboard)();
     });
     // Trigger analysis on document save
     vscode.workspace.onDidSaveTextDocument(async (document) => {

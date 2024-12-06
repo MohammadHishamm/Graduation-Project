@@ -18,21 +18,20 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Fetch selected metrics initially
   const selectedMetrics = getSelectedMetrics();
- 
 
   // Create an Output Channel for the extension
   outputChannel = vscode.window.createOutputChannel("CodePure Output");
 
-  vscode.window.showInformationMessage(
-    "CodePure is now active! Use 'Ctrl+S' to detect CodeSmells.");
-    
-  // Create a Status Bar Item
+  vscode.window.showInformationMessage("CodePure is now active! Use 'Ctrl+S' to detect CodeSmells.");
+  
+    // Create a Status Bar Item
   statusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left,
-    1000
+      vscode.StatusBarAlignment.Left,
+      1000
   );
   statusBarItem.text = "CodePure: Ready";
   statusBarItem.show();
+
 
   const activateCommand = vscode.commands.registerCommand(
     "extension.activateCommand",
@@ -110,7 +109,7 @@ export function activate(context: vscode.ExtensionContext) {
   const openDashboardCommand = vscode.commands.registerCommand(
     "extension.openDashboard",
     async () => {
-        openDashboard
+        openDashboard();
     }
   );
 
