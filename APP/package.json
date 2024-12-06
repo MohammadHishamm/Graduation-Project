@@ -24,6 +24,23 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codepure",
+          "title": "CodePure",
+          "icon": "Logo02.png"
+        }
+      ]
+    },
+    "views": {
+      "codepure": [
+        {
+          "id": "codepureTreeView",
+          "name": "CodePure Tree View"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "extension.activateCommand",
@@ -148,7 +165,6 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "codepure": "file:",
     "python-ast": "^0.1.0",
     "tree-sitter": "^0.21.1",
     "tree-sitter-java": "^0.23.4",

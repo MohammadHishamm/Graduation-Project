@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { openDashboard } from "./dashboard";
+import { CustomTreeProvider } from "./dashboard";
 
 import { MetricsFactory } from "./Factory/MetricsFactory";
 
@@ -14,8 +14,13 @@ let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
+  // Start timer
+  console.time("Extension Execution Time");
+
+  console.log('Codepure extension is now active!');
+  
   // Fetch selected metrics initially
   const selectedMetrics = getSelectedMetrics();
 
@@ -32,6 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
   statusBarItem.text = "CodePure: Ready";
   statusBarItem.show();
 
+  const treeDataProvider = new CustomTreeProvider();
+    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
 
   const activateCommand = vscode.commands.registerCommand(
     "extension.activateCommand",
@@ -105,14 +112,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Command to open the dashboard
-  const openDashboardCommand = vscode.commands.registerCommand(
-    "extension.openDashboard",
-    async () => {
-        openDashboard();
-    }
-  );
-
   // Trigger analysis on document save
   vscode.workspace.onDidSaveTextDocument(async (document) => {
     const problemschecker = new ProblemsChecker(document);
@@ -145,10 +144,12 @@ export function activate(context: vscode.ExtensionContext) {
     deactivateCommand,
     outputChannel,
     statusBarItem,
-    openDashboardCommand,
     analyzeSelectedCodeCommand,
-    openSettingsCommand
+    openSettingsCommand,
   );
+
+   // End timer
+   console.timeEnd("Extension Execution Time");
 }
 
 async function AnalyzeSelctedCode(
@@ -304,5 +305,3 @@ async function analyzeCode(
     return errorMessage;
   }
 }
-
-

@@ -34,7 +34,10 @@ const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
-function activate(context) {
+async function activate(context) {
+    // Start timer
+    console.time("Extension Execution Time");
+    console.log('Codepure extension is now active!');
     // Fetch selected metrics initially
     const selectedMetrics = getSelectedMetrics();
     // Create an Output Channel for the extension
@@ -44,6 +47,8 @@ function activate(context) {
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1000);
     statusBarItem.text = "CodePure: Ready";
     statusBarItem.show();
+    const treeDataProvider = new dashboard_1.CustomTreeProvider();
+    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
     const activateCommand = vscode.commands.registerCommand("extension.activateCommand", async () => {
         if (!isActive) {
             isActive = true;
@@ -89,10 +94,6 @@ function activate(context) {
             }
         }
     });
-    // Command to open the dashboard
-    const openDashboardCommand = vscode.commands.registerCommand("extension.openDashboard", async () => {
-        (0, dashboard_1.openDashboard)();
-    });
     // Trigger analysis on document save
     vscode.workspace.onDidSaveTextDocument(async (document) => {
         const problemschecker = new ProblemsChecker_1.ProblemsChecker(document);
@@ -115,7 +116,9 @@ function activate(context) {
             vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(', ')}`);
         }
     });
-    context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, openDashboardCommand, analyzeSelectedCodeCommand, openSettingsCommand);
+    context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, analyzeSelectedCodeCommand, openSettingsCommand);
+    // End timer
+    console.timeEnd("Extension Execution Time");
 }
 async function AnalyzeSelctedCode(document, sourceCode) {
     vscode.window.showInformationMessage("Analyzing Selected code...");
