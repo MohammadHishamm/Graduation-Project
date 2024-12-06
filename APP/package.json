@@ -37,11 +37,12 @@
       "codepure": [
         {
           "id": "codepureTreeView",
-          "name": "CodePure Tree View"
+          "name": "Metrics"
         }
       ]
     },
     "commands": [
+      
       {
         "command": "extension.activateCommand",
         "title": "CodePure: Activate"

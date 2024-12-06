@@ -23,51 +23,63 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TreeNode = exports.CustomTreeProvider = void 0;
+exports.CustomTreeProvider = void 0;
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
 class CustomTreeProvider {
     _onDidChangeTreeData = new vscode.EventEmitter();
     onDidChangeTreeData = this._onDidChangeTreeData.event;
-    // Dummy data for the Tree View
-    data = [
-        new TreeNode("Root Node 1", [
-            new TreeNode("Child Node 1"),
-            new TreeNode("Child Node 2", [
-                new TreeNode("Grandchild Node 1"),
-                new TreeNode("Grandchild Node 2"),
-            ]),
-        ]),
-        new TreeNode("Root Node 2", [
-            new TreeNode("Child Node 3"),
-            new TreeNode("Child Node 4"),
-        ]),
-    ];
-    refresh() {
-        this._onDidChangeTreeData.fire();
+    treeItems = [];
+    constructor() {
+        // Whenever tree data changes, call the update method
+        this.loadMetricsData();
     }
+    // Read the Metrics.json file and load the data asynchronously
+    async loadMetricsData() {
+        let filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+        // Remove 'out' from the file path, if it exists
+        filePath = filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
+        try {
+            const data = await fs.promises.readFile(filePath, "utf8");
+            const metricsData = JSON.parse(data);
+            // Map the metricsData to TreeItems
+            this.treeItems = metricsData.map(item => {
+                return new TreeItem(item.fileName, item.metrics);
+            });
+            // Pass the items to the tree
+            this._onDidChangeTreeData.fire();
+        }
+        catch (err) {
+            console.error("Error reading or parsing metrics file:", err);
+        }
+    }
+    // Get the tree items (files with metrics)
     getTreeItem(element) {
         return element;
     }
+    // Get the children (metrics for each file)
     getChildren(element) {
-        if (element) {
-            return element.children;
+        if (!element) {
+            // Top level, return the list of files
+            return Promise.resolve(this.treeItems || []);
         }
-        else {
-            return this.data;
-        }
+        // If the element is a file, return the metrics for that file
+        return Promise.resolve(element.metrics.map(metric => new TreeItem(`${metric.name}: ${metric.value}`, [])));
     }
 }
 exports.CustomTreeProvider = CustomTreeProvider;
-class TreeNode extends vscode.TreeItem {
+// TreeItem class to represent each item in the tree (both files and metrics)
+class TreeItem extends vscode.TreeItem {
     label;
-    children;
-    constructor(label, children = []) {
-        super(label, children.length === 0
-            ? vscode.TreeItemCollapsibleState.None
-            : vscode.TreeItemCollapsibleState.Collapsed);
+    metrics;
+    constructor(label, metrics = []) {
+        super(label, metrics.length > 0 ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.None);
         this.label = label;
-        this.children = children;
+        this.metrics = metrics;
+        this.tooltip = `${label}`;
+        this.description = metrics.length > 0 ? `${metrics.length} metrics` : "";
+        this.contextValue = metrics.length > 0 ? "fileWithMetrics" : "file";
     }
 }
-exports.TreeNode = TreeNode;
 //# sourceMappingURL=dashboard.js.map

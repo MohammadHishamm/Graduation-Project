@@ -31,6 +31,7 @@ const javaParser_1 = require("./Languages/javaParser");
 const pythonParser_1 = require("./Languages/pythonParser");
 const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
+const MetricsSaver_1 = require("./Saver/MetricsSaver");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
@@ -66,6 +67,8 @@ async function activate(context) {
         else {
             vscode.window.showWarningMessage("CodePure is not active!");
         }
+        let metricSaver = new MetricsSaver_1.MetricsSaver();
+        metricSaver.clearFile();
     });
     // Register the command for analyzing selected code
     const analyzeSelectedCodeCommand = vscode.commands.registerCommand("extension.analyzeSelectedCode", async () => {
@@ -224,6 +227,12 @@ async function analyzeCode(document, sourceCode) {
                 outputChannel.appendLine(`${metricName}: ${value}`);
             }
         });
+        let metrics = analysisResults.map(result => {
+            const [name, value] = result.split(": ");
+            return new MetricsSaver_1.Metric(name.trim(), parseFloat(value)); // Adjust "fileName" as necessary
+        });
+        let metricSaver = new MetricsSaver_1.MetricsSaver();
+        metricSaver.saveMetrics(metrics, document.fileName);
         outputChannel.show();
         // Combine the results into a string
         return `Analysis Results:\n${analysisResults.join("\n")}`;

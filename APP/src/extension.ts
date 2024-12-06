@@ -10,6 +10,8 @@ import { pythonParser } from "./Languages/pythonParser";
 import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 import { ProblemsChecker } from "./Validator/ProblemsChecker";
 
+import {MetricsSaver , Metric} from "./Saver/MetricsSaver";
+
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
@@ -62,6 +64,9 @@ export async function activate(context: vscode.ExtensionContext) {
       } else {
         vscode.window.showWarningMessage("CodePure is not active!");
       }
+      let metricSaver = new MetricsSaver();
+      metricSaver.clearFile();
+
     }
   );
 
@@ -294,6 +299,15 @@ async function analyzeCode(
         outputChannel.appendLine(`${metricName}: ${value}`);
       }
     });
+
+
+    let metrics: Metric[] = analysisResults.map(result => {
+      const [name, value] = result.split(": ");
+      return new Metric(name.trim(), parseFloat(value)); // Adjust "fileName" as necessary
+  });
+  
+  let metricSaver = new MetricsSaver();
+  metricSaver.saveMetrics(metrics , document.fileName);
 
     outputChannel.show();
 

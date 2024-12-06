@@ -1,53 +1,70 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
+import { Metric, MetricsData } from "./Saver/MetricsSaver"; // Ensure you import your Metric classes
 
-export class CustomTreeProvider implements vscode.TreeDataProvider<TreeNode> {
-    private _onDidChangeTreeData: vscode.EventEmitter<TreeNode | undefined | null | void> =
-        new vscode.EventEmitter<TreeNode | undefined | null | void>();
-    readonly onDidChangeTreeData: vscode.Event<TreeNode | undefined | null | void> =
-        this._onDidChangeTreeData.event;
+export class CustomTreeProvider implements vscode.TreeDataProvider<TreeItem> {
 
-    // Dummy data for the Tree View
-    private data: TreeNode[] = [
-        new TreeNode("Root Node 1", [
-            new TreeNode("Child Node 1"),
-            new TreeNode("Child Node 2", [
-                new TreeNode("Grandchild Node 1"),
-                new TreeNode("Grandchild Node 2"),
-            ]),
-        ]),
-        new TreeNode("Root Node 2", [
-            new TreeNode("Child Node 3"),
-            new TreeNode("Child Node 4"),
-        ]),
-    ];
+    private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
+    readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-    refresh(): void {
-        this._onDidChangeTreeData.fire();
+    private treeItems: TreeItem[] = [];
+
+    constructor() {
+        // Whenever tree data changes, call the update method
+        this.loadMetricsData();
     }
 
-    getTreeItem(element: TreeNode): vscode.TreeItem {
+    // Read the Metrics.json file and load the data asynchronously
+    private async loadMetricsData(): Promise<void> {
+        let filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+
+        // Remove 'out' from the file path, if it exists
+        filePath = filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
+
+
+        try {
+            const data = await fs.promises.readFile(filePath, "utf8");
+            const metricsData: MetricsData[] = JSON.parse(data);
+
+            // Map the metricsData to TreeItems
+            this.treeItems = metricsData.map(item => {
+                return new TreeItem(item.fileName, item.metrics);
+            });
+
+            // Pass the items to the tree
+            this._onDidChangeTreeData.fire();
+        } catch (err) {
+            console.error("Error reading or parsing metrics file:", err);
+        }
+    }
+
+    // Get the tree items (files with metrics)
+    getTreeItem(element: TreeItem): vscode.TreeItem {
         return element;
     }
 
-    getChildren(element?: TreeNode): TreeNode[] | Thenable<TreeNode[]> {
-        if (element) {
-            return element.children;
-        } else {
-            return this.data;
+    // Get the children (metrics for each file)
+    getChildren(element?: TreeItem): Thenable<TreeItem[]> {
+        if (!element) {
+            // Top level, return the list of files
+            return Promise.resolve(this.treeItems || []);
         }
+
+        // If the element is a file, return the metrics for that file
+        return Promise.resolve(element.metrics.map(metric => new TreeItem(`${metric.name}: ${metric.value}`, [])));
     }
 }
 
-export class TreeNode extends vscode.TreeItem {
+// TreeItem class to represent each item in the tree (both files and metrics)
+class TreeItem extends vscode.TreeItem {
     constructor(
         public readonly label: string,
-        public readonly children: TreeNode[] = []
+        public metrics: Metric[] = []
     ) {
-        super(
-            label,
-            children.length === 0
-                ? vscode.TreeItemCollapsibleState.None
-                : vscode.TreeItemCollapsibleState.Collapsed
-        );
+        super(label, metrics.length > 0 ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.None);
+        this.tooltip = `${label}`;
+        this.description = metrics.length > 0 ? `${metrics.length} metrics` : "";
+        this.contextValue = metrics.length > 0 ? "fileWithMetrics" : "file";
     }
 }
