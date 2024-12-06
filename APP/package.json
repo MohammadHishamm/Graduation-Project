@@ -14,7 +14,7 @@
     "type": "git",
     "url": "https://github.com/MohammadHishamm/Graduation-Project"
   },
-  "icon": "Logo.png",
+  "icon": "./src/Assets/codepure-logo.png",
   "categories": [
     "Other"
   ],
@@ -29,7 +29,7 @@
         {
           "id": "codepure",
           "title": "CodePure",
-          "icon": "Logo02.png"
+          "icon": "./src/Assets/codepure-icon.png"
         }
       ]
     },
