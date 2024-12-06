@@ -151,7 +151,7 @@ class TCCCalculation extends MetricCalculator_1.MetricCalculator {
             return nummeth;
         }
         else {
-            return tcc;
+            return parseFloat(tcc.toFixed(2));
         }
     }
     // Method to extract the fields used in a specific method

@@ -206,7 +206,7 @@ export class TCCCalculation extends MetricCalculator {
         return nummeth;
     }
     else{
-    return tcc;
+      return parseFloat(tcc.toFixed(2));
     }
   }
 
