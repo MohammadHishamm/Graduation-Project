@@ -15,7 +15,7 @@ const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
 const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
 const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
 const ECFCode_1 = require("../Core/ECFCode");
-//import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
+const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
@@ -54,7 +54,7 @@ class MetricsFactory {
             case `AFTD`:
                 return new JavaAFTD_1.JavaAccessToForeignData();
             case `DAC`:
-            //return new JavaDataAbstractionCoupling();
+                return new JavaDAC_1.JavaDataAbstractionCoupling();
             case "NOA":
                 return new JavaNOA_1.JavaNumberOfAttributesMetric();
             case "NOM":

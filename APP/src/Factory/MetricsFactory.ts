@@ -14,7 +14,8 @@ import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
 import { NDUCalculation } from "../Metrics/Java/JavaNDU";
 import { JavaAccessToForeignData } from "../Metrics/Java/JavaAFTD ";
 import { ExtractComponentsFromCode } from "../Core/ECFCode";
-//import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
+import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
+
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
 import {TCCCalculation} from "../Metrics/Java/JavaTCC";
@@ -64,7 +65,7 @@ export class MetricsFactory {
       case `AFTD`:
         return new JavaAccessToForeignData();
       case `DAC`:
-        //return new JavaDataAbstractionCoupling();
+        return new JavaDataAbstractionCoupling();
       case "NOA":
         return new JavaNumberOfAttributesMetric();
       case "NOM":
