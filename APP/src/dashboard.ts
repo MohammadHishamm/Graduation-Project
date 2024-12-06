@@ -1,5 +1,10 @@
-
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
+
+
+const MAX_FEEDBACK_COUNT = 100; // Limit to 100 feedback entries
+let ACTUAL_FEEDBACK_COUNT = 0;
 
 export function openDashboard() {
     const panel = vscode.window.createWebviewPanel(
@@ -14,12 +19,61 @@ export function openDashboard() {
 
     // Listen for messages from the webview (e.g., feedback)
     panel.webview.onDidReceiveMessage((message) => {
-        if (message.type === "feedback") {
-            vscode.window.showInformationMessage(
-                `Feedback received: ${message.feedback}`
-            );
+        if(MAX_FEEDBACK_COUNT !== ACTUAL_FEEDBACK_COUNT)
+        {
+            if (message.type === "feedback" && message.feedback !== '' ) {
+                saveFeedbackToLog(message.feedback);
+                vscode.window.showInformationMessage(`Feedback Sent.`);
+                ACTUAL_FEEDBACK_COUNT --;
+            }
+            else
+            {
+                vscode.window.showWarningMessage(`Feedback field is empty !`);
+            }
         }
+        else
+        {
+            vscode.window.showWarningMessage(`Feedback already sent .`);
+        }
+
     });
+}
+
+
+
+function saveFeedbackToLog(feedback: string) {
+    try {
+        // Use __dirname to get the extension's current directory
+        const srcDir = path.join(__dirname, '..', 'src'); // Going up from the out directory to src
+
+        // Define the log folder and ensure it exists
+        const logFolderPath = path.join(srcDir, 'logs');
+        if (!fs.existsSync(logFolderPath)) {
+            fs.mkdirSync(logFolderPath, { recursive: true }); // Ensure it creates any missing directories
+        }
+
+        // Define the log file path
+        const logFilePath = path.join(logFolderPath, 'Feedback.log');
+
+        // Format the log entry with a timestamp
+        const logEntry = `[${new Date().toISOString()}] Feedback: ${feedback}\n`;
+
+        // Log to the console for debugging
+        console.log(`Saving log entry: ${logEntry}`);
+
+        // Append the log entry to the file
+        fs.appendFile(logFilePath, logEntry, (err) => {
+            if (err) {
+                console.error('Error writing to log file:', err);
+                
+            } else {
+                console.error('Feedback saved to log file:', err);
+            }
+        });
+    } catch (error) {
+        // Handle any unexpected errors
+        console.error('Unexpected error:', error);
+    }
 }
 
 // Create HTML content for the dashboard

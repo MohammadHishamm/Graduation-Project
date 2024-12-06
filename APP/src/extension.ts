@@ -83,7 +83,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (!problemschecker.checkForErrors()) {
         if (isActive && issupportedfileType.isSupported()) {
           // Call the analyzeCode function (stub in this example)
-          const analysisResult = await AnalyzeCodeMetrics(
+          const analysisResult = await AnalyzeSelctedCode(
             editor.document,
             selectedText
           );
@@ -151,7 +151,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-async function AnalyzeCodeMetrics(
+async function AnalyzeSelctedCode(
   document: vscode.TextDocument,
   sourceCode: string
 ): Promise<string> {

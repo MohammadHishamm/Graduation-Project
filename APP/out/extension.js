@@ -80,7 +80,7 @@ function activate(context) {
         if (!problemschecker.checkForErrors()) {
             if (isActive && issupportedfileType.isSupported()) {
                 // Call the analyzeCode function (stub in this example)
-                const analysisResult = await AnalyzeCodeMetrics(editor.document, selectedText);
+                const analysisResult = await AnalyzeSelctedCode(editor.document, selectedText);
                 vscode.window.showInformationMessage(`Current selected metrics: ${selectedMetrics.join(', ')}`);
                 // Highlight the selected code
                 highlightCode(editor, selection);
@@ -117,7 +117,7 @@ function activate(context) {
     });
     context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, openDashboardCommand, analyzeSelectedCodeCommand, openSettingsCommand);
 }
-async function AnalyzeCodeMetrics(document, sourceCode) {
+async function AnalyzeSelctedCode(document, sourceCode) {
     vscode.window.showInformationMessage("Analyzing Selected code...");
     const analysisResults = [];
     try {

@@ -27,14 +27,15 @@ exports.isSupportedFileType = void 0;
 const vscode = __importStar(require("vscode"));
 class isSupportedFileType {
     document;
-    constructor(document) {
+    supportedFileTypes;
+    constructor(document, supportedFileTypes = ["java", "python"]) {
         this.document = document;
+        this.supportedFileTypes = supportedFileTypes;
     }
     ;
     isSupported() {
         const fileType = this.document.languageId;
-        const supportedFileTypes = ["java", "python"];
-        if (supportedFileTypes.includes(fileType)) {
+        if (this.supportedFileTypes.includes(fileType)) {
             return true;
         }
         else {
