@@ -1,17 +1,31 @@
 import * as vscode from "vscode";
+
+import { openDashboard } from "./dashboard";
+
 import { MetricsFactory } from "./Factory/MetricsFactory";
-import { ProblemsChecker } from "./Validator/ProblemsChecker";
+
 import { javaParser } from "./Languages/javaParser";
 import { pythonParser } from "./Languages/pythonParser";
+
+import { isSupportedFileType } from "./Validator/SupportedFileTypes";
+import { ProblemsChecker } from "./Validator/ProblemsChecker";
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
+
+  // Fetch selected metrics initially
+  const selectedMetrics = getSelectedMetrics();
+ 
+
   // Create an Output Channel for the extension
   outputChannel = vscode.window.createOutputChannel("CodePure Output");
 
+  vscode.window.showInformationMessage(
+    "CodePure is now active! Use 'Ctrl+S' to detect CodeSmells.");
+    
   // Create a Status Bar Item
   statusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left,
@@ -22,10 +36,11 @@ export function activate(context: vscode.ExtensionContext) {
 
   const activateCommand = vscode.commands.registerCommand(
     "extension.activateCommand",
-    () => {
+    async () => {
       if (!isActive) {
         isActive = true;
-        vscode.window.showInformationMessage("CodePure Activated!");
+        vscode.window.showInformationMessage(
+          "CodePure is now active!.");
       } else {
         vscode.window.showWarningMessage("CodePure is already active!");
       }
@@ -34,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const deactivateCommand = vscode.commands.registerCommand(
     "extension.deactivateCommand",
-    () => {
+    async () => {
       if (isActive) {
         isActive = false;
         vscode.window.showInformationMessage("CodePure Deactivated!");
@@ -64,13 +79,17 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const problemschecker = new ProblemsChecker(editor.document);
+      const issupportedfileType = new isSupportedFileType(editor.document);
+
       if (!problemschecker.checkForErrors()) {
-        if (isActive && isSupportedFileType(editor.document)) {
+        if (isActive && issupportedfileType.isSupported()) {
           // Call the analyzeCode function (stub in this example)
-          const analysisResult = await analyzeCode(
+          const analysisResult = await AnalyzeCodeMetrics(
             editor.document,
             selectedText
           );
+
+          vscode.window.showInformationMessage(`Current selected metrics: ${selectedMetrics.join(', ')}`);
 
           // Highlight the selected code
           highlightCode(editor, selection);
@@ -90,38 +109,37 @@ export function activate(context: vscode.ExtensionContext) {
   // Command to open the dashboard
   const openDashboardCommand = vscode.commands.registerCommand(
     "extension.openDashboard",
-    () => {
-      const panel = vscode.window.createWebviewPanel(
-        "codePureDashboard", // Identifier for the webview panel
-        "CodePure Dashboard", // Title of the panel
-        vscode.ViewColumn.One, // Display in the first column
-        { enableScripts: true } // Enable JavaScript in the webview
-      );
-
-      // Set the HTML content for the dashboard
-      panel.webview.html = getDashboardHtml();
-
-      // Listen for messages from the webview (e.g., feedback)
-      panel.webview.onDidReceiveMessage((message) => {
-        if (message.type === "feedback") {
-          vscode.window.showInformationMessage(
-            `Feedback received: ${message.feedback}`
-          );
-        }
-      });
+    async () => {
+        openDashboard
     }
   );
 
   // Trigger analysis on document save
   vscode.workspace.onDidSaveTextDocument(async (document) => {
     const problemschecker = new ProblemsChecker(document);
+    const issupportedfileType = new isSupportedFileType(document);
     if (!problemschecker.checkForErrors()) {
-      if (isActive && isSupportedFileType(document)) {
+      if (isActive && issupportedfileType.isSupported()) {
         const code = document.getText();
         await analyzeCode(document, code);
       }
     }
   });
+
+
+    // Register the command to open CodePure settings
+    const openSettingsCommand = vscode.commands.registerCommand('codepure.openSettings', () => {
+      vscode.commands.executeCommand('workbench.action.openSettings', 'CodePure');
+  });
+
+  // Listen for changes in the settings
+  vscode.workspace.onDidChangeConfiguration(event => {
+    if (event.affectsConfiguration('extension.selectedMetrics')) {
+      const updatedMetrics = getSelectedMetrics();
+      vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(', ')}`);
+    }
+  });
+
 
   context.subscriptions.push(
     activateCommand,
@@ -129,9 +147,60 @@ export function activate(context: vscode.ExtensionContext) {
     outputChannel,
     statusBarItem,
     openDashboardCommand,
-    analyzeSelectedCodeCommand
+    analyzeSelectedCodeCommand,
+    openSettingsCommand
   );
 }
+
+async function AnalyzeCodeMetrics(
+  document: vscode.TextDocument,
+  sourceCode: string
+): Promise<string> {
+
+  vscode.window.showInformationMessage("Analyzing Selected code...");
+
+  const analysisResults: string[] = [];
+  try {
+
+    let parser;
+    if (document.languageId === "java") {
+      parser = new javaParser();
+    } else {
+      parser = new pythonParser();
+    }
+
+    parser.selectLanguage();
+    const rootNode = parser.parse(sourceCode);
+
+    const metricsToCalculate = getSelectedMetrics();
+    // Calculate metrics
+    metricsToCalculate.forEach((metricName) => {
+      const metricCalculator = MetricsFactory.CreateMetric(
+        metricName,
+        document.languageId
+      );
+      if (metricCalculator) {
+        const value = metricCalculator.calculate(rootNode, sourceCode);
+        analysisResults.push(`${metricName}: ${value}`);
+      }
+    });
+
+    // Combine the results into a string
+    return `Analysis Results:\n${analysisResults.join("\n")}`;
+  } catch (error) {
+    const errorMessage = `Error during analysis:\n${error}`;
+    outputChannel.appendLine(errorMessage);
+    return errorMessage;
+  }
+}
+
+
+// Function to get selected metrics from settings
+function getSelectedMetrics(): string[] {
+  const config = vscode.workspace.getConfiguration('codepure');
+  return config.get<string[]>('selectedMetrics', ["LOC", "NOA", "NOM", "NOPA", "NOAM"]);
+}
+
 
 function highlightCode(editor: vscode.TextEditor, selection: vscode.Selection) {
   const decorationType = vscode.window.createTextEditorDecorationType({
@@ -144,17 +213,7 @@ function highlightCode(editor: vscode.TextEditor, selection: vscode.Selection) {
   }, 8000);
 }
 
-function isSupportedFileType(document: vscode.TextDocument): boolean {
-  const fileType = document.languageId;
-  const supportedFileTypes = ["java", "python"];
 
-  if (supportedFileTypes.includes(fileType)) {
-    return true;
-  } else {
-    vscode.window.showWarningMessage(`Unsupported file type: ${fileType}`);
-    return false;
-  }
-}
 
 function registerHoverProvider(
   context: vscode.ExtensionContext,
@@ -180,6 +239,8 @@ function registerHoverProvider(
     hoverProvider.dispose();
   }, 8000);
 }
+
+
 async function analyzeCode(
   document: vscode.TextDocument,
   sourceCode: string
@@ -245,129 +306,4 @@ async function analyzeCode(
   }
 }
 
-// Create HTML content for the dashboard
-function getDashboardHtml(): string {
-  return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>CodePure Dashboard</title>
-            <style>
-                body {
-                    font-family: 'Arial', sans-serif;
-                    margin: 0;
-                    padding: 0;
-                    background-color: #f9f9f9;
-                    color: #333;
-                }
-                header {
-                    background-color: #007acc;
-                    color: white;
-                    padding: 10px 20px;
-                    font-size: 24px;
-                    font-weight: bold;
-                    text-align: center;
-                }
-                .container {
-                    padding: 20px;
-                }
-                h2 {
-                    color: #007acc;
-                    margin-bottom: 10px;
-                }
-                .section {
-                    background: white;
-                    border-radius: 8px;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 10px;
-                }
-                table th, table td {
-                    text-align: left;
-                    padding: 8px;
-                    border-bottom: 1px solid #ddd;
-                }
-                table th {
-                    background-color: #f4f4f4;
-                    font-weight: bold;
-                }
-                .chart-container {
-                    position: relative;
-                    height: 300px;
-                }
-                .feedback {
-                    display: flex;
-                    flex-direction: column;
-                }
-                .feedback textarea {
-                    resize: none;
-                    padding: 10px;
-                    margin-bottom: 10px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    font-size: 14px;
-                }
-                .feedback button {
-                    align-self: flex-end;
-                    background-color: #007acc;
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    font-size: 14px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-                .feedback button:hover {
-                    background-color: #005a9e;
-                }
-            </style>
-        </head>
-        <body>
-            <header>CodePure Dashboard</header>
-            <div class="container">
-                <div class="section">
-                    <h2>Metrics Summary</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>Value</th>
-                                <th>Threshold</th>
-                            </tr>
-                        </thead>
-                        <tbody id="metricsTable"></tbody>
-                    </table>
-                </div>
-                <div class="section">
-                    <h2>Code Smells Distribution</h2>
-                    <div class="chart-container">
-                        <canvas id="smellsChart"></canvas>
-                    </div>
-                </div>
-                <div class="section">
-                    <h2>Feedback</h2>
-                    <div class="feedback">
-                        <textarea id="feedbackInput" rows="4" placeholder="Provide your feedback"></textarea>
-                        <button id="submitFeedback">Submit Feedback</button>
-                    </div>
-                </div>
-            </div>
-            <script>
-                const vscode = acquireVsCodeApi();
-                const feedbackButton = document.getElementById('submitFeedback');
-                feedbackButton.addEventListener('click', () => {
-                    const feedbackText = document.getElementById('feedbackInput').value;
-                    vscode.postMessage({ type: 'feedback', feedback: feedbackText });
-                });
-            </script>
-        </body>
-        </html>
-    `;
-}
+

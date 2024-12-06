@@ -40,6 +40,10 @@
       {
         "command": "extension.openDashboard",
         "title": "CodePure: Open Dashboard"
+      },
+      {
+        "command": "codepure.openSettings",
+        "title": "CodePure: Metrics Settings"
       }
     ],
     "keybindings": [
@@ -66,6 +70,11 @@
         "key": "ctrl+n",
         "mac": "cmd+n",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "codepure.openSettings",
+        "key": "ctrl+alt+S",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -76,6 +85,47 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "CodePure",
+      "properties": {
+        "codepure.selectedMetrics": {
+          "type": "array",
+          "default": [
+            "LOC",
+            "NOA",
+            "NOM",
+            "NOPA",
+            "NOAM"
+          ],
+          "description": "Select the metrics to display",
+          "items": {
+            "type": "string",
+            "enum": [
+              "LOC",
+              "AMW",
+              "AFTD",
+              "DAC",
+              "WMC",
+              "WOC",
+              "NOA",
+              "NOM",
+              "NOAM",
+              "NOPA",
+              "NAbsm",
+              "NProtM",
+              "FANOUT",
+              "NDU",
+              "NAS",
+              "BUR",
+              "NOD",
+              "NODD",
+              "TCC"
+            ]
+          }
+        }
+      }
     }
   },
   "scripts": {
