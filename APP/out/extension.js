@@ -233,6 +233,8 @@ async function analyzeCode(document, sourceCode) {
         });
         let metricSaver = new MetricsSaver_1.MetricsSaver();
         metricSaver.saveMetrics(metrics, document.fileName);
+        const treeDataProvider = new dashboard_1.CustomTreeProvider();
+        vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
         outputChannel.show();
         // Combine the results into a string
         return `Analysis Results:\n${analysisResults.join("\n")}`;

@@ -10,7 +10,7 @@ import { pythonParser } from "./Languages/pythonParser";
 import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 import { ProblemsChecker } from "./Validator/ProblemsChecker";
 
-import {MetricsSaver , Metric} from "./Saver/MetricsSaver";
+import { MetricsSaver, Metric } from "./Saver/MetricsSaver";
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
@@ -22,7 +22,7 @@ export async function activate(context: vscode.ExtensionContext) {
   console.time("Extension Execution Time");
 
   console.log('Codepure extension is now active!');
-  
+
   // Fetch selected metrics initially
   const selectedMetrics = getSelectedMetrics();
 
@@ -30,17 +30,17 @@ export async function activate(context: vscode.ExtensionContext) {
   outputChannel = vscode.window.createOutputChannel("CodePure Output");
 
   vscode.window.showInformationMessage("CodePure is now active! Use 'Ctrl+S' to detect CodeSmells.");
-  
-    // Create a Status Bar Item
+
+  // Create a Status Bar Item
   statusBarItem = vscode.window.createStatusBarItem(
-      vscode.StatusBarAlignment.Left,
-      1000
+    vscode.StatusBarAlignment.Left,
+    1000
   );
   statusBarItem.text = "CodePure: Ready";
   statusBarItem.show();
 
   const treeDataProvider = new CustomTreeProvider();
-    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
+  vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
 
   const activateCommand = vscode.commands.registerCommand(
     "extension.activateCommand",
@@ -130,9 +130,9 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
 
-    // Register the command to open CodePure settings
-    const openSettingsCommand = vscode.commands.registerCommand('codepure.openSettings', () => {
-      vscode.commands.executeCommand('workbench.action.openSettings', 'CodePure');
+  // Register the command to open CodePure settings
+  const openSettingsCommand = vscode.commands.registerCommand('codepure.openSettings', () => {
+    vscode.commands.executeCommand('workbench.action.openSettings', 'CodePure');
   });
 
   // Listen for changes in the settings
@@ -153,8 +153,8 @@ export async function activate(context: vscode.ExtensionContext) {
     openSettingsCommand,
   );
 
-   // End timer
-   console.timeEnd("Extension Execution Time");
+  // End timer
+  console.timeEnd("Extension Execution Time");
 }
 
 async function AnalyzeSelctedCode(
@@ -304,11 +304,12 @@ async function analyzeCode(
     let metrics: Metric[] = analysisResults.map(result => {
       const [name, value] = result.split(": ");
       return new Metric(name.trim(), parseFloat(value)); // Adjust "fileName" as necessary
-  });
-  
-  let metricSaver = new MetricsSaver();
-  metricSaver.saveMetrics(metrics , document.fileName);
+    });
 
+    let metricSaver = new MetricsSaver();
+    metricSaver.saveMetrics(metrics, document.fileName);
+    const treeDataProvider = new CustomTreeProvider();
+    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
     outputChannel.show();
 
     // Combine the results into a string

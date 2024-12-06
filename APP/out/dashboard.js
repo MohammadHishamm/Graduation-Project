@@ -27,6 +27,7 @@ exports.CustomTreeProvider = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
+const MetricsSaver_1 = require("./Saver/MetricsSaver"); // Ensure you import your Metric classes
 class CustomTreeProvider {
     _onDidChangeTreeData = new vscode.EventEmitter();
     onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -43,10 +44,17 @@ class CustomTreeProvider {
         try {
             const data = await fs.promises.readFile(filePath, "utf8");
             const metricsData = JSON.parse(data);
-            // Map the metricsData to TreeItems
-            this.treeItems = metricsData.map(item => {
-                return new TreeItem(item.fileName, item.metrics);
+            // Create a root node for "ALL Files"
+            const allFilesItem = new TreeItem('ALL Files', []);
+            // Map metricsData to TreeItems, ensuring the metrics array is passed correctly
+            const fileItems = metricsData.map(item => {
+                const fileMetrics = item.metrics.map(metric => new MetricsSaver_1.Metric(metric.name, metric.value));
+                return new TreeItem(item.fileName, fileMetrics);
             });
+            // Add the file items under the "ALL Files" root node
+            allFilesItem.children = fileItems;
+            // Set the tree items to include the "ALL Files" root node
+            this.treeItems = [allFilesItem];
             // Pass the items to the tree
             this._onDidChangeTreeData.fire();
         }
@@ -58,11 +66,15 @@ class CustomTreeProvider {
     getTreeItem(element) {
         return element;
     }
-    // Get the children (metrics for each file)
+    // Get the children (metrics for each file or list of files under ALL Files)
     getChildren(element) {
         if (!element) {
-            // Top level, return the list of files
-            return Promise.resolve(this.treeItems || []);
+            // Top level: return the "ALL Files" node
+            return Promise.resolve(this.treeItems);
+        }
+        // If the element is "ALL Files", return the file nodes
+        if (element.label === 'ALL Files') {
+            return Promise.resolve(element.children || []);
         }
         // If the element is a file, return the metrics for that file
         return Promise.resolve(element.metrics.map(metric => new TreeItem(`${metric.name}: ${metric.value}`, [])));
@@ -73,8 +85,9 @@ exports.CustomTreeProvider = CustomTreeProvider;
 class TreeItem extends vscode.TreeItem {
     label;
     metrics;
-    constructor(label, metrics = []) {
-        super(label, metrics.length > 0 ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.None);
+    children; // To store children nodes for "ALL Files"
+    constructor(label, metrics = [], collapsibleState = vscode.TreeItemCollapsibleState.Collapsed) {
+        super(label, collapsibleState);
         this.label = label;
         this.metrics = metrics;
         this.tooltip = `${label}`;
