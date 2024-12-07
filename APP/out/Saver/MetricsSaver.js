@@ -50,60 +50,71 @@ class MetricsSaver {
         }
         console.log(`Metrics will be saved to: ${this.filePath}`);
     }
-    // Save metrics to the JSON file
-    saveMetrics(metrics, fileName) {
+    // read w write Async 3ashan a5ly kolo y2of ma3ada dol
+    saveMetrics(metrics, fullPath) {
+        let fileName = path.basename(fullPath);
+        // Get the parent directory of the file
+        const parentDir = path.dirname(fullPath);
+        // Get the immediate folder name (i.e., the last directory in the path)
+        let folderName = path.basename(parentDir);
+        folderName += `/${fileName}`;
         if (metrics.length === 0) {
             console.log("No metrics to save.");
             return;
         }
-        // Read the current contents of the JSON file
-        fs.readFile(this.filePath, "utf8", (err, data) => {
-            let currentData = [];
-            if (err && err.code !== 'ENOENT') {
-                console.log("Failed to read metrics file.");
+        let currentData = [];
+        try {
+            // Check if file exists and is not empty
+            const data = fs.readFileSync(this.filePath, 'utf8').trim();
+            // If the file is empty, handle it gracefully
+            if (data === '') {
+                console.log("Metrics file is empty, initializing new data.");
+            }
+            else {
+                // Parse the existing file if it has content
+                currentData = JSON.parse(data);
+            }
+        }
+        catch (err) {
+            if (err === 'ENOENT') {
+                // If the file doesn't exist, it's not an error, we'll create it
+                console.log("Metrics file does not exist, creating a new one.");
+            }
+            else {
+                // If there's any other error (like JSON parsing error), log it
+                console.log("Failed to read or parse metrics file.");
                 console.error(err);
                 return;
             }
-            // Parse the existing file if it exists
-            if (data) {
-                try {
-                    currentData = JSON.parse(data);
-                }
-                catch (parseError) {
-                    console.log("Failed to parse JSON data.");
-                    console.error(parseError);
-                }
-            }
-            // Check if the file with the same name already exists
-            const existingIndex = currentData.findIndex(item => item.fileName === fileName);
-            if (existingIndex !== -1) {
-                // Replace the existing entry with the new metrics
-                currentData[existingIndex].metrics = metrics;
-                console.log(`Replaced metrics for file: ${fileName}`);
-            }
-            else {
-                // Append the new metrics for this file
-                currentData.push({ fileName, metrics });
-                console.log(`Added metrics for new file: ${fileName}`);
-            }
-            // Save the updated data to the file
-            this.writeToFile(currentData);
-        });
+        }
+        // Check if the file with the same name already exists
+        const existingIndex = currentData.findIndex(item => item.fullPath === fullPath);
+        if (existingIndex !== -1) {
+            // Replace the existing entry with the new metrics
+            currentData[existingIndex].metrics = metrics;
+        }
+        else {
+            // Append the new metrics for this file
+            currentData.push({ fullPath, folderName, metrics });
+        }
+        // Save the updated data to the file synchronously
+        this.writeToFile(currentData);
     }
-    // Write the data to the JSON file
     writeToFile(data) {
-        fs.writeFile(this.filePath, JSON.stringify(data, null, 2), (err) => {
-            if (err) {
-                console.log("Failed to save metrics to file.");
-                console.error(err);
-            }
-            else {
-                console.log("Metrics saved to Metrics.json.");
-            }
-        });
+        try {
+            fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2));
+            console.log("Metrics saved to Metrics.json.");
+        }
+        catch (err) {
+            console.log("Failed to save metrics to file.");
+            console.error(err);
+        }
     }
     // Method to clear the file contents (if needed)
     clearFile() {
+        this.filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+        // Remove 'out' from the file path, if it exists
+        this.filePath = this.filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
         fs.writeFile(this.filePath, "", (err) => {
             if (err) {
                 console.log("Failed to clear the file.");

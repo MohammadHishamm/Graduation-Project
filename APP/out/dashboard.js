@@ -33,7 +33,6 @@ class CustomTreeProvider {
     onDidChangeTreeData = this._onDidChangeTreeData.event;
     treeItems = [];
     constructor() {
-        // Whenever tree data changes, call the update method
         this.loadMetricsData();
     }
     // Read the Metrics.json file and load the data asynchronously
@@ -43,24 +42,33 @@ class CustomTreeProvider {
         filePath = filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
         try {
             const data = await fs.promises.readFile(filePath, "utf8");
+            if (data.length === 0) {
+                console.log("No metrics to retrive.");
+                return;
+            }
             const metricsData = JSON.parse(data);
             // Create a root node for "ALL Files"
             const allFilesItem = new TreeItem('ALL Files', []);
             // Map metricsData to TreeItems, ensuring the metrics array is passed correctly
             const fileItems = metricsData.map(item => {
                 const fileMetrics = item.metrics.map(metric => new MetricsSaver_1.Metric(metric.name, metric.value));
-                return new TreeItem(item.fileName, fileMetrics);
+                return new TreeItem(item.folderName, fileMetrics);
             });
             // Add the file items under the "ALL Files" root node
             allFilesItem.children = fileItems;
             // Set the tree items to include the "ALL Files" root node
             this.treeItems = [allFilesItem];
-            // Pass the items to the tree
+            // Notify listeners that the tree data has changed
             this._onDidChangeTreeData.fire();
         }
         catch (err) {
             console.error("Error reading or parsing metrics file:", err);
         }
+    }
+    // Function to reload the tree data
+    reload() {
+        console.log("reload triggered.");
+        this.loadMetricsData(); // This triggers the tree view refresh
     }
     // Get the tree items (files with metrics)
     getTreeItem(element) {

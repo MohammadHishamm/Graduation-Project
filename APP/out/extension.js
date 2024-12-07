@@ -29,12 +29,13 @@ const dashboard_1 = require("./dashboard");
 const MetricsFactory_1 = require("./Factory/MetricsFactory");
 const javaParser_1 = require("./Languages/javaParser");
 const pythonParser_1 = require("./Languages/pythonParser");
-const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
+const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
 const MetricsSaver_1 = require("./Saver/MetricsSaver");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
+let metricSaver = new MetricsSaver_1.MetricsSaver();
 async function activate(context) {
     // Start timer
     console.time("Extension Execution Time");
@@ -48,8 +49,6 @@ async function activate(context) {
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1000);
     statusBarItem.text = "CodePure: Ready";
     statusBarItem.show();
-    const treeDataProvider = new dashboard_1.CustomTreeProvider();
-    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
     const activateCommand = vscode.commands.registerCommand("extension.activateCommand", async () => {
         if (!isActive) {
             isActive = true;
@@ -67,8 +66,6 @@ async function activate(context) {
         else {
             vscode.window.showWarningMessage("CodePure is not active!");
         }
-        let metricSaver = new MetricsSaver_1.MetricsSaver();
-        metricSaver.clearFile();
     });
     // Register the command for analyzing selected code
     const analyzeSelectedCodeCommand = vscode.commands.registerCommand("extension.analyzeSelectedCode", async () => {
@@ -98,14 +95,15 @@ async function activate(context) {
         }
     });
     // Trigger analysis on document save
+    const treeDataProvider = new dashboard_1.CustomTreeProvider();
+    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
     vscode.workspace.onDidSaveTextDocument(async (document) => {
-        const problemschecker = new ProblemsChecker_1.ProblemsChecker(document);
-        const issupportedfileType = new SupportedFileTypes_1.isSupportedFileType(document);
-        if (!problemschecker.checkForErrors()) {
-            if (isActive && issupportedfileType.isSupported()) {
-                const code = document.getText();
-                await analyzeCode(document, code);
-            }
+        const problemsChecker = new ProblemsChecker_1.ProblemsChecker(document);
+        const isSupportedfiletype = new SupportedFileTypes_1.isSupportedFileType(document);
+        if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
+            const sourceCode = document.getText();
+            analyzeCode(document, sourceCode);
+            treeDataProvider.reload();
         }
     });
     // Register the command to open CodePure settings
@@ -119,6 +117,18 @@ async function activate(context) {
             vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(', ')}`);
         }
     });
+    // Clear the JSON file on VS Code close
+    process.on('exit', metricSaver.clearFile); // Normal exit
+    process.on('SIGINT', () => {
+        metricSaver.clearFile();
+        ;
+        process.exit();
+    }); // Interrupt (Ctrl+C)
+    process.on('SIGTERM', () => {
+        metricSaver.clearFile();
+        ;
+        process.exit();
+    }); // Termination
     context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, analyzeSelectedCodeCommand, openSettingsCommand);
     // End timer
     console.timeEnd("Extension Execution Time");
@@ -182,66 +192,64 @@ function registerHoverProvider(context, documentUri, selection, message) {
         hoverProvider.dispose();
     }, 8000);
 }
-async function analyzeCode(document, sourceCode) {
-    vscode.window.showInformationMessage("Analyzing code...");
-    outputChannel.appendLine("Analyzing code...");
-    outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
+function analyzeCode(document, sourceCode) {
+    vscode.window.showInformationMessage(`Analyzing ${document.languageId} code...`);
     const analysisResults = [];
+    const metricsToCalculate = [
+        "LOC",
+        "AMW",
+        "AFTD",
+        "DAC",
+        "WMC",
+        "WOC",
+        "NOA",
+        "NOM",
+        "NOAM",
+        "NOPA",
+        "NAbsm",
+        "NProtM",
+        "FANOUT",
+        "NDU",
+        "NAS",
+        "BUR",
+        "NOD",
+        "NODD",
+        "TCC",
+    ];
     try {
-        const metricsToCalculate = [
-            "LOC",
-            `AMW`,
-            "AFTD",
-            "DAC",
-            "WMC",
-            `WOC`,
-            "NOA",
-            "NOM",
-            "NOAM",
-            "NOPA",
-            "NAbsm",
-            "NProtM",
-            "FANOUT",
-            "NDU",
-            "NAS",
-            "BUR",
-            "NOD",
-            "NODD",
-            "TCC",
-        ];
-        let parser;
-        if (document.languageId === "java") {
-            parser = new javaParser_1.javaParser();
-        }
-        else {
-            parser = new pythonParser_1.pythonParser();
-        }
+        // Dynamically select the parser based on the language
+        const parser = document.languageId === "java" ? new javaParser_1.javaParser() : new pythonParser_1.pythonParser();
         parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
         // Calculate metrics
-        metricsToCalculate.forEach((metricName) => {
+        for (const metricName of metricsToCalculate) {
             const metricCalculator = MetricsFactory_1.MetricsFactory.CreateMetric(metricName, document.languageId);
             if (metricCalculator) {
                 const value = metricCalculator.calculate(rootNode, sourceCode);
                 analysisResults.push(`${metricName}: ${value}`);
-                outputChannel.appendLine(`${metricName}: ${value}`);
             }
-        });
-        let metrics = analysisResults.map(result => {
+        }
+        // Map results to Metric objects
+        const metrics = analysisResults.map((result) => {
             const [name, value] = result.split(": ");
-            return new MetricsSaver_1.Metric(name.trim(), parseFloat(value)); // Adjust "fileName" as necessary
+            if (!name || isNaN(parseFloat(value))) {
+                throw new Error(`Invalid metric format: ${result}`);
+            }
+            return new MetricsSaver_1.Metric(name.trim(), parseFloat(value));
         });
-        let metricSaver = new MetricsSaver_1.MetricsSaver();
+        console.log("analyze triggered.");
+        // Save metrics
+        const metricSaver = new MetricsSaver_1.MetricsSaver();
         metricSaver.saveMetrics(metrics, document.fileName);
-        const treeDataProvider = new dashboard_1.CustomTreeProvider();
-        vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
+        // Display results in the output channel
         outputChannel.show();
-        // Combine the results into a string
+        outputChannel.appendLine(`Analysis Results:\n${analysisResults.join("\n")}`);
         return `Analysis Results:\n${analysisResults.join("\n")}`;
     }
     catch (error) {
         const errorMessage = `Error during analysis:\n${error}`;
         outputChannel.appendLine(errorMessage);
+        vscode.window.showErrorMessage(errorMessage);
         return errorMessage;
     }
 }

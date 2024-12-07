@@ -7,14 +7,15 @@ import { MetricsFactory } from "./Factory/MetricsFactory";
 import { javaParser } from "./Languages/javaParser";
 import { pythonParser } from "./Languages/pythonParser";
 
-import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 import { ProblemsChecker } from "./Validator/ProblemsChecker";
+import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 
-import { MetricsSaver, Metric } from "./Saver/MetricsSaver";
+import { Metric, MetricsSaver } from "./Saver/MetricsSaver";
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
+let metricSaver = new MetricsSaver();
 
 export async function activate(context: vscode.ExtensionContext) {
 
@@ -39,8 +40,12 @@ export async function activate(context: vscode.ExtensionContext) {
   statusBarItem.text = "CodePure: Ready";
   statusBarItem.show();
 
-  const treeDataProvider = new CustomTreeProvider();
-  vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
+
+
+
+
+
+
 
   const activateCommand = vscode.commands.registerCommand(
     "extension.activateCommand",
@@ -64,8 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
       } else {
         vscode.window.showWarningMessage("CodePure is not active!");
       }
-      let metricSaver = new MetricsSaver();
-      metricSaver.clearFile();
+
 
     }
   );
@@ -118,14 +122,17 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   // Trigger analysis on document save
+  const treeDataProvider = new CustomTreeProvider();
+  vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
+
   vscode.workspace.onDidSaveTextDocument(async (document) => {
-    const problemschecker = new ProblemsChecker(document);
-    const issupportedfileType = new isSupportedFileType(document);
-    if (!problemschecker.checkForErrors()) {
-      if (isActive && issupportedfileType.isSupported()) {
-        const code = document.getText();
-        await analyzeCode(document, code);
-      }
+    const problemsChecker = new ProblemsChecker(document);
+    const isSupportedfiletype = new isSupportedFileType(document);
+
+    if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
+      const sourceCode = document.getText();
+       analyzeCode(document, sourceCode);
+       treeDataProvider.reload();
     }
   });
 
@@ -143,6 +150,16 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  // Clear the JSON file on VS Code close
+  process.on('exit', metricSaver.clearFile); // Normal exit
+  process.on('SIGINT', () => {
+    metricSaver.clearFile();;
+    process.exit();
+  }); // Interrupt (Ctrl+C)
+  process.on('SIGTERM', () => {
+    metricSaver.clearFile();;
+    process.exit();
+  }); // Termination
 
   context.subscriptions.push(
     activateCommand,
@@ -246,49 +263,48 @@ function registerHoverProvider(
 }
 
 
-async function analyzeCode(
+ function analyzeCode(
   document: vscode.TextDocument,
-  sourceCode: string
-): Promise<string> {
-  vscode.window.showInformationMessage("Analyzing code...");
-  outputChannel.appendLine("Analyzing code...");
-  outputChannel.appendLine("Code being analyzed:\n" + sourceCode);
+  sourceCode: string,
+): string {
+  vscode.window.showInformationMessage(
+    `Analyzing ${document.languageId} code...`
+  );
 
   const analysisResults: string[] = [];
+
+  const metricsToCalculate = [
+    "LOC",
+    "AMW",
+    "AFTD",
+    "DAC",
+    "WMC",
+    "WOC",
+    "NOA",
+    "NOM",
+    "NOAM",
+    "NOPA",
+    "NAbsm",
+    "NProtM",
+    "FANOUT",
+    "NDU",
+    "NAS",
+    "BUR",
+    "NOD",
+    "NODD",
+    "TCC",
+  ];
+
   try {
-    const metricsToCalculate = [
-      "LOC",
-      `AMW`,
-      "AFTD",
-      "DAC",
-      "WMC",
-      `WOC`,
-      "NOA",
-      "NOM",
-      "NOAM",
-      "NOPA",
-      "NAbsm",
-      "NProtM",
-      "FANOUT",
-      "NDU",
-      "NAS",
-      "BUR",
-      "NOD",
-      "NODD",
-      "TCC",
-    ];
-    let parser;
-    if (document.languageId === "java") {
-      parser = new javaParser();
-    } else {
-      parser = new pythonParser();
-    }
+    // Dynamically select the parser based on the language
+    const parser =
+      document.languageId === "java" ? new javaParser() : new pythonParser();
 
     parser.selectLanguage();
     const rootNode = parser.parse(sourceCode);
 
     // Calculate metrics
-    metricsToCalculate.forEach((metricName) => {
+    for (const metricName of metricsToCalculate) {
       const metricCalculator = MetricsFactory.CreateMetric(
         metricName,
         document.languageId
@@ -296,27 +312,37 @@ async function analyzeCode(
       if (metricCalculator) {
         const value = metricCalculator.calculate(rootNode, sourceCode);
         analysisResults.push(`${metricName}: ${value}`);
-        outputChannel.appendLine(`${metricName}: ${value}`);
       }
-    });
+    }
 
-
-    let metrics: Metric[] = analysisResults.map(result => {
+    // Map results to Metric objects
+    const metrics: Metric[] = analysisResults.map((result) => {
       const [name, value] = result.split(": ");
-      return new Metric(name.trim(), parseFloat(value)); // Adjust "fileName" as necessary
+      if (!name || isNaN(parseFloat(value))) {
+        throw new Error(`Invalid metric format: ${result}`);
+      }
+      return new Metric(name.trim(), parseFloat(value));
     });
 
-    let metricSaver = new MetricsSaver();
-    metricSaver.saveMetrics(metrics, document.fileName);
-    const treeDataProvider = new CustomTreeProvider();
-    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
-    outputChannel.show();
 
-    // Combine the results into a string
+    console.log("analyze triggered.");
+
+    // Save metrics
+    const metricSaver = new MetricsSaver();
+    metricSaver.saveMetrics(metrics, document.fileName);
+
+
+    
+    // Display results in the output channel
+    outputChannel.show();
+    outputChannel.appendLine(`Analysis Results:\n${analysisResults.join("\n")}`);
+
     return `Analysis Results:\n${analysisResults.join("\n")}`;
   } catch (error) {
     const errorMessage = `Error during analysis:\n${error}`;
     outputChannel.appendLine(errorMessage);
+    vscode.window.showErrorMessage(errorMessage);
     return errorMessage;
   }
 }
+
