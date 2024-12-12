@@ -31,11 +31,18 @@ const javaParser_1 = require("./Languages/javaParser");
 const pythonParser_1 = require("./Languages/pythonParser");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
 const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
+const MetricsFileFormat_1 = require("./Interface/MetricsData/MetricsFileFormat");
 const MetricsSaver_1 = require("./Saver/MetricsSaver");
+const MetricsNotifier_1 = require("./Core/MetricsNotifier");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
-let metricSaver = new MetricsSaver_1.MetricsSaver();
+// extension.ts
+const metricsNotifier = new MetricsNotifier_1.MetricsNotifier();
+const metricsSaver = new MetricsSaver_1.MetricsSaver(metricsNotifier); // Pass notifier to MetricsSaver
+// CustomTreeProvider listens to the notifier automatically
+const customTreeProvider = new dashboard_1.CustomTreeProvider();
+metricsNotifier.addObserver(customTreeProvider);
 async function activate(context) {
     // Start timer
     console.time("Extension Execution Time");
@@ -94,16 +101,13 @@ async function activate(context) {
             }
         }
     });
-    // Trigger analysis on document save
-    const treeDataProvider = new dashboard_1.CustomTreeProvider();
-    vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
+    vscode.window.registerTreeDataProvider("codepureTreeView", customTreeProvider);
     vscode.workspace.onDidSaveTextDocument(async (document) => {
         const problemsChecker = new ProblemsChecker_1.ProblemsChecker(document);
         const isSupportedfiletype = new SupportedFileTypes_1.isSupportedFileType(document);
         if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
             const sourceCode = document.getText();
             analyzeCode(document, sourceCode);
-            treeDataProvider.reload();
         }
     });
     // Register the command to open CodePure settings
@@ -117,18 +121,6 @@ async function activate(context) {
             vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(', ')}`);
         }
     });
-    // Clear the JSON file on VS Code close
-    process.on('exit', metricSaver.clearFile); // Normal exit
-    process.on('SIGINT', () => {
-        metricSaver.clearFile();
-        ;
-        process.exit();
-    }); // Interrupt (Ctrl+C)
-    process.on('SIGTERM', () => {
-        metricSaver.clearFile();
-        ;
-        process.exit();
-    }); // Termination
     context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, analyzeSelectedCodeCommand, openSettingsCommand);
     // End timer
     console.timeEnd("Extension Execution Time");
@@ -235,12 +227,10 @@ function analyzeCode(document, sourceCode) {
             if (!name || isNaN(parseFloat(value))) {
                 throw new Error(`Invalid metric format: ${result}`);
             }
-            return new MetricsSaver_1.Metric(name.trim(), parseFloat(value));
+            return new MetricsFileFormat_1.Metric(name.trim(), parseFloat(value));
         });
         console.log("analyze triggered.");
-        // Save metrics
-        const metricSaver = new MetricsSaver_1.MetricsSaver();
-        metricSaver.saveMetrics(metrics, document.fileName);
+        metricsSaver.saveMetrics(metrics, document.fileName);
         // Display results in the output channel
         outputChannel.show();
         outputChannel.appendLine(`Analysis Results:\n${analysisResults.join("\n")}`);

@@ -1,68 +1,63 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Metric, MetricsData } from "./Saver/MetricsSaver"; // Ensure you import your Metric classes
+import { Metric, MetricsData } from "./Interface/MetricsData/MetricsFileFormat"; // Ensure you import your Metric classes
+import { Observer } from './Core/MetricsObserver'; // Import Observer interface
 
-export class CustomTreeProvider implements vscode.TreeDataProvider<TreeItem> {
+export class CustomTreeProvider implements vscode.TreeDataProvider<TreeItem>, Observer {
 
     private _onDidChangeTreeData: vscode.EventEmitter<TreeItem | undefined | null | void> = new vscode.EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
     private treeItems: TreeItem[] = [];
 
-    constructor() 
-    {
-        this.loadMetricsData();
+    constructor() {
+        this.loadMetricsData();  // Initial data load
     }
 
-    // Read the Metrics.json file and load the data asynchronously
-    private async loadMetricsData(): Promise<void> {
-        let filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+    // Load metrics data into the tree
+    private loadMetricsData(metricsData: MetricsData[] = []): void {
+        if (metricsData.length === 0) {
+            let filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+            filePath = filePath.replace(/out[\\\/]?/, "");
 
-        // Remove 'out' from the file path, if it exists
-        filePath = filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
+            try {
+                const data = fs.readFileSync(filePath, "utf8");
+                if (data.length === 0) {
+                    console.log("No metrics to retrieve.");
+                    return;
+                }
 
-        try {
-            
-            const data = await fs.promises.readFile(filePath, "utf8");
-            if (data.length === 0) {
-                console.log("No metrics to retrive.");
-                return;
+                metricsData = JSON.parse(data);
+            } catch (err) {
+                console.error("Error reading or parsing metrics file:", err);
             }
-
-            const metricsData: MetricsData[] = JSON.parse(data);
-
-
-
-            // Create a root node for "ALL Files"
-            const allFilesItem = new TreeItem('ALL Files', []);
-
-            // Map metricsData to TreeItems, ensuring the metrics array is passed correctly
-            const fileItems = metricsData.map(item => {
-                const fileMetrics = item.metrics.map(metric => new Metric(metric.name, metric.value));
-                return new TreeItem(item.folderName, fileMetrics);
-            });
-
-            // Add the file items under the "ALL Files" root node
-            allFilesItem.children = fileItems;
-
-            // Set the tree items to include the "ALL Files" root node
-            this.treeItems = [allFilesItem];
-
-            // Notify listeners that the tree data has changed
-            this._onDidChangeTreeData.fire();
-        } catch (err) {
-            console.error("Error reading or parsing metrics file:", err);
         }
+
+        // Create a root node for "ALL Files"
+        const allFilesItem = new TreeItem('ALL Files', []);
+
+        // Map metricsData to TreeItems, ensuring the metrics array is passed correctly
+        const fileItems = metricsData.map(item => {
+            const fileMetrics = item.metrics.map(metric => new Metric(metric.name, metric.value));
+            return new TreeItem(item.folderName, fileMetrics);
+        });
+
+        // Add the file items under the "ALL Files" root node
+        allFilesItem.children = fileItems;
+
+        // Set the tree items to include the "ALL Files" root node
+        this.treeItems = [allFilesItem];
+
+        // Notify listeners that the tree data has changed
+        this._onDidChangeTreeData.fire();
     }
 
-
-
-    // Function to reload the tree data
-     reload():void{
-        console.log("reload triggered.");
-        this.loadMetricsData(); // This triggers the tree view refresh
-      }
+    // Update method to handle the entire metrics data
+    update(metricsData: MetricsData[]): void {
+        console.log(`Observer notified: Metrics updated with ${metricsData.length} items.`);
+        this.loadMetricsData(metricsData);  // Reload tree data with updated metrics
+    }
 
     // Get the tree items (files with metrics)
     getTreeItem(element: TreeItem): vscode.TreeItem {

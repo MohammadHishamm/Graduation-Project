@@ -10,12 +10,20 @@ import { pythonParser } from "./Languages/pythonParser";
 import { ProblemsChecker } from "./Validator/ProblemsChecker";
 import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 
-import { Metric, MetricsSaver } from "./Saver/MetricsSaver";
+import { Metric } from "./Interface/MetricsData/MetricsFileFormat";
+import { MetricsSaver } from "./Saver/MetricsSaver";
+import { MetricsNotifier } from "./Core/MetricsNotifier";
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
-let metricSaver = new MetricsSaver();
+// extension.ts
+const metricsNotifier = new MetricsNotifier();
+const metricsSaver = new MetricsSaver(metricsNotifier);  // Pass notifier to MetricsSaver
+
+// CustomTreeProvider listens to the notifier automatically
+const customTreeProvider = new CustomTreeProvider();
+metricsNotifier.addObserver(customTreeProvider);
 
 export async function activate(context: vscode.ExtensionContext) {
 
@@ -121,9 +129,8 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Trigger analysis on document save
-  const treeDataProvider = new CustomTreeProvider();
-  vscode.window.registerTreeDataProvider("codepureTreeView", treeDataProvider);
+
+  vscode.window.registerTreeDataProvider("codepureTreeView", customTreeProvider);
 
   vscode.workspace.onDidSaveTextDocument(async (document) => {
     const problemsChecker = new ProblemsChecker(document);
@@ -132,7 +139,6 @@ export async function activate(context: vscode.ExtensionContext) {
     if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
       const sourceCode = document.getText();
        analyzeCode(document, sourceCode);
-       treeDataProvider.reload();
     }
   });
 
@@ -150,16 +156,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  // Clear the JSON file on VS Code close
-  process.on('exit', metricSaver.clearFile); // Normal exit
-  process.on('SIGINT', () => {
-    metricSaver.clearFile();;
-    process.exit();
-  }); // Interrupt (Ctrl+C)
-  process.on('SIGTERM', () => {
-    metricSaver.clearFile();;
-    process.exit();
-  }); // Termination
+
 
   context.subscriptions.push(
     activateCommand,
@@ -327,9 +324,8 @@ function registerHoverProvider(
 
     console.log("analyze triggered.");
 
-    // Save metrics
-    const metricSaver = new MetricsSaver();
-    metricSaver.saveMetrics(metrics, document.fileName);
+
+    metricsSaver.saveMetrics(metrics, document.fileName);
 
 
     

@@ -1,19 +1,22 @@
 import { Observer } from './MetricsObserver'; 
+import {MetricsData} from '../Interface/MetricsData/MetricsFileFormat';
 
 
-export class MetricsNotifier 
-{
+// MetricsNotifier
+export class MetricsNotifier {
     private observers: Observer[] = [];
 
-    public addObserver(observer: Observer): void {
+    addObserver(observer: Observer): void {
         this.observers.push(observer);
     }
 
-    public removeObserver(observer: Observer): void {
+    removeObserver(observer: Observer): void {
         this.observers = this.observers.filter(obs => obs !== observer);
     }
 
-    public notify(metricName: string, value: number): void {
-        this.observers.forEach(observer => observer.update(metricName, value));
+    notify(event: string, data: MetricsData[]): void {
+        for (let observer of this.observers) {
+            observer.update(data);  // Pass the full metrics data
+        }
     }
 }

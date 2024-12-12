@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsNotifier = void 0;
+// MetricsNotifier
 class MetricsNotifier {
     observers = [];
     addObserver(observer) {
@@ -9,8 +10,10 @@ class MetricsNotifier {
     removeObserver(observer) {
         this.observers = this.observers.filter(obs => obs !== observer);
     }
-    notify(metricName, value) {
-        this.observers.forEach(observer => observer.update(metricName, value));
+    notify(event, data) {
+        for (let observer of this.observers) {
+            observer.update(data); // Pass the full metrics data
+        }
     }
 }
 exports.MetricsNotifier = MetricsNotifier;

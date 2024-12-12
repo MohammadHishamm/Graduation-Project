@@ -1,31 +1,23 @@
 import * as fs from "fs";
 import * as path from "path";
+import { MetricsNotifier } from '../Core/MetricsNotifier'; // Import MetricsNotifier
+import {Metric, MetricsData} from '../Interface/MetricsData/MetricsFileFormat';
 
 // Metric class
-export class Metric {
-    constructor(
-        public name: string,
-        public value: number,
-    ) { }
-}
 
-// Interface for the full metrics data
-export interface MetricsData {
-    fullPath: string;
-    folderName: string;
-    metrics: Metric[];
-}
+
 
 export class MetricsSaver {
     private filePath: string;
+    private notifier: MetricsNotifier; // Add notifier reference
 
-    constructor() {
+    constructor(notifier: MetricsNotifier) {
         this.filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
 
         // Remove 'out' from the file path, if it exists
-        this.filePath = this.filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
+        this.filePath = this.filePath.replace(/out[\\\/]?/, "");
 
-        // Ensure the 'results' folder exists, create it if it doesn't
+        // Ensure the 'results' folder exists
         const resultsDir = path.dirname(this.filePath);
         if (!fs.existsSync(resultsDir)) {
             fs.mkdirSync(resultsDir, { recursive: true });
@@ -33,64 +25,53 @@ export class MetricsSaver {
         }
 
         console.log(`Metrics will be saved to: ${this.filePath}`);
+
+        // Inject the MetricsNotifier to the class
+        this.notifier = notifier;
     }
 
-    // read w write Async 3ashan a5ly kolo y2of ma3ada dol
     saveMetrics(metrics: Metric[], fullPath: string): void {
-
         let fileName = path.basename(fullPath);
-
-        // Get the parent directory of the file
         const parentDir = path.dirname(fullPath);
-
-        // Get the immediate folder name (i.e., the last directory in the path)
         let folderName = path.basename(parentDir);
 
         folderName += `/${fileName}`;
-        
+
         if (metrics.length === 0) {
             console.log("No metrics to save.");
             return;
         }
 
-
         let currentData: MetricsData[] = [];
-
         try {
-            // Check if file exists and is not empty
             const data = fs.readFileSync(this.filePath, 'utf8').trim();
-
-            // If the file is empty, handle it gracefully
             if (data === '') {
                 console.log("Metrics file is empty, initializing new data.");
             } else {
-                // Parse the existing file if it has content
                 currentData = JSON.parse(data);
             }
         } catch (err) {
             if (err === 'ENOENT') {
-                // If the file doesn't exist, it's not an error, we'll create it
                 console.log("Metrics file does not exist, creating a new one.");
             } else {
-                // If there's any other error (like JSON parsing error), log it
                 console.log("Failed to read or parse metrics file.");
                 console.error(err);
                 return;
             }
         }
 
-        // Check if the file with the same name already exists
         const existingIndex = currentData.findIndex(item => item.fullPath === fullPath);
         if (existingIndex !== -1) {
-            // Replace the existing entry with the new metrics
             currentData[existingIndex].metrics = metrics;
         } else {
-            // Append the new metrics for this file
             currentData.push({ fullPath, folderName, metrics });
         }
 
-        // Save the updated data to the file synchronously
+        // Save the updated data to the file
         this.writeToFile(currentData);
+
+        // Notify observers that metrics have been updated
+        this.notifier.notify('Metrics Updated', currentData);
     }
 
     private writeToFile(data: MetricsData[]): void {
@@ -102,27 +83,5 @@ export class MetricsSaver {
             console.error(err);
         }
     }
-
-    // Method to clear the file contents (if needed)
-    clearFile(): void {
-
-        this.filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
-
-        // Remove 'out' from the file path, if it exists
-        this.filePath = this.filePath.replace(/out[\\\/]?/, ""); // Regular expression to match 'out' and remove it
-
-        fs.writeFile(this.filePath, "", (err) => {
-            if (err) {
-                console.log("Failed to clear the file.");
-                console.error(err);
-            } else {
-                console.log("Metrics file cleared.");
-            }
-        });
-    }
-
-    // Optionally, you could create a method to get the file path for testing purposes
-    getFilePath(): string {
-        return this.filePath;
-    }
 }
+
