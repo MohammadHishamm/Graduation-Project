@@ -5,7 +5,6 @@ export interface ParsedComponents {
   classes: ClassInfo[];
   methods: MethodInfo[];
   fields: FieldInfo[];
-  weight: number; // The calculated weight
 }
 
 export interface ClassInfo {

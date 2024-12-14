@@ -30,6 +30,8 @@ exports.FolderExtractComponentsFromCode = void 0;
 const vscode = __importStar(require("vscode"));
 const tree_sitter_1 = __importDefault(require("tree-sitter"));
 const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 class FolderExtractComponentsFromCode {
     parser;
     constructor() {
@@ -55,8 +57,38 @@ class FolderExtractComponentsFromCode {
                 console.error(`Error parsing file: ${fileUri.fsPath}`);
             }
         }
+        try {
+            let filePath = path.join(__dirname, "..", "src", "Results", "AllMetrics.json");
+            // Remove 'out' from the file path, if it exists
+            filePath = filePath.replace(/out[\\\/]?/, "");
+            fs.writeFileSync(filePath, JSON.stringify(allParsedComponents, null, 2));
+            console.log("Metrics saved to Metrics.json.");
+        }
+        catch (err) {
+            console.log("Failed to save metrics to file.");
+            console.error(err);
+        }
         // Return the array of parsed components
         return allParsedComponents;
+    }
+    /**
+     * Reads the JSON file containing parsed components and returns its content.
+     * @returns An array of FileParsedComponents objects.
+     */
+    getParsedComponentsFromFile() {
+        try {
+            const filePath = path.join(__dirname, "..", "src", "Results", "AllMetrics.json");
+            // Remove 'out' from the file path, if it exists
+            const adjustedPath = filePath.replace(/out[\\\/]?/, "");
+            // Read the file content
+            const fileContent = fs.readFileSync(adjustedPath, 'utf8');
+            // Parse the JSON content and return it
+            return JSON.parse(fileContent);
+        }
+        catch (err) {
+            console.error("Failed to read parsed components from file:", err);
+            return [];
+        }
     }
     /**
      * This function will be responsible for fetching and parsing the code from the file.
@@ -106,15 +138,6 @@ class FolderExtractComponentsFromCode {
             classes: classgroup // Return the object with the 'classes' property
         };
     }
-    extractClassesinfo(rootNode) {
-        const classNodes = rootNode.descendantsOfType('class_declaration');
-        return classNodes.map((node) => ({
-            fileName: rootNode.text, // Assuming you want to track the file name for each class
-            name: node.childForFieldName('name')?.text ?? 'Unknown',
-            startPosition: node.startPosition,
-            endPosition: node.endPosition,
-        }));
-    }
     extractClasses(rootNode, fileName) {
         const classNodes = rootNode.descendantsOfType('class_declaration');
         const classes = this.extractClassesinfo(rootNode);
@@ -126,73 +149,6 @@ class FolderExtractComponentsFromCode {
             methods: methods,
             fields: fields,
         }));
-    }
-    extractMethods(rootNode, classes) {
-        const methodNodes = rootNode.descendantsOfType('method_declaration');
-        return methodNodes.map((node) => {
-            const modifiersNode = node.children.find((child) => child.type === 'modifiers');
-            const modifiers = modifiersNode ? modifiersNode.text : '';
-            const isOverridden = modifiers.includes('@Override');
-            let accessModifier = modifiers.replace('@Override', '').replace('static', '').trim();
-            if (accessModifier.includes('public')) {
-                accessModifier = 'public';
-            }
-            else if (accessModifier.includes('private')) {
-                accessModifier = 'private';
-            }
-            else if (accessModifier.includes('protected')) {
-                accessModifier = 'protected';
-            }
-            else {
-                accessModifier = 'public'; // Default to public if no access modifier is found
-            }
-            const name = node.childForFieldName('name')?.text ?? 'Unknown';
-            const params = node.childForFieldName('parameters')?.text ?? '';
-            const parentClass = this.findParentClass(node, classes);
-            const isConstructor = parentClass ? parentClass.name === name : false;
-            const isAccessor = this.isAccessor(name);
-            return {
-                name,
-                modifiers: accessModifier, // Only 'public', 'private', or 'protected' are kept
-                isConstructor,
-                isAccessor,
-                isOverridden, // Add the isOverridden field to the return value
-                startPosition: node.startPosition,
-                endPosition: node.endPosition,
-            };
-        });
-    }
-    extractFields(rootNode, classes) {
-        const fieldNodes = rootNode.descendantsOfType('field_declaration');
-        return fieldNodes.map((node) => {
-            const modifiersNode = node.child(0);
-            const modifiers = modifiersNode ? modifiersNode.text : '';
-            const typeNode = node.child(1);
-            const type = typeNode ? typeNode.text : '';
-            const nameNode = node.child(2);
-            const name = nameNode ? nameNode.text : 'Unknown';
-            return {
-                name,
-                type,
-                modifiers,
-                startPosition: node.startPosition,
-                endPosition: node.endPosition,
-            };
-        });
-    }
-    findParentClass(node, classes) {
-        for (const cls of classes) {
-            if (node.startPosition.row >= cls.startPosition.row &&
-                node.endPosition.row <= cls.endPosition.row) {
-                return cls;
-            }
-        }
-        return null;
-    }
-    isAccessor(methodName) {
-        const isGetter = /^get[A-Za-z]/.test(methodName);
-        const isSetter = /^set[A-Za-z]/.test(methodName);
-        return isGetter || isSetter;
     }
 }
 exports.FolderExtractComponentsFromCode = FolderExtractComponentsFromCode;

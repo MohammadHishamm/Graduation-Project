@@ -1,21 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
-const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
-const JavaCoC_1 = require("../Metrics/Java/JavaCoC");
+const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
+const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
+// import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
+const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
+const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
 const JavaNOPA_1 = require("../Metrics/Java/JavaNOPA");
 const JavaNProtM_1 = require("../Metrics/Java/JavaNProtM");
+const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
 const JavaWOC_1 = require("../Metrics/Java/JavaWOC");
-const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
-const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
-const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
-const ECFCode_1 = require("../Core/ECFCode");
-const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
@@ -67,8 +66,8 @@ class MetricsFactory {
                 return new JavaNAbsm_1.JavaNumberOfAbstractClassesM();
             case "NProtM":
                 return new JavaNProtM_1.JavaNumberOfProtectedMethodsMetric();
-            case "CognitiveComplexity":
-                return new JavaCoC_1.JavaCognitiveComplexityMetric();
+            // case "CognitiveComplexity":
+            //   return new JavaCognitiveComplexityMetric();
             case "NDU":
                 return new JavaNDU_1.NDUCalculation();
             case "NAS":
@@ -81,28 +80,21 @@ class MetricsFactory {
                 return new JavaNODD_1.NODDCalculation();
             case "TCC":
                 return new JavaTCC_1.TCCCalculation();
-            case "FANOUT":
-                const javaCode = `
-
-public class Dog extends Animal {
-    // Overriding the makeSound method from Animal class
-    
-    static public void makeSound() {
-        System.out.println("Dog barks");
-    }
-
-
-}
-
-           
-
-`;
-                const parser = new ECFCode_1.ExtractComponentsFromCode(); // Create an instance of CodeParser
-                const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
-                const components = parser.extractComponents(tree); // Extract classes, methods, and fields
-                console.log("Classes:", components.classes);
-                console.log("Methods:", components.methods);
-                console.log("Fields:", components.fields);
+            //       case "FANOUT":
+            //         const javaCode = `
+            // public class Dog extends Animal {
+            //     // Overriding the makeSound method from Animal class
+            //     static public void makeSound() {
+            //         System.out.println("Dog barks");
+            //     }
+            // }
+            // `;
+            //         const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+            //         const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+            //         const components = parser.extractComponents(tree); // Extract classes, methods, and fields
+            //         console.log("Classes:", components.classes);
+            //         console.log("Methods:", components.methods);
+            //         console.log("Fields:", components.fields);
             // console.log('WOC:', components.weight);
             // console.log('Fields:', components.weight);
             default:

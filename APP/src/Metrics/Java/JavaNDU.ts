@@ -2,6 +2,7 @@ import Parser from 'tree-sitter';
 import Java, { name } from 'tree-sitter-java';
 import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../../Interface/ParsedComponentsNDU'; // Import the interface
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class NDUCalculation extends MetricCalculator {
 

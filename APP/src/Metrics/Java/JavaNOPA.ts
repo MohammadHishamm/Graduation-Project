@@ -1,6 +1,8 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class JavaNumberOfPublicAttributesM extends MetricCalculator {
+
     calculate(node: any): number {
         let numberOfAttributes = 0;
 

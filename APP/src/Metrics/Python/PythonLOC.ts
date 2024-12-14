@@ -1,6 +1,9 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class PythonLOCMetric extends MetricCalculator {
+
+    
     calculate(node: any, sourceCode: string): number {
         const lines = sourceCode.split('\n');
         let inMultiLineComment = false;

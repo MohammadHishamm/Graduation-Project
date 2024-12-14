@@ -31,13 +31,12 @@ const javaParser_1 = require("./Languages/javaParser");
 const pythonParser_1 = require("./Languages/pythonParser");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
 const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
+const MetricsNotifier_1 = require("./Core/MetricsNotifier");
 const MetricsFileFormat_1 = require("./Interface/MetricsData/MetricsFileFormat");
 const MetricsSaver_1 = require("./Saver/MetricsSaver");
-const MetricsNotifier_1 = require("./Core/MetricsNotifier");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
-// extension.ts
 const metricsNotifier = new MetricsNotifier_1.MetricsNotifier();
 const metricsSaver = new MetricsSaver_1.MetricsSaver(metricsNotifier); // Pass notifier to MetricsSaver
 // CustomTreeProvider listens to the notifier automatically

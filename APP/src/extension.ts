@@ -10,14 +10,13 @@ import { pythonParser } from "./Languages/pythonParser";
 import { ProblemsChecker } from "./Validator/ProblemsChecker";
 import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 
+import { MetricsNotifier } from "./Core/MetricsNotifier";
 import { Metric } from "./Interface/MetricsData/MetricsFileFormat";
 import { MetricsSaver } from "./Saver/MetricsSaver";
-import { MetricsNotifier } from "./Core/MetricsNotifier";
 
 let isActive = true;
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
-// extension.ts
 const metricsNotifier = new MetricsNotifier();
 const metricsSaver = new MetricsSaver(metricsNotifier);  // Pass notifier to MetricsSaver
 
@@ -47,12 +46,6 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   statusBarItem.text = "CodePure: Ready";
   statusBarItem.show();
-
-
-
-
-
-
 
 
   const activateCommand = vscode.commands.registerCommand(
@@ -300,13 +293,16 @@ function registerHoverProvider(
     parser.selectLanguage();
     const rootNode = parser.parse(sourceCode);
 
+
     // Calculate metrics
     for (const metricName of metricsToCalculate) {
       const metricCalculator = MetricsFactory.CreateMetric(
         metricName,
         document.languageId
       );
-      if (metricCalculator) {
+      if (metricCalculator) 
+      {
+ 
         const value = metricCalculator.calculate(rootNode, sourceCode);
         analysisResults.push(`${metricName}: ${value}`);
       }

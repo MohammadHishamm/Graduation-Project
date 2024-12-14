@@ -1,6 +1,9 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class JavaNumberOfAttributesMetric extends MetricCalculator {
+
+    
     calculate(node: any): number {
         let numberOfAttributes = 0;
 

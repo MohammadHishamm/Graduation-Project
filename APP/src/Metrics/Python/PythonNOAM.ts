@@ -1,6 +1,9 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class PythonNumberOfAccessorMethods extends MetricCalculator {
+
+    
     calculate(node: any): number {
         let accessorCounter = 0;
         let valid = false;

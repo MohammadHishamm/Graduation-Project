@@ -1,9 +1,11 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
 import * as vscode from 'vscode';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 
 
 export class JavaWeightedMethodCount extends MetricCalculator {
+
     calculate(node: any): number {
         let complexity = 0; 
     

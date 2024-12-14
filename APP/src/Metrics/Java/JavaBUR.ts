@@ -6,8 +6,11 @@ import {
   FieldInfo,
 } from "../../Interface/ParsedComponentsNDU";
 import { MetricCalculator } from "../../Core/MetricCalculator";
+import { FileParsedComponents } from "../../Interface/FileParsedComponents";
 
 export class BURCalculation extends MetricCalculator {
+
+  
   calculate(node: any): number {
     return this.extractComponents(node.tree);
   }

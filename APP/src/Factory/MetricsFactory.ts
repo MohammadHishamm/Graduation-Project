@@ -1,24 +1,24 @@
 import { MetricCalculator } from "../Core/MetricCalculator";
 
-import { JavaWeightedMethodCount } from "../Metrics/Java/JavaWMC";
-import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
+import { ExtractComponentsFromCode } from "../Extractors/ExtractComponentsFromCode";
+import { JavaAccessToForeignData } from "../Metrics/Java/JavaAFTD ";
+import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
+// import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
+import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 import { JavaLOCMetric } from "../Metrics/Java/JavaLOCC";
 import { JavaNumberOfAbstractClassesM } from "../Metrics/Java/JavaNAbsm";
+import { NDUCalculation } from "../Metrics/Java/JavaNDU";
 import { JavaNumberOfAttributesMetric } from "../Metrics/Java/JavaNOA";
 import { JavaNumberOfAccessorMethods } from "../Metrics/Java/JavaNOAM";
 import { JavaNumberOfMethodsMetric } from "../Metrics/Java/JavaNOM";
 import { JavaNumberOfPublicAttributesM } from "../Metrics/Java/JavaNOPA";
 import { JavaNumberOfProtectedMethodsMetric } from "../Metrics/Java/JavaNProtM";
+import { JavaWeightedMethodCount } from "../Metrics/Java/JavaWMC";
 import { JavaWeightOfAClass } from "../Metrics/Java/JavaWOC";
-import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
-import { NDUCalculation } from "../Metrics/Java/JavaNDU";
-import { JavaAccessToForeignData } from "../Metrics/Java/JavaAFTD ";
-import { ExtractComponentsFromCode } from "../Core/ECFCode";
-import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
-import {TCCCalculation} from "../Metrics/Java/JavaTCC";
+import { TCCCalculation } from "../Metrics/Java/JavaTCC";
 
 
 
@@ -78,8 +78,8 @@ export class MetricsFactory {
         return new JavaNumberOfAbstractClassesM();
       case "NProtM":
         return new JavaNumberOfProtectedMethodsMetric();
-      case "CognitiveComplexity":
-        return new JavaCognitiveComplexityMetric();
+      // case "CognitiveComplexity":
+      //   return new JavaCognitiveComplexityMetric();
       case "NDU":
         return new NDUCalculation();
       case "NAS":
@@ -93,30 +93,30 @@ export class MetricsFactory {
       case "TCC":
         return new TCCCalculation();  
 
-      case "FANOUT":
-        const javaCode = `
+//       case "FANOUT":
+//         const javaCode = `
 
-public class Dog extends Animal {
-    // Overriding the makeSound method from Animal class
+// public class Dog extends Animal {
+//     // Overriding the makeSound method from Animal class
     
-    static public void makeSound() {
-        System.out.println("Dog barks");
-    }
+//     static public void makeSound() {
+//         System.out.println("Dog barks");
+//     }
 
 
-}
+// }
 
            
 
-`;
-        const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
-        const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+// `;
+//         const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+//         const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
 
-        const components = parser.extractComponents(tree); // Extract classes, methods, and fields
+//         const components = parser.extractComponents(tree); // Extract classes, methods, and fields
 
-        console.log("Classes:", components.classes);
-        console.log("Methods:", components.methods);
-        console.log("Fields:", components.fields);
+//         console.log("Classes:", components.classes);
+//         console.log("Methods:", components.methods);
+//         console.log("Fields:", components.fields);
       // console.log('WOC:', components.weight);
       // console.log('Fields:', components.weight);
 

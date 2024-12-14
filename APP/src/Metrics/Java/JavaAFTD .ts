@@ -5,6 +5,7 @@ import { ParsedComponents, ClassInfo, MethodInfo, FieldInfo } from '../../Interf
 
 export class JavaAccessToForeignData extends MetricCalculator {
 
+    
     calculate(node: any): number {
         return this.extractComponents(node.tree);
     }

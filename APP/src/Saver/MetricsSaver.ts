@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { MetricsNotifier } from '../Core/MetricsNotifier'; // Import MetricsNotifier
+import { MetricsNotifier } from '../Core/MetricsNotifier'; 
 import {Metric, MetricsData} from '../Interface/MetricsData/MetricsFileFormat';
 
 // Metric class

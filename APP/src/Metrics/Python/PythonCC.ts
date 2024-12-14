@@ -3,8 +3,11 @@
 
 
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class PythonCyclomaticComplexityMetric extends MetricCalculator {
+
+    
     calculate(node: any): number {
         let complexity = 0; 
 

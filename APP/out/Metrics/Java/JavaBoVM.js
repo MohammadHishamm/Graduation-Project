@@ -96,12 +96,15 @@ class JavaBaseclassOverwritingMethods extends MetricCalculator_1.MetricCalculato
         return null;
     }
     extractAccessModifier(modifiers) {
-        if (modifiers.includes("public"))
+        if (modifiers.includes("public")) {
             return "public";
-        if (modifiers.includes("private"))
+        }
+        if (modifiers.includes("private")) {
             return "private";
-        if (modifiers.includes("protected"))
+        }
+        if (modifiers.includes("protected")) {
             return "protected";
+        }
         return "public"; // Default
     }
     isAccessor(methodName) {

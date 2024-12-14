@@ -7,8 +7,11 @@ import {
   MethodInfo,
   FieldInfo,
 } from "../../Interface/ParsedComponents";
+import { FileParsedComponents } from "../../Interface/FileParsedComponents";
 
 export class JavaBaseclassOverwritingMethods extends MetricCalculator {
+
+  
   calculate(node: any): number {
     return this.extractComponents(node.tree);
   }
@@ -153,9 +156,9 @@ export class JavaBaseclassOverwritingMethods extends MetricCalculator {
   }
 
   private extractAccessModifier(modifiers: string): string {
-    if (modifiers.includes("public")) return "public";
-    if (modifiers.includes("private")) return "private";
-    if (modifiers.includes("protected")) return "protected";
+    if (modifiers.includes("public")) {return "public";}
+    if (modifiers.includes("private")) {return "private";}
+    if (modifiers.includes("protected")) {return "protected";}
     return "public"; // Default
   }
 

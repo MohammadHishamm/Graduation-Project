@@ -2,8 +2,10 @@ import Parser from "tree-sitter";
 import Java from "tree-sitter-java";
 import { MetricCalculator } from "../../Core/MetricCalculator";
 import { ClassInfo } from "../../Interface/ParsedComponents";
+import { FileParsedComponents } from "../../Interface/FileParsedComponents";
 
 export class NODCalculation extends MetricCalculator {
+
   calculate(node: any): number {
     return this.calculateNODForFirstClass(node.tree);
   }

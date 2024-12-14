@@ -1,6 +1,8 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
+import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
 export class PythonNumberOfMethodsMetric extends MetricCalculator {
+
     calculate(node: any): number {
         let NumberOfMethods= 0;
         let classTrigger = false;
