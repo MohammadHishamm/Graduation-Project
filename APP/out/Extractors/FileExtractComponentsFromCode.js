@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExtractComponentsFromCode = void 0;
-class ExtractComponentsFromCode {
+exports.FileExtractComponentsFromCode = void 0;
+class FileExtractComponentsFromCode {
     extractClasses(rootNode) {
         const classNodes = rootNode.descendantsOfType("class_declaration");
         return classNodes.map((node) => ({
@@ -123,14 +123,15 @@ class ExtractComponentsFromCode {
         return fieldsUsed;
     }
     filterPublicNonEncapsulatedFields(fields, methods) {
-        return fields.filter(field => field.modifiers.includes('public') && !this.hasGetterSetter(field.name, methods));
+        return fields.filter((field) => field.modifiers.includes("public") &&
+            !this.hasGetterSetter(field.name, methods));
     }
     // Check if the field has getter or setter methods
     hasGetterSetter(fieldName, methods) {
         const getterPattern = new RegExp(`get${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}\\(`);
         const setterPattern = new RegExp(`set${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}\\(`);
-        return methods.some(method => getterPattern.test(method.name) || setterPattern.test(method.name));
+        return methods.some((method) => getterPattern.test(method.name) || setterPattern.test(method.name));
     }
 }
-exports.ExtractComponentsFromCode = ExtractComponentsFromCode;
+exports.FileExtractComponentsFromCode = FileExtractComponentsFromCode;
 //# sourceMappingURL=FileExtractComponentsFromCode.js.map

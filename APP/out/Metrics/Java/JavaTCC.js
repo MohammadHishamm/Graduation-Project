@@ -5,7 +5,7 @@ const MetricCalculator_1 = require("../../Core/MetricCalculator");
 const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
 class TCCCalculation extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.ExtractComponentsFromCode();
+        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         const Fields = extractcomponentsfromcode.extractFields(node, Classes);

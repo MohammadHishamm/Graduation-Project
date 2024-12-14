@@ -1,12 +1,10 @@
 import Parser from "tree-sitter";
 
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import {
-  ParsedComponents,
-  ClassInfo,
-  MethodInfo,
-  FieldInfo,
-} from "../../Interface/ParsedComponents";
+import { ClassInfo } from "../../Interface/ClassInfo";
+import { MethodInfo } from "../../Interface/MethodInfo";
+import { FieldInfo } from "../../Interface/FieldInfo";
+
 import { FileParsedComponents } from "../../Interface/FileParsedComponents";
 
 export class JavaBaseclassOverwritingMethods extends MetricCalculator {

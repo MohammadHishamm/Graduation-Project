@@ -154,5 +154,239 @@
         "value": 0
       }
     ]
+  },
+  {
+    "fullPath": "c:\\Users\\PC\\Desktop\\java1\\BaseClass.java",
+    "folderName": "java1/BaseClass.java",
+    "metrics": [
+      {
+        "name": "LOC",
+        "value": 21
+      },
+      {
+        "name": "AMW",
+        "value": 1
+      },
+      {
+        "name": "AFTD",
+        "value": 0
+      },
+      {
+        "name": "DAC",
+        "value": 0
+      },
+      {
+        "name": "WMC",
+        "value": 4
+      },
+      {
+        "name": "WOC",
+        "value": 1
+      },
+      {
+        "name": "NOA",
+        "value": 1
+      },
+      {
+        "name": "NOM",
+        "value": 4
+      },
+      {
+        "name": "NOAM",
+        "value": 0
+      },
+      {
+        "name": "NOPA",
+        "value": 0
+      },
+      {
+        "name": "NAbsm",
+        "value": 0
+      },
+      {
+        "name": "NProtM",
+        "value": 2
+      },
+      {
+        "name": "NDU",
+        "value": 1
+      },
+      {
+        "name": "NAS",
+        "value": 1
+      },
+      {
+        "name": "BUR",
+        "value": 1
+      },
+      {
+        "name": "NOD",
+        "value": 1
+      },
+      {
+        "name": "NODD",
+        "value": 1
+      },
+      {
+        "name": "TCC",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "fullPath": "c:\\Users\\PC\\Desktop\\java1\\A.java",
+    "folderName": "java1/A.java",
+    "metrics": [
+      {
+        "name": "LOC",
+        "value": 30
+      },
+      {
+        "name": "AMW",
+        "value": 1
+      },
+      {
+        "name": "AFTD",
+        "value": 0
+      },
+      {
+        "name": "DAC",
+        "value": 0
+      },
+      {
+        "name": "WMC",
+        "value": 6
+      },
+      {
+        "name": "WOC",
+        "value": 1
+      },
+      {
+        "name": "NOA",
+        "value": 0
+      },
+      {
+        "name": "NOM",
+        "value": 6
+      },
+      {
+        "name": "NOAM",
+        "value": 0
+      },
+      {
+        "name": "NOPA",
+        "value": 0
+      },
+      {
+        "name": "NAbsm",
+        "value": 0
+      },
+      {
+        "name": "NProtM",
+        "value": 0
+      },
+      {
+        "name": "NDU",
+        "value": 6
+      },
+      {
+        "name": "NAS",
+        "value": 6
+      },
+      {
+        "name": "BUR",
+        "value": 5
+      },
+      {
+        "name": "NOD",
+        "value": 5
+      },
+      {
+        "name": "NODD",
+        "value": 2
+      },
+      {
+        "name": "TCC",
+        "value": 0
+      }
+    ]
+  },
+  {
+    "fullPath": "c:\\Users\\PC\\Desktop\\java1\\Animal.java",
+    "folderName": "java1/Animal.java",
+    "metrics": [
+      {
+        "name": "LOC",
+        "value": 20
+      },
+      {
+        "name": "AMW",
+        "value": 1
+      },
+      {
+        "name": "AFTD",
+        "value": 0
+      },
+      {
+        "name": "DAC",
+        "value": 0
+      },
+      {
+        "name": "WMC",
+        "value": 5
+      },
+      {
+        "name": "WOC",
+        "value": 1
+      },
+      {
+        "name": "NOA",
+        "value": 0
+      },
+      {
+        "name": "NOM",
+        "value": 5
+      },
+      {
+        "name": "NOAM",
+        "value": 0
+      },
+      {
+        "name": "NOPA",
+        "value": 0
+      },
+      {
+        "name": "NAbsm",
+        "value": 0
+      },
+      {
+        "name": "NProtM",
+        "value": 0
+      },
+      {
+        "name": "NDU",
+        "value": 2
+      },
+      {
+        "name": "NAS",
+        "value": 2
+      },
+      {
+        "name": "BUR",
+        "value": 3
+      },
+      {
+        "name": "NOD",
+        "value": 3
+      },
+      {
+        "name": "NODD",
+        "value": 2
+      },
+      {
+        "name": "TCC",
+        "value": 0
+      }
+    ]
   }
 ]

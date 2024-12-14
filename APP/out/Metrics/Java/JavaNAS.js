@@ -6,7 +6,7 @@ const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractCom
 class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
     calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.ExtractComponentsFromCode();
+        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         return this.findNAS(methods, node, FECFC);
@@ -15,13 +15,13 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
         let NAS = 0;
         let extendedClass;
         const fileParsedComponents = FECFC.getParsedComponentsFromFile();
-        const classNodes = rootNode.descendantsOfType('class_declaration');
+        const classNodes = rootNode.descendantsOfType("class_declaration");
         classNodes.forEach((node) => {
             // Try to find the 'superclass' node
-            const extendsNode = node.childForFieldName('superclass');
+            const extendsNode = node.childForFieldName("superclass");
             if (extendsNode) {
                 // Extract the text and trim 'extends' from the start
-                extendedClass = extendsNode.text.trim().replace(/^extends\s*/, '');
+                extendedClass = extendsNode.text.trim().replace(/^extends\s*/, "");
             }
         });
         if (extendedClass) {
@@ -44,7 +44,7 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
                     }
                 }
                 else {
-                    if (method.modifiers.includes('public') && // Only public methods
+                    if (method.modifiers.includes("public") && // Only public methods
                         !method.isConstructor && // Exclude constructors
                         !method.isAccessor // Exclude getters and setters
                     ) {
@@ -55,7 +55,7 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
         }
         else {
             for (const method of methods) {
-                if (method.modifiers.includes('public') && // Only public methods
+                if (method.modifiers.includes("public") && // Only public methods
                     !method.isConstructor && // Exclude constructors
                     !method.isAccessor // Exclude getters and setters
                 ) {

@@ -54,8 +54,8 @@ class MetricsSaver {
         }
         let currentData = [];
         try {
-            const data = fs.readFileSync(this.filePath, 'utf8').trim();
-            if (data === '') {
+            const data = fs.readFileSync(this.filePath, "utf8").trim();
+            if (data === "") {
                 console.log("Metrics file is empty, initializing new data.");
             }
             else {
@@ -63,7 +63,7 @@ class MetricsSaver {
             }
         }
         catch (err) {
-            if (err === 'ENOENT') {
+            if (err === "ENOENT") {
                 console.log("Metrics file does not exist, creating a new one.");
             }
             else {
@@ -72,7 +72,7 @@ class MetricsSaver {
                 return;
             }
         }
-        const existingIndex = currentData.findIndex(item => item.fullPath === fullPath);
+        const existingIndex = currentData.findIndex((item) => item.fullPath === fullPath);
         if (existingIndex !== -1) {
             currentData[existingIndex].metrics = metrics;
         }
@@ -82,7 +82,7 @@ class MetricsSaver {
         // Save the updated data to the file
         this.writeToFile(currentData);
         // Notify observers that metrics have been updated
-        this.notifier.notify('Metrics Updated', currentData);
+        this.notifier.notify("Metrics Updated", currentData);
     }
     writeToFile(data) {
         try {

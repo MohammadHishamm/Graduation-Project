@@ -43,7 +43,7 @@ class FolderExtractComponentsFromCode {
         this.cacheManager = new FileCacheManager_1.FileCacheManager();
     }
     async parseAllJavaFiles() {
-        const javaFiles = await vscode.workspace.findFiles('**/*.java');
+        const javaFiles = await vscode.workspace.findFiles("**/*.java");
         const allParsedComponents = [];
         for (const fileUri of javaFiles) {
             const filePath = fileUri.fsPath;
@@ -70,7 +70,9 @@ class FolderExtractComponentsFromCode {
     }
     saveParsedComponents(parsedComponents) {
         try {
-            const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json").replace(/out[\\\/]?/, "");
+            const filePath = path
+                .join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json")
+                .replace(/out[\\\/]?/, "");
             const newContent = JSON.stringify(parsedComponents, null, 2);
             if (newContent) {
                 fs.writeFileSync(filePath, newContent);
@@ -87,7 +89,7 @@ class FolderExtractComponentsFromCode {
         try {
             const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
             const adjustedPath = filePath.replace(/out[\\\/]?/, "");
-            const fileContent = fs.readFileSync(adjustedPath, 'utf8');
+            const fileContent = fs.readFileSync(adjustedPath, "utf8");
             return JSON.parse(fileContent);
         }
         catch (err) {
@@ -102,13 +104,13 @@ class FolderExtractComponentsFromCode {
             return this.extractComponents(tree, fileUri.fsPath);
         }
         catch (error) {
-            console.error('Error parsing file ${fileUri.fsPath}:, error');
+            console.error("Error parsing file ${fileUri.fsPath}:, error");
             return null;
         }
     }
     async fetchFileContent(fileUri) {
         const fileContent = await vscode.workspace.fs.readFile(fileUri);
-        return Buffer.from(fileContent).toString('utf8');
+        return Buffer.from(fileContent).toString("utf8");
     }
     parseCode(sourceCode) {
         return this.parser.parse(sourceCode);
@@ -117,18 +119,18 @@ class FolderExtractComponentsFromCode {
         const rootNode = tree.rootNode;
         const classgroup = this.extractClasses(rootNode, fileName);
         return {
-            classes: classgroup
+            classes: classgroup,
         };
     }
     extractClasses(rootNode, fileName) {
-        const classNodes = rootNode.descendantsOfType('class_declaration');
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.ExtractComponentsFromCode();
+        const classNodes = rootNode.descendantsOfType("class_declaration");
+        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
         const classes = extractcomponentsfromcode.extractClasses(rootNode);
         const methods = extractcomponentsfromcode.extractMethods(rootNode, classes);
         const fields = extractcomponentsfromcode.extractFields(rootNode, classes);
         return classNodes.map((node) => ({
             fileName: fileName,
-            name: node.childForFieldName('name')?.text ?? 'Unknown',
+            name: node.childForFieldName("name")?.text ?? "Unknown",
             methods: methods,
             fields: fields,
         }));

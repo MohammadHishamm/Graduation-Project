@@ -5,7 +5,7 @@ const MetricCalculator_1 = require("../../Core/MetricCalculator");
 const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
 class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.ExtractComponentsFromCode();
+        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         const Fields = extractcomponentsfromcode.extractFields(node, Classes);
@@ -17,16 +17,16 @@ class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
     calculateWeight(methods, fields) {
         let nom = 0; // Numerator: public methods (non-constructor and non-accessor) + public attributes
         let den = 0; // Denominator: public methods that are not accessors
-        methods.forEach(method => {
-            if (!method.isConstructor && method.modifiers.includes('public')) {
+        methods.forEach((method) => {
+            if (!method.isConstructor && method.modifiers.includes("public")) {
                 ++nom;
                 if (method.isAccessor) {
                     ++den;
                 }
             }
         });
-        fields.forEach(field => {
-            if (field.modifiers.includes('public')) {
+        fields.forEach((field) => {
+            if (field.modifiers.includes("public")) {
                 ++nom;
             }
         });

@@ -8,7 +8,7 @@ class MetricsNotifier {
         this.observers.push(observer);
     }
     removeObserver(observer) {
-        this.observers = this.observers.filter(obs => obs !== observer);
+        this.observers = this.observers.filter((obs) => obs !== observer);
     }
     notify(event, data) {
         for (let observer of this.observers) {

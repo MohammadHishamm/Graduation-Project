@@ -32,9 +32,9 @@ const pythonParser_1 = require("./Languages/pythonParser");
 const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
 const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
 const MetricsNotifier_1 = require("./Core/MetricsNotifier");
-const MetricsFileFormat_1 = require("./Interface/MetricsFileFormat");
 const MetricsSaver_1 = require("./Saver/MetricsSaver");
 const FolderExtractComponentsFromCode_1 = require("./Extractors/FolderExtractComponentsFromCode");
+const Metric_1 = require("./Core/Metric");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
@@ -47,7 +47,7 @@ metricsNotifier.addObserver(customTreeProvider);
 async function activate(context) {
     // Start timer
     console.time("Extension Execution Time");
-    console.log('Codepure extension is now active!');
+    console.log("Codepure extension is now active!");
     // Fetch selected metrics initially
     const selectedMetrics = getSelectedMetrics();
     // Create an Output Channel for the extension
@@ -94,7 +94,7 @@ async function activate(context) {
             if (isActive && issupportedfileType.isSupported()) {
                 // Call the analyzeCode function (stub in this example)
                 const analysisResult = await AnalyzeSelctedCode(editor.document, selectedText);
-                vscode.window.showInformationMessage(`Current selected metrics: ${selectedMetrics.join(', ')}`);
+                vscode.window.showInformationMessage(`Current selected metrics: ${selectedMetrics.join(", ")}`);
                 // Highlight the selected code
                 highlightCode(editor, selection);
                 // Show a hover message on the highlighted text
@@ -106,20 +106,21 @@ async function activate(context) {
     vscode.workspace.onDidSaveTextDocument(async (document) => {
         const problemsChecker = new ProblemsChecker_1.ProblemsChecker(document);
         const isSupportedfiletype = new SupportedFileTypes_1.isSupportedFileType(document);
-        if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
+        if (!problemsChecker.checkForErrors() &&
+            isSupportedfiletype.isSupported()) {
             const sourceCode = document.getText();
             analyzeCode(document, sourceCode);
         }
     });
     // Register the command to open CodePure settings
-    const openSettingsCommand = vscode.commands.registerCommand('codepure.openSettings', () => {
-        vscode.commands.executeCommand('workbench.action.openSettings', 'CodePure');
+    const openSettingsCommand = vscode.commands.registerCommand("codepure.openSettings", () => {
+        vscode.commands.executeCommand("workbench.action.openSettings", "CodePure");
     });
     // Listen for changes in the settings
-    vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration('extension.selectedMetrics')) {
+    vscode.workspace.onDidChangeConfiguration((event) => {
+        if (event.affectsConfiguration("extension.selectedMetrics")) {
             const updatedMetrics = getSelectedMetrics();
-            vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(', ')}`);
+            vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(", ")}`);
         }
     });
     context.subscriptions.push(activateCommand, deactivateCommand, outputChannel, statusBarItem, analyzeSelectedCodeCommand, openSettingsCommand);
@@ -159,8 +160,14 @@ async function AnalyzeSelctedCode(document, sourceCode) {
 }
 // Function to get selected metrics from settings
 function getSelectedMetrics() {
-    const config = vscode.workspace.getConfiguration('codepure');
-    return config.get('selectedMetrics', ["LOC", "NOA", "NOM", "NOPA", "NOAM"]);
+    const config = vscode.workspace.getConfiguration("codepure");
+    return config.get("selectedMetrics", [
+        "LOC",
+        "NOA",
+        "NOM",
+        "NOPA",
+        "NOAM",
+    ]);
 }
 function highlightCode(editor, selection) {
     const decorationType = vscode.window.createTextEditorDecorationType({
@@ -222,10 +229,15 @@ async function analyzeCode(document, sourceCode) {
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
             await pause(500);
-            const parser = document.languageId === "java" ? new javaParser_1.javaParser() : new pythonParser_1.pythonParser();
+            const parser = document.languageId === "java"
+                ? new javaParser_1.javaParser()
+                : new pythonParser_1.pythonParser();
             parser.selectLanguage();
             const rootNode = parser.parse(sourceCode);
-            progress.report({ message: "Parsing workspace files...", increment: 20 });
+            progress.report({
+                message: "Parsing workspace files...",
+                increment: 20,
+            });
             await pause(500);
             FECFcode.parseAllJavaFiles();
             progress.report({ message: "Calculating metrics...", increment: 40 });
@@ -244,7 +256,7 @@ async function analyzeCode(document, sourceCode) {
             progress.report({ message: "Saving metrics...", increment: 20 });
             metricsSaver.saveMetrics(analysisResults.map((result) => {
                 const [name, value] = result.split(": ");
-                return new MetricsFileFormat_1.Metric(name.trim(), parseFloat(value));
+                return new Metric_1.Metric(name.trim(), parseFloat(value));
             }), document.fileName);
             vscode.window.showInformationMessage(`Analysis completed.`);
             outputChannel.show();
