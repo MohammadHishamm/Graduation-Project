@@ -1,5 +1,5 @@
-import { Observer } from './MetricsObserver'; 
-import {MetricsData} from '../Interface/MetricsData/MetricsFileFormat';
+import { MetricsData } from '../Interface/MetricsFileFormat';
+import { Observer } from './MetricsObserver';
 
 
 // MetricsNotifier

@@ -27,7 +27,7 @@ exports.CustomTreeProvider = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
-const MetricsFileFormat_1 = require("./Interface/MetricsData/MetricsFileFormat"); // Ensure you import your Metric classes
+const MetricsFileFormat_1 = require("./Interface/MetricsFileFormat"); // Ensure you import your Metric classes
 class CustomTreeProvider {
     _onDidChangeTreeData = new vscode.EventEmitter();
     onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -38,7 +38,7 @@ class CustomTreeProvider {
     // Load metrics data into the tree
     loadMetricsData(metricsData = []) {
         if (metricsData.length === 0) {
-            let filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+            let filePath = path.join(__dirname, "..", "src", "Results", "MetricsCalculated.json");
             filePath = filePath.replace(/out[\\\/]?/, "");
             try {
                 const data = fs.readFileSync(filePath, "utf8");

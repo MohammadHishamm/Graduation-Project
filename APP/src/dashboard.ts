@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Metric, MetricsData } from "./Interface/MetricsData/MetricsFileFormat"; // Ensure you import your Metric classes
 import { Observer } from './Core/MetricsObserver'; // Import Observer interface
+import { Metric, MetricsData } from "./Interface/MetricsFileFormat"; // Ensure you import your Metric classes
 
 export class CustomTreeProvider implements vscode.TreeDataProvider<TreeItem>, Observer {
 
@@ -18,7 +18,7 @@ export class CustomTreeProvider implements vscode.TreeDataProvider<TreeItem>, Ob
     // Load metrics data into the tree
     private loadMetricsData(metricsData: MetricsData[] = []): void {
         if (metricsData.length === 0) {
-            let filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+            let filePath = path.join(__dirname, "..", "src", "Results", "MetricsCalculated.json");
             filePath = filePath.replace(/out[\\\/]?/, "");
 
             try {

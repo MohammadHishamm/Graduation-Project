@@ -30,7 +30,7 @@ class MetricsSaver {
     filePath;
     notifier; // Add notifier reference
     constructor(notifier) {
-        this.filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+        this.filePath = path.join(__dirname, "..", "src", "Results", "MetricsCalculated.json");
         // Remove 'out' from the file path, if it exists
         this.filePath = this.filePath.replace(/out[\\\/]?/, "");
         // Ensure the 'results' folder exists

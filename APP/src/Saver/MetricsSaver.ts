@@ -1,14 +1,14 @@
 import * as fs from "fs";
 import * as path from "path";
-import { MetricsNotifier } from '../Core/MetricsNotifier'; 
-import {Metric, MetricsData} from '../Interface/MetricsData/MetricsFileFormat';
+import { MetricsNotifier } from '../Core/MetricsNotifier';
+import { Metric, MetricsData } from '../Interface/MetricsFileFormat';
 
 export class MetricsSaver {
     private filePath: string;
     private notifier: MetricsNotifier; // Add notifier reference
 
     constructor(notifier: MetricsNotifier) {
-        this.filePath = path.join(__dirname, "..", "src", "Results", "Metrics.json");
+        this.filePath = path.join(__dirname, "..", "src", "Results", "MetricsCalculated.json");
 
         // Remove 'out' from the file path, if it exists
         this.filePath = this.filePath.replace(/out[\\\/]?/, "");

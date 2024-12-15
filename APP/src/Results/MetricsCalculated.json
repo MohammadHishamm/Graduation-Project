@@ -1,0 +1,158 @@
+[
+  {
+    "fullPath": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Librarian.java",
+    "folderName": "src/Librarian.java",
+    "metrics": [
+      {
+        "name": "LOC",
+        "value": 22
+      },
+      {
+        "name": "AMW",
+        "value": 1.3333333333333333
+      },
+      {
+        "name": "AFTD",
+        "value": 0
+      },
+      {
+        "name": "DAC",
+        "value": 0
+      },
+      {
+        "name": "WMC",
+        "value": 4
+      },
+      {
+        "name": "WOC",
+        "value": 0.5
+      },
+      {
+        "name": "NOA",
+        "value": 1
+      },
+      {
+        "name": "NOM",
+        "value": 3
+      },
+      {
+        "name": "NOAM",
+        "value": 1
+      },
+      {
+        "name": "NOPA",
+        "value": 0
+      },
+      {
+        "name": "NAbsm",
+        "value": 0
+      },
+      {
+        "name": "NProtM",
+        "value": 0
+      },
+      {
+        "name": "NDU",
+        "value": 1
+      },
+      {
+        "name": "NAS",
+        "value": 1
+      },
+      {
+        "name": "BUR",
+        "value": 0
+      },
+      {
+        "name": "NOD",
+        "value": 0
+      },
+      {
+        "name": "NODD",
+        "value": 0
+      },
+      {
+        "name": "TCC",
+        "value": 0
+      }
+    ]
+  },
+  {
+    "fullPath": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\Animal.java",
+    "folderName": "LibraryManagement test/Animal.java",
+    "metrics": [
+      {
+        "name": "LOC",
+        "value": 5
+      },
+      {
+        "name": "AMW",
+        "value": 0
+      },
+      {
+        "name": "AFTD",
+        "value": 0
+      },
+      {
+        "name": "DAC",
+        "value": 0
+      },
+      {
+        "name": "WMC",
+        "value": 0
+      },
+      {
+        "name": "WOC",
+        "value": 0
+      },
+      {
+        "name": "NOA",
+        "value": 0
+      },
+      {
+        "name": "NOM",
+        "value": 0
+      },
+      {
+        "name": "NOAM",
+        "value": 0
+      },
+      {
+        "name": "NOPA",
+        "value": 0
+      },
+      {
+        "name": "NAbsm",
+        "value": 0
+      },
+      {
+        "name": "NProtM",
+        "value": 0
+      },
+      {
+        "name": "NDU",
+        "value": 0
+      },
+      {
+        "name": "NAS",
+        "value": 0
+      },
+      {
+        "name": "BUR",
+        "value": 0
+      },
+      {
+        "name": "NOD",
+        "value": 0
+      },
+      {
+        "name": "NODD",
+        "value": 0
+      },
+      {
+        "name": "TCC",
+        "value": 0
+      }
+    ]
+  }
+]

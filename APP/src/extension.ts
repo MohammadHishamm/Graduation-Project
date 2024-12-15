@@ -11,7 +11,7 @@ import { ProblemsChecker } from "./Validator/ProblemsChecker";
 import { isSupportedFileType } from "./Validator/SupportedFileTypes";
 
 import { MetricsNotifier } from "./Core/MetricsNotifier";
-import { Metric } from "./Interface/MetricsData/MetricsFileFormat";
+import { Metric } from "./Interface/MetricsFileFormat";
 import { MetricsSaver } from "./Saver/MetricsSaver";
 
 import { FolderExtractComponentsFromCode } from "./Extractors/FolderExtractComponentsFromCode";
