@@ -5,11 +5,11 @@
     "metrics": [
       {
         "name": "LOC",
-        "value": 23
+        "value": 27
       },
       {
         "name": "AMW",
-        "value": 1.25
+        "value": 1.3333333333333333
       },
       {
         "name": "AFTD",
@@ -21,11 +21,11 @@
       },
       {
         "name": "WMC",
-        "value": 5
+        "value": 4
       },
       {
         "name": "WOC",
-        "value": 0.6666666666666667
+        "value": 0.5
       },
       {
         "name": "NOA",
@@ -33,7 +33,7 @@
       },
       {
         "name": "NOM",
-        "value": 4
+        "value": 3
       },
       {
         "name": "NOAM",
@@ -53,15 +53,15 @@
       },
       {
         "name": "NDU",
-        "value": 0
+        "value": 1
       },
       {
         "name": "NAS",
-        "value": 0
+        "value": 1
       },
       {
         "name": "BUR",
-        "value": 1
+        "value": 0
       },
       {
         "name": "NOD",
@@ -83,7 +83,7 @@
     "metrics": [
       {
         "name": "LOC",
-        "value": 16
+        "value": 15
       },
       {
         "name": "AMW",
@@ -99,11 +99,11 @@
       },
       {
         "name": "WMC",
-        "value": 2
+        "value": 1
       },
       {
         "name": "WOC",
-        "value": 0.5
+        "value": 1
       },
       {
         "name": "NOA",
@@ -111,11 +111,11 @@
       },
       {
         "name": "NOM",
-        "value": 2
+        "value": 1
       },
       {
         "name": "NOAM",
-        "value": 1
+        "value": 0
       },
       {
         "name": "NOPA",
@@ -131,15 +131,15 @@
       },
       {
         "name": "NDU",
-        "value": 0
+        "value": 1
       },
       {
         "name": "NAS",
-        "value": 0
+        "value": 1
       },
       {
         "name": "BUR",
-        "value": 1
+        "value": 0
       },
       {
         "name": "NOD",
@@ -161,7 +161,7 @@
     "metrics": [
       {
         "name": "LOC",
-        "value": 4
+        "value": 5
       },
       {
         "name": "AMW",
@@ -217,7 +217,7 @@
       },
       {
         "name": "BUR",
-        "value": 1
+        "value": 0
       },
       {
         "name": "NOD",
@@ -287,15 +287,15 @@
       },
       {
         "name": "NDU",
-        "value": 0
+        "value": 1
       },
       {
         "name": "NAS",
-        "value": 0
+        "value": 1
       },
       {
         "name": "BUR",
-        "value": 1
+        "value": 0
       },
       {
         "name": "NOD",
@@ -365,7 +365,7 @@
       },
       {
         "name": "NDU",
-        "value": 0
+        "value": 4
       },
       {
         "name": "NAS",
@@ -373,7 +373,7 @@
       },
       {
         "name": "BUR",
-        "value": 1
+        "value": 0
       },
       {
         "name": "NOD",

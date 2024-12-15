@@ -1,8 +1,7 @@
 import Parser from "tree-sitter";
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
-import {MethodInfo , FieldInfo } from '../../Interface/ParsedComponents';
-import { FileParsedComponents } from "../../Interface/FileParsedComponents";
+import { ExtractComponentsFromCode } from '../../Extractors/FileExtractComponentsFromCode';
+import { FieldInfo, MethodInfo } from '../../Interface/ParsedComponents';
 
 
 export class TCCCalculation extends MetricCalculator 

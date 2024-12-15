@@ -3,10 +3,6 @@ import * as path from "path";
 import { MetricsNotifier } from '../Core/MetricsNotifier'; 
 import {Metric, MetricsData} from '../Interface/MetricsData/MetricsFileFormat';
 
-// Metric class
-
-
-
 export class MetricsSaver {
     private filePath: string;
     private notifier: MetricsNotifier; // Add notifier reference

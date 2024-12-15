@@ -14,9 +14,15 @@ import { MetricsNotifier } from "./Core/MetricsNotifier";
 import { Metric } from "./Interface/MetricsData/MetricsFileFormat";
 import { MetricsSaver } from "./Saver/MetricsSaver";
 
+import { FolderExtractComponentsFromCode } from "./Extractors/FolderExtractComponentsFromCode";
+
 let isActive = true;
+
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
+
+const FECFcode = new FolderExtractComponentsFromCode();
+
 const metricsNotifier = new MetricsNotifier();
 const metricsSaver = new MetricsSaver(metricsNotifier);  // Pass notifier to MetricsSaver
 
@@ -129,9 +135,10 @@ export async function activate(context: vscode.ExtensionContext) {
     const problemsChecker = new ProblemsChecker(document);
     const isSupportedfiletype = new isSupportedFileType(document);
 
-    if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
+    if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported() ) {
       const sourceCode = document.getText();
        analyzeCode(document, sourceCode);
+       
     }
   });
 
@@ -192,7 +199,7 @@ async function AnalyzeSelctedCode(
         document.languageId
       );
       if (metricCalculator) {
-        const value = metricCalculator.calculate(rootNode, sourceCode);
+        const value = metricCalculator.calculate(rootNode, sourceCode , FECFcode);
         analysisResults.push(`${metricName}: ${value}`);
       }
     });
@@ -252,89 +259,111 @@ function registerHoverProvider(
   }, 8000);
 }
 
+let isAnalyzing = false; // Flag to track if an analysis is currently running
 
- function analyzeCode(
-  document: vscode.TextDocument,
-  sourceCode: string,
-): string {
-  vscode.window.showInformationMessage(
-    `Analyzing ${document.languageId} code...`
-  );
+async function analyzeCode(document: vscode.TextDocument, sourceCode: string): Promise<string> {
+  if (isAnalyzing) {
+    vscode.window.showInformationMessage("Analysis is already running. Please wait...");
+    return "Analysis in progress";
+  }
 
-  const analysisResults: string[] = [];
+  isAnalyzing = true; // Set the flag to indicate analysis is running
 
-  const metricsToCalculate = [
-    "LOC",
-    "AMW",
-    "AFTD",
-    "DAC",
-    "WMC",
-    "WOC",
-    "NOA",
-    "NOM",
-    "NOAM",
-    "NOPA",
-    "NAbsm",
-    "NProtM",
-    "FANOUT",
-    "NDU",
-    "NAS",
-    "BUR",
-    "NOD",
-    "NODD",
-    "TCC",
-  ];
+  return await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: `Analyzing ${document.languageId} code`,
+      cancellable: false,
+    },
+    async (progress) => {
+      const analysisResults: string[] = [];
+      const metricsToCalculate = [
+        "LOC",
+        "AMW",
+        "AFTD",
+        "DAC",
+        "WMC",
+        "WOC",
+        "NOA",
+        "NOM",
+        "NOAM",
+        "NOPA",
+        "NAbsm",
+        "NProtM",
+        "FANOUT",
+        "NDU",
+        "NAS",
+        "BUR",
+        "NOD",
+        "NODD",
+        "TCC",
+      ];
 
-  try {
-    // Dynamically select the parser based on the language
-    const parser =
-      document.languageId === "java" ? new javaParser() : new pythonParser();
+      try {
+        progress.report({ message: "Initializing parser...", increment: 10 });
+        await pause(500);
 
-    parser.selectLanguage();
-    const rootNode = parser.parse(sourceCode);
+        const parser =
+          document.languageId === "java" ? new javaParser() : new pythonParser();
+        parser.selectLanguage();
+        const rootNode = parser.parse(sourceCode);
 
+        progress.report({ message: "Parsing workspace files...", increment: 20 });
+        await pause(500);
+        FECFcode.parseAllJavaFiles();
 
-    // Calculate metrics
-    for (const metricName of metricsToCalculate) {
-      const metricCalculator = MetricsFactory.CreateMetric(
-        metricName,
-        document.languageId
-      );
-      if (metricCalculator) 
-      {
- 
-        const value = metricCalculator.calculate(rootNode, sourceCode);
-        analysisResults.push(`${metricName}: ${value}`);
+        progress.report({ message: "Calculating metrics...", increment: 40 });
+        for (const [index, metricName] of metricsToCalculate.entries()) {
+          const metricCalculator = MetricsFactory.CreateMetric(
+            metricName,
+            document.languageId
+          );
+          if (metricCalculator) {
+            const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode);
+            analysisResults.push(`${metricName}: ${value}`);
+
+            progress.report({
+              message: `Calculating ${metricName}...`,
+              increment: 30 / metricsToCalculate.length,
+            });
+            await pause(300);
+          }
+        }
+
+        progress.report({ message: "Saving metrics...", increment: 20 });
+        metricsSaver.saveMetrics(
+          analysisResults.map((result) => {
+            const [name, value] = result.split(": ");
+            return new Metric(name.trim(), parseFloat(value));
+          }),
+          document.fileName
+        );
+
+        vscode.window.showInformationMessage(`Analysis completed.`);
+        outputChannel.show();
+        outputChannel.appendLine(`Analysis Results:\n${analysisResults.join("\n")}`);
+
+        return `Analysis Results:\n${analysisResults.join("\n")}`;
+      } catch (error) {
+        const errorMessage = `Error during analysis:\n${error}`;
+        outputChannel.appendLine(errorMessage);
+        vscode.window.showErrorMessage(errorMessage);
+        return errorMessage;
+      } finally {
+        isAnalyzing = false; // Reset the flag once the analysis is complete
       }
     }
-
-    // Map results to Metric objects
-    const metrics: Metric[] = analysisResults.map((result) => {
-      const [name, value] = result.split(": ");
-      if (!name || isNaN(parseFloat(value))) {
-        throw new Error(`Invalid metric format: ${result}`);
-      }
-      return new Metric(name.trim(), parseFloat(value));
-    });
-
-
-    console.log("analyze triggered.");
-
-
-    metricsSaver.saveMetrics(metrics, document.fileName);
-
-
-    
-    // Display results in the output channel
-    outputChannel.show();
-    outputChannel.appendLine(`Analysis Results:\n${analysisResults.join("\n")}`);
-
-    return `Analysis Results:\n${analysisResults.join("\n")}`;
-  } catch (error) {
-    const errorMessage = `Error during analysis:\n${error}`;
-    outputChannel.appendLine(errorMessage);
-    vscode.window.showErrorMessage(errorMessage);
-    return errorMessage;
-  }
+  );
 }
+
+
+// Helper function to create a delay
+function pause(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+
+
+
+
 

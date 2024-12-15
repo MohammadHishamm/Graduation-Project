@@ -1,13 +1,12 @@
 import { MetricCalculator } from "../Core/MetricCalculator";
 
-import { ExtractComponentsFromCode } from "../Extractors/ExtractComponentsFromCode";
 import { JavaAccessToForeignData } from "../Metrics/Java/JavaAFTD ";
 import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
 // import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
 import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 import { JavaLOCMetric } from "../Metrics/Java/JavaLOCC";
 import { JavaNumberOfAbstractClassesM } from "../Metrics/Java/JavaNAbsm";
-import { NDUCalculation } from "../Metrics/Java/JavaNDU";
+// import { NDUCalculation } from "../Metrics/Java/JavaNDU";
 import { JavaNumberOfAttributesMetric } from "../Metrics/Java/JavaNOA";
 import { JavaNumberOfAccessorMethods } from "../Metrics/Java/JavaNOAM";
 import { JavaNumberOfMethodsMetric } from "../Metrics/Java/JavaNOM";
@@ -31,7 +30,7 @@ import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
-import { BURCalculation } from "../Metrics/Java/JavaBUR";
+// import { BURCalculation } from "../Metrics/Java/JavaBUR";
 import { NODCalculation } from "../Metrics/Java/JavaNOD";
 import { NODDCalculation } from "../Metrics/Java/JavaNODD";
 
@@ -81,11 +80,11 @@ export class MetricsFactory {
       // case "CognitiveComplexity":
       //   return new JavaCognitiveComplexityMetric();
       case "NDU":
-        return new NDUCalculation();
+        // return new NDUCalculation();
       case "NAS":
         return new JavaNumberOfAddedServices();
       case "BUR":
-        return new BURCalculation();
+        // return new BURCalculation();
       case "NOD":
         return new NODCalculation();
       case "NODD":

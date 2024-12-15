@@ -1,30 +1,30 @@
 import Parser from 'tree-sitter';
 
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
+import { ExtractComponentsFromCode } from '../../Extractors/FileExtractComponentsFromCode';
 import { FolderExtractComponentsFromCode } from '../../Extractors/FolderExtractComponentsFromCode';
 import { MethodInfo } from '../../Interface/ParsedComponents';
 
 
-export class JavaNumberOfAddedServices extends MetricCalculator {
+export class JavaNumberOfAddedServices extends MetricCalculator 
+{
     // Return a Promise from calculate
-    calculate(node: any): number {
+    calculate(node: any , sourceCode: string , FECFC: FolderExtractComponentsFromCode): number {
         const extractcomponentsfromcode = new ExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
 
-        return this.findNAS(methods, node);
+        return this.findNAS(methods, node , FECFC);
     }
 
 
 
-    private  findNAS(methods: MethodInfo[], rootNode: Parser.SyntaxNode): number {
+    private findNAS(methods: MethodInfo[], rootNode: Parser.SyntaxNode ,  FECFC: FolderExtractComponentsFromCode): number {
         let NAS = 0;
-        let FECFcode = new FolderExtractComponentsFromCode();
+        
         let extendedClass;
-        // Await the result of the asynchronous method to get the array of FileParsedComponents
-         FECFcode.parseAllJavaFiles();
-         const fileParsedComponents = FECFcode.getParsedComponentsFromFile();
+
+         const fileParsedComponents = FECFC.getParsedComponentsFromFile();
 
         const classNodes = rootNode.descendantsOfType('class_declaration');
         classNodes.forEach((node) => {

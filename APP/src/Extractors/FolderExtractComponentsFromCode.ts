@@ -1,52 +1,76 @@
 import * as vscode from 'vscode';
-import Parser from 'tree-sitter';
-import { FileParsedComponents, ClassGroup } from '../Interface/FileParsedComponents'; // Import the correct interface
-import { ExtractComponentsFromCode } from './ExtractComponentsFromCode'; // Import the correct interface
-import java from 'tree-sitter-java';
 import * as fs from "fs";
 import * as path from "path";
 
-export class FolderExtractComponentsFromCode {
-    public parser: Parser;
+import Parser from 'tree-sitter';
+import java from 'tree-sitter-java';
 
-    constructor() 
-    {
+import { ClassGroup, FileParsedComponents } from '../Interface/FileParsedComponents';
+import { ExtractComponentsFromCode } from './FileExtractComponentsFromCode'; 
+import { FileCacheManager } from '../Cache/FileCacheManager'; 
+
+export class FolderExtractComponentsFromCode {
+    private parser: Parser;
+    private cacheManager: FileCacheManager;
+
+    constructor() {
         this.parser = new Parser();
-        this.parser.setLanguage(java); // Use Java grammar
+        this.parser.setLanguage(java);
+        this.cacheManager = new FileCacheManager(); 
     }
 
+
     public async parseAllJavaFiles() {
-        // Step 1: Find all Java files in the workspace
         const javaFiles = await vscode.workspace.findFiles('**/*.java');
+        const allParsedComponents: FileParsedComponents[] = [];
 
-        // Step 2: Initialize an array to store the parsed components
-        let allParsedComponents: FileParsedComponents[] = [];
-
-        // Step 3: Loop through each file and parse it
         for (const fileUri of javaFiles) {
-            const parsedComponents = await this.parseFile(fileUri);
+            const filePath = fileUri.fsPath;
 
-            // If components are parsed, add them to the allParsedComponents array
-            if (parsedComponents) {
-                allParsedComponents.push(parsedComponents); // Append to array
+          
+            const fileContent = await this.fetchFileContent(fileUri);
+
+            
+            const fileHash = FileCacheManager.computeHash(fileContent);
+
+        
+            const cachedComponents = this.cacheManager.get(filePath, fileHash);
+
+            if (cachedComponents) 
+            {  
+                console.log(`Cache hit: ${filePath}`);
             } else {
-                console.error(`Error parsing file: ${fileUri.fsPath}`);
+                
+                const parsedComponents = await this.parseFile(fileUri);
+                if (parsedComponents) {
+                    allParsedComponents.push(parsedComponents);
+                    this.cacheManager.set(filePath, fileHash, parsedComponents);
+
+                    this.saveParsedComponents(allParsedComponents);
+                    console.log("changes detected , New Metrics saved");
+                    console.log(`Cache updated: ${filePath}`);
+                } else {
+                    console.error(`Error parsing file: ${filePath}`);
+                }
             }
         }
 
-        try {
-            let filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
+       
+    }
 
-            // Remove 'out' from the file path, if it exists
-            filePath = filePath.replace(/out[\\\/]?/, "");
-
-            fs.writeFileSync(filePath, JSON.stringify(allParsedComponents, null, 2));
-            console.log("Metrics saved to Metrics.json.");
+    private saveParsedComponents(parsedComponents: FileParsedComponents[]) {
+        try 
+        {
+            const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json").replace(/out[\\\/]?/, ""); 
+            const newContent = JSON.stringify(parsedComponents, null, 2);
+            if (newContent) {
+                fs.writeFileSync(filePath, newContent);
+            } else {
+                console.log("No parsedComponents.");
+            }
         } catch (err) {
-            console.log("Failed to save metrics to file.");
-            console.error(err);
+            console.error("Failed to save parsedComponents to file:", err);
         }
-
     }
 
 
@@ -54,13 +78,13 @@ export class FolderExtractComponentsFromCode {
         try {
             const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
 
-            // Remove 'out' from the file path, if it exists
+            
             const adjustedPath = filePath.replace(/out[\\\/]?/, "");
 
-            // Read the file content
+            
             const fileContent = fs.readFileSync(adjustedPath, 'utf8');
 
-            // Parse the JSON content and return it
+           
             return JSON.parse(fileContent) as FileParsedComponents[];
         } catch (err) {
             console.error("Failed to read parsed components from file:", err);
@@ -70,16 +94,16 @@ export class FolderExtractComponentsFromCode {
 
     public async parseFile(fileUri: vscode.Uri): Promise<FileParsedComponents | null> {
         try {
-            // Step 1: Fetch the content of the file using VS Code API
+            
             const fileContent = await this.fetchFileContent(fileUri);
 
-            // Step 2: Parse the content of the file
+        
             const tree = this.parseCode(fileContent);
 
-            // Step 3: Extract components (classes, methods, fields) from the parsed code
+           
             return this.extractComponents(tree, fileUri.fsPath);
         } catch (error) {
-            console.error(`Error parsing file ${fileUri.fsPath}:`, error);
+            console.error('Error parsing file ${fileUri.fsPath}:, error');
             return null;
         }
     }
@@ -90,7 +114,7 @@ export class FolderExtractComponentsFromCode {
     }
 
     public parseCode(sourceCode: string): Parser.Tree {
-        return this.parser.parse(sourceCode); // Parse Java source code
+        return this.parser.parse(sourceCode); 
     }
 
 
@@ -100,7 +124,7 @@ export class FolderExtractComponentsFromCode {
         const classgroup = this.extractClasses(rootNode, fileName);
 
         return {
-            classes: classgroup  // Return the object with the 'classes' property
+            classes: classgroup  
         };
     }
 

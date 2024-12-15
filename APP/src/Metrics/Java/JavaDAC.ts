@@ -1,6 +1,5 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
+import { ExtractComponentsFromCode } from '../../Extractors/FileExtractComponentsFromCode';
 import { FieldInfo } from '../../Interface/ParsedComponents';
 
 

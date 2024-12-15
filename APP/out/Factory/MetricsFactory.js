@@ -7,7 +7,7 @@ const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
-const JavaNDU_1 = require("../Metrics/Java/JavaNDU");
+// import { NDUCalculation } from "../Metrics/Java/JavaNDU";
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
@@ -24,7 +24,7 @@ const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
-const JavaBUR_1 = require("../Metrics/Java/JavaBUR");
+// import { BURCalculation } from "../Metrics/Java/JavaBUR";
 const JavaNOD_1 = require("../Metrics/Java/JavaNOD");
 const JavaNODD_1 = require("../Metrics/Java/JavaNODD");
 class MetricsFactory {
@@ -69,11 +69,11 @@ class MetricsFactory {
             // case "CognitiveComplexity":
             //   return new JavaCognitiveComplexityMetric();
             case "NDU":
-                return new JavaNDU_1.NDUCalculation();
+            // return new NDUCalculation();
             case "NAS":
                 return new JavaNAS_1.JavaNumberOfAddedServices();
             case "BUR":
-                return new JavaBUR_1.BURCalculation();
+            // return new BURCalculation();
             case "NOD":
                 return new JavaNOD_1.NODCalculation();
             case "NODD":

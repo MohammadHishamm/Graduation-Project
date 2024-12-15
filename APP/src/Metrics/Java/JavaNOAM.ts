@@ -1,8 +1,6 @@
-import Parser from 'tree-sitter';
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
-import { MethodInfo , FieldInfo } from '../../Interface/ParsedComponents';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
+import { ExtractComponentsFromCode } from '../../Extractors/FileExtractComponentsFromCode';
+import { MethodInfo } from '../../Interface/ParsedComponents';
 
 
 export class JavaNumberOfAccessorMethods extends MetricCalculator {

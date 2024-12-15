@@ -28,53 +28,66 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FolderExtractComponentsFromCode = void 0;
 const vscode = __importStar(require("vscode"));
-const tree_sitter_1 = __importDefault(require("tree-sitter"));
-const ExtractComponentsFromCode_1 = require("./ExtractComponentsFromCode"); // Import the correct interface
-const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const tree_sitter_1 = __importDefault(require("tree-sitter"));
+const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
+const FileExtractComponentsFromCode_1 = require("./FileExtractComponentsFromCode");
+const FileCacheManager_1 = require("../Cache/FileCacheManager");
 class FolderExtractComponentsFromCode {
     parser;
+    cacheManager;
     constructor() {
         this.parser = new tree_sitter_1.default();
-        this.parser.setLanguage(tree_sitter_java_1.default); // Use Java grammar
+        this.parser.setLanguage(tree_sitter_java_1.default);
+        this.cacheManager = new FileCacheManager_1.FileCacheManager();
     }
     async parseAllJavaFiles() {
-        // Step 1: Find all Java files in the workspace
         const javaFiles = await vscode.workspace.findFiles('**/*.java');
-        // Step 2: Initialize an array to store the parsed components
-        let allParsedComponents = [];
-        // Step 3: Loop through each file and parse it
+        const allParsedComponents = [];
         for (const fileUri of javaFiles) {
-            const parsedComponents = await this.parseFile(fileUri);
-            // If components are parsed, add them to the allParsedComponents array
-            if (parsedComponents) {
-                allParsedComponents.push(parsedComponents); // Append to array
+            const filePath = fileUri.fsPath;
+            const fileContent = await this.fetchFileContent(fileUri);
+            const fileHash = FileCacheManager_1.FileCacheManager.computeHash(fileContent);
+            const cachedComponents = this.cacheManager.get(filePath, fileHash);
+            if (cachedComponents) {
+                console.log(`Cache hit: ${filePath}`);
             }
             else {
-                console.error(`Error parsing file: ${fileUri.fsPath}`);
+                const parsedComponents = await this.parseFile(fileUri);
+                if (parsedComponents) {
+                    allParsedComponents.push(parsedComponents);
+                    this.cacheManager.set(filePath, fileHash, parsedComponents);
+                    this.saveParsedComponents(allParsedComponents);
+                    console.log("changes detected , New Metrics saved");
+                    console.log(`Cache updated: ${filePath}`);
+                }
+                else {
+                    console.error(`Error parsing file: ${filePath}`);
+                }
             }
         }
+    }
+    saveParsedComponents(parsedComponents) {
         try {
-            let filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
-            // Remove 'out' from the file path, if it exists
-            filePath = filePath.replace(/out[\\\/]?/, "");
-            fs.writeFileSync(filePath, JSON.stringify(allParsedComponents, null, 2));
-            console.log("Metrics saved to Metrics.json.");
+            const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json").replace(/out[\\\/]?/, "");
+            const newContent = JSON.stringify(parsedComponents, null, 2);
+            if (newContent) {
+                fs.writeFileSync(filePath, newContent);
+            }
+            else {
+                console.log("No parsedComponents.");
+            }
         }
         catch (err) {
-            console.log("Failed to save metrics to file.");
-            console.error(err);
+            console.error("Failed to save parsedComponents to file:", err);
         }
     }
     getParsedComponentsFromFile() {
         try {
             const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
-            // Remove 'out' from the file path, if it exists
             const adjustedPath = filePath.replace(/out[\\\/]?/, "");
-            // Read the file content
             const fileContent = fs.readFileSync(adjustedPath, 'utf8');
-            // Parse the JSON content and return it
             return JSON.parse(fileContent);
         }
         catch (err) {
@@ -84,15 +97,12 @@ class FolderExtractComponentsFromCode {
     }
     async parseFile(fileUri) {
         try {
-            // Step 1: Fetch the content of the file using VS Code API
             const fileContent = await this.fetchFileContent(fileUri);
-            // Step 2: Parse the content of the file
             const tree = this.parseCode(fileContent);
-            // Step 3: Extract components (classes, methods, fields) from the parsed code
             return this.extractComponents(tree, fileUri.fsPath);
         }
         catch (error) {
-            console.error(`Error parsing file ${fileUri.fsPath}:`, error);
+            console.error('Error parsing file ${fileUri.fsPath}:, error');
             return null;
         }
     }
@@ -101,18 +111,18 @@ class FolderExtractComponentsFromCode {
         return Buffer.from(fileContent).toString('utf8');
     }
     parseCode(sourceCode) {
-        return this.parser.parse(sourceCode); // Parse Java source code
+        return this.parser.parse(sourceCode);
     }
     extractComponents(tree, fileName) {
         const rootNode = tree.rootNode;
         const classgroup = this.extractClasses(rootNode, fileName);
         return {
-            classes: classgroup // Return the object with the 'classes' property
+            classes: classgroup
         };
     }
     extractClasses(rootNode, fileName) {
         const classNodes = rootNode.descendantsOfType('class_declaration');
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
+        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const classes = extractcomponentsfromcode.extractClasses(rootNode);
         const methods = extractcomponentsfromcode.extractMethods(rootNode, classes);
         const fields = extractcomponentsfromcode.extractFields(rootNode, classes);

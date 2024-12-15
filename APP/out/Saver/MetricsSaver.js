@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsSaver = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-// Metric class
 class MetricsSaver {
     filePath;
     notifier; // Add notifier reference
