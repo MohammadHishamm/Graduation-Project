@@ -101,7 +101,8 @@ class FolderExtractComponentsFromCode {
         try {
             const fileContent = await this.fetchFileContent(fileUri);
             const tree = this.parseCode(fileContent);
-            return this.extractComponents(tree, fileUri.fsPath);
+            const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+            return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
         }
         catch (error) {
             console.error("Error parsing file ${fileUri.fsPath}:, error");
@@ -114,26 +115,6 @@ class FolderExtractComponentsFromCode {
     }
     parseCode(sourceCode) {
         return this.parser.parse(sourceCode);
-    }
-    extractComponents(tree, fileName) {
-        const rootNode = tree.rootNode;
-        const classgroup = this.extractClasses(rootNode, fileName);
-        return {
-            classes: classgroup,
-        };
-    }
-    extractClasses(rootNode, fileName) {
-        const classNodes = rootNode.descendantsOfType("class_declaration");
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
-        const classes = extractcomponentsfromcode.extractClasses(rootNode);
-        const methods = extractcomponentsfromcode.extractMethods(rootNode, classes);
-        const fields = extractcomponentsfromcode.extractFields(rootNode, classes);
-        return classNodes.map((node) => ({
-            fileName: fileName,
-            name: node.childForFieldName("name")?.text ?? "Unknown",
-            methods: methods,
-            fields: fields,
-        }));
     }
 }
 exports.FolderExtractComponentsFromCode = FolderExtractComponentsFromCode;

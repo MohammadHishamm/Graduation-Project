@@ -8,9 +8,10 @@ import java from "tree-sitter-java";
 import { FileParsedComponents } from "../Interface/FileParsedComponents";
 import { FileExtractComponentsFromCode } from "./FileExtractComponentsFromCode";
 import { FileCacheManager } from "../Cache/FileCacheManager";
-import { ClassGroup } from "../Interface/ClassGroup";
 
-export class FolderExtractComponentsFromCode {
+export class FolderExtractComponentsFromCode 
+{
+
   private parser: Parser;
   private cacheManager: FileCacheManager;
 
@@ -102,7 +103,8 @@ export class FolderExtractComponentsFromCode {
 
       const tree = this.parseCode(fileContent);
 
-      return this.extractComponents(tree, fileUri.fsPath);
+      const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+      return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
     } catch (error) {
       console.error("Error parsing file ${fileUri.fsPath}:, error");
       return null;
@@ -118,35 +120,5 @@ export class FolderExtractComponentsFromCode {
     return this.parser.parse(sourceCode);
   }
 
-  public extractComponents(
-    tree: Parser.Tree,
-    fileName: string
-  ): FileParsedComponents {
-    const rootNode = tree.rootNode;
 
-    const classgroup = this.extractClasses(rootNode, fileName);
-
-    return {
-      classes: classgroup,
-    };
-  }
-
-  public extractClasses(
-    rootNode: Parser.SyntaxNode,
-    fileName: string
-  ): ClassGroup[] {
-    const classNodes = rootNode.descendantsOfType("class_declaration");
-
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
-    const classes = extractcomponentsfromcode.extractClasses(rootNode);
-    const methods = extractcomponentsfromcode.extractMethods(rootNode, classes);
-    const fields = extractcomponentsfromcode.extractFields(rootNode, classes);
-
-    return classNodes.map((node) => ({
-      fileName: fileName,
-      name: node.childForFieldName("name")?.text ?? "Unknown",
-      methods: methods,
-      fields: fields,
-    }));
-  }
 }

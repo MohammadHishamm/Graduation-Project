@@ -2,6 +2,26 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileExtractComponentsFromCode = void 0;
 class FileExtractComponentsFromCode {
+    extractFileComponents(tree, fileName) {
+        const rootNode = tree.rootNode;
+        const classgroup = this.extractClassGroup(rootNode, fileName);
+        return {
+            classes: classgroup,
+        };
+    }
+    extractClassGroup(rootNode, fileName) {
+        const classNodes = rootNode.descendantsOfType("class_declaration");
+        const classes = this.extractClasses(rootNode);
+        const methods = this.extractMethods(rootNode, classes);
+        const fields = this.extractFields(rootNode, classes);
+        return classNodes.map((node) => ({
+            fileName: fileName,
+            name: node.childForFieldName("name")?.text ?? "Unknown",
+            classes: classes,
+            methods: methods,
+            fields: fields,
+        }));
+    }
     extractClasses(rootNode) {
         const classNodes = rootNode.descendantsOfType("class_declaration");
         return classNodes.map((node) => ({

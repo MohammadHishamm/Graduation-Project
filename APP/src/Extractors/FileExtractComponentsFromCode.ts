@@ -1,9 +1,45 @@
 import Parser from "tree-sitter";
+import { FileParsedComponents } from "../Interface/FileParsedComponents";
+import { ClassGroup } from "../Interface/ClassGroup";
 import { ClassInfo } from "../Interface/ClassInfo";
 import { MethodInfo } from "../Interface/MethodInfo";
 import { FieldInfo } from "../Interface/FieldInfo";
 
-export class FileExtractComponentsFromCode {
+export class FileExtractComponentsFromCode 
+{
+   public extractFileComponents(
+      tree: Parser.Tree,
+      fileName: string
+    ): FileParsedComponents {
+      const rootNode = tree.rootNode;
+  
+      const classgroup = this.extractClassGroup(rootNode, fileName);
+  
+      return {
+        classes: classgroup,
+      };
+    }
+
+    public extractClassGroup(
+      rootNode: Parser.SyntaxNode,
+      fileName: string
+    ): ClassGroup[] {
+      const classNodes = rootNode.descendantsOfType("class_declaration");
+  
+      const classes = this.extractClasses(rootNode);
+      const methods = this.extractMethods(rootNode, classes);
+      const fields = this.extractFields(rootNode, classes);
+  
+      return classNodes.map((node) => ({
+        fileName: fileName,
+        name: node.childForFieldName("name")?.text ?? "Unknown",
+        classes: classes,
+        methods: methods,
+        fields: fields,
+      }));
+    }
+  
+
   public extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] {
     const classNodes = rootNode.descendantsOfType("class_declaration");
     return classNodes.map((node) => ({
