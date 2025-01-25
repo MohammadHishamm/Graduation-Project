@@ -23,6 +23,7 @@ const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
+const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -50,8 +51,8 @@ class MetricsFactory {
                 return new JavaWOC_1.JavaWeightOfAClass();
             case `AMW`:
                 return new JavaAMW_1.JavaAverageMethodWeight();
-            // case `AFTD`:
-            //   return new JavaAccessToForeignData();
+            case `ATFD`:
+                return new JavaATFD_1.JavaAccessToForeignData();
             case `DAC`:
                 return new JavaDAC_1.JavaDataAbstractionCoupling();
             case "NOA":

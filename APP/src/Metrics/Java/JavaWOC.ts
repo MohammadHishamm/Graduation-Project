@@ -33,6 +33,7 @@ export class JavaWeightOfAClass extends MetricCalculator {
     fields.forEach((field) => {
       if (field.modifiers.includes("public")) {
         ++nom;
+        ++den;
       }
     });
 
