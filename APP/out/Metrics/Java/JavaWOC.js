@@ -28,6 +28,7 @@ class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
         fields.forEach((field) => {
             if (field.modifiers.includes("public")) {
                 ++nom;
+                ++den;
             }
         });
         if (nom === 0) {

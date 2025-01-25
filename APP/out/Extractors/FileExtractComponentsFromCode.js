@@ -33,9 +33,11 @@ class FileExtractComponentsFromCode {
     extractClasses(rootNode) {
         let extendedClass;
         const classNodes = rootNode.descendantsOfType("class_declaration");
+        let bodyNode;
         classNodes.forEach((node) => {
             // Try to find the 'superclass' node
             const extendsNode = node.childForFieldName("superclass");
+            bodyNode = node.childForFieldName("body"); // Extract class body
             if (extendsNode) {
                 // Extract the text and trim 'extends' from the start
                 extendedClass = extendsNode.text.trim().replace(/^(extends|implements)\s*/, "");
@@ -46,8 +48,8 @@ class FileExtractComponentsFromCode {
             extendedclass: extendedClass,
             isAbstract: node.children.some((child) => child.type === "modifier" && child.text === "abstract"),
             isInterface: node.type === "interface_declaration",
-            startPosition: node.startPosition,
-            endPosition: node.endPosition,
+            startPosition: bodyNode?.startPosition ?? node.startPosition, // Use body start
+            endPosition: bodyNode?.endPosition ?? node.endPosition, // Use body end
         }));
     }
     extractMethods(rootNode, classes) {
@@ -67,10 +69,7 @@ class FileExtractComponentsFromCode {
             const params = node.childForFieldName("parameters")?.text ?? "";
             const parentClass = this.findParentClass(node, classes);
             const isConstructor = parentClass ? parentClass.name === name : false;
-            const isAccessor = this.isAccessor(name);
-            // Extract all fields used by this method
-            if (isAccessor) {
-            }
+            const isAccessor = this.isAccessor(node, name);
             const fieldsUsed = this.extractFieldsUsedInMethod(node);
             return {
                 name,
@@ -102,9 +101,43 @@ class FileExtractComponentsFromCode {
         }
         return fieldsUsed;
     }
-    // Check if a method is an accessor (getter or setter)
-    isAccessor(methodName) {
-        return /^get[A-Z]/.test(methodName) || /^set[A-Z]/.test(methodName);
+    isAccessor(rootNode, methodName) {
+        let isAccessor = false;
+        // Check if the method name matches a getter or setter naming convention
+        if (/^get[A-Z]/.test(methodName) || /^set[A-Z]/.test(methodName)) {
+            const methodNodes = rootNode.descendantsOfType("method_declaration");
+            methodNodes.forEach((node) => {
+                const nameNode = node.childForFieldName("name")?.text;
+                if (nameNode === methodName) {
+                    const bodyNode = node.childForFieldName("body");
+                    if (bodyNode) {
+                        const statements = bodyNode.children;
+                        // Ensure the body has only [SyntaxNode, ReturnStatementNode, SyntaxNode] for get or  [SyntaxNode, ExpressionStatementNode, SyntaxNode] for set
+                        if (statements.length === 3) {
+                            // get the middle statment returnstatment or expressionstatment
+                            const statement = statements[1];
+                            console.log(statement.type);
+                            if (statement.type === "expression_statement") {
+                                // get the return statment and gets its child which is field accesed so it is a set
+                                const returnValue = statement.childrenForFieldName("ExpressionStatementNode");
+                                if (returnValue) {
+                                    isAccessor = true;
+                                }
+                            }
+                            else if (statement.type === "return_statement") {
+                                // get the return statment and gets its child which is field accesed so it is a get 
+                                const returnValue = statement.childrenForFieldName("FieldAccessNode");
+                                if (returnValue) {
+                                    isAccessor = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                return isAccessor;
+            });
+        }
+        return isAccessor;
     }
     isClass(rootNode) {
         const classNodes = rootNode.descendantsOfType("class_declaration");
