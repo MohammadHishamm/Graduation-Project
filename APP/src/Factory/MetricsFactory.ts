@@ -19,16 +19,12 @@ import { JavaWeightOfAClass } from "../Metrics/Java/JavaWOC";
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
 import { TCCCalculation } from "../Metrics/Java/JavaTCC";
 
-
-
-
-
-
 import { PythonCyclomaticComplexityMetric } from "../Metrics/Python/PythonCC";
 import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
 import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
+import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -61,8 +57,8 @@ export class MetricsFactory {
         return new JavaWeightOfAClass();
       case `AMW`:
         return new JavaAverageMethodWeight();
-      // case `AFTD`:
-      //   return new JavaAccessToForeignData();
+      case `ATFD`:
+        return new JavaAccessToForeignData();
       case `DAC`:
         return new JavaDataAbstractionCoupling();
       case "NOA":
@@ -80,42 +76,39 @@ export class MetricsFactory {
       // case "CognitiveComplexity":
       //   return new JavaCognitiveComplexityMetric();
       case "NDU":
-        // return new NDUCalculation();
+      // return new NDUCalculation();
       case "NAS":
         return new JavaNumberOfAddedServices();
       case "BUR":
-        // return new BURCalculation();
+      // return new BURCalculation();
       // case "NOD":
       //   return new NODCalculation();
       // case "NODD":
       //   return new NODDCalculation();
       case "TCC":
-        return new TCCCalculation();  
+        return new TCCCalculation();
 
-//       case "FANOUT":
-//         const javaCode = `
+      //       case "FANOUT":
+      //         const javaCode = `
 
-// public class Dog extends Animal {
-//     // Overriding the makeSound method from Animal class
-    
-//     static public void makeSound() {
-//         System.out.println("Dog barks");
-//     }
+      // public class Dog extends Animal {
+      //     // Overriding the makeSound method from Animal class
 
+      //     static public void makeSound() {
+      //         System.out.println("Dog barks");
+      //     }
 
-// }
+      // }
 
-           
+      // `;
+      //         const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
+      //         const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
 
-// `;
-//         const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
-//         const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
+      //         const components = parser.extractComponents(tree); // Extract classes, methods, and fields
 
-//         const components = parser.extractComponents(tree); // Extract classes, methods, and fields
-
-//         console.log("Classes:", components.classes);
-//         console.log("Methods:", components.methods);
-//         console.log("Fields:", components.fields);
+      //         console.log("Classes:", components.classes);
+      //         console.log("Methods:", components.methods);
+      //         console.log("Fields:", components.fields);
       // console.log('WOC:', components.weight);
       // console.log('Fields:', components.weight);
 
