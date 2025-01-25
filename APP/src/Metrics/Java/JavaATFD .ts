@@ -5,9 +5,19 @@ import { ClassInfo } from "../../Interface/ClassInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
 import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
+import { FileParsedComponents } from "../../Interface/FileParsedComponents";
+interface Reference {
+  name: string;
+  type: "field" | "method";
+}
 
 export class JavaAccessToForeignData extends MetricCalculator {
-  calculate(node: any): number {
+  calculate(
+    node: any,
+    sourceCode: string,
+    FECFC: FolderExtractComponentsFromCode
+  ): number {
     console.log("[ATFD] Starting calculation");
     console.log("[ATFD] Input node type:", node ? node.type : "null/undefined");
 
@@ -36,7 +46,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
       Classes,
       methods,
       Fields,
-      extractcomponentsfromcode
+      FECFC
     );
 
     console.log("[ATFD] Final Metric Value:", ATFD);
@@ -48,11 +58,11 @@ export class JavaAccessToForeignData extends MetricCalculator {
     currentClasses: ClassInfo[],
     methods: MethodInfo[],
     fields: FieldInfo[],
-    extractcomponentsfromcode: FileExtractComponentsFromCode
+    FECFC: FolderExtractComponentsFromCode
   ): number {
     console.log("[ATFD:calculateAccessToForeignData] Starting method");
 
-    // Filter out constant fields
+    // Filter out constant fields (including static final variables)
     const nonConstantFields = fields.filter(
       (field) =>
         !field.modifiers.includes("final") &&
@@ -63,8 +73,8 @@ export class JavaAccessToForeignData extends MetricCalculator {
       nonConstantFields.map((f) => f.name)
     );
 
-    // Track unique foreign classes accessed
-    const foreignClassesAccessed = new Set<string>();
+    // Track unique foreign field and method references
+    const foreignReferences = new Set<string>();
 
     // Check each method for foreign data access
     methods.forEach((method) => {
@@ -75,7 +85,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
         console.log(
           `[ATFD] Skipping method ${method.name} - constructor or accessor`
         );
-        return;
+        return; // Skip this method if it is a constructor or accessor
       }
 
       // Find the method's node in the syntax tree
@@ -85,7 +95,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
         return;
       }
 
-      // Get all fields from current class and its ancestors
+      // Get all fields from the current class and its ancestors
       const currentClassFields = this.getClassAndAncestorFields(
         method,
         currentClasses,
@@ -97,10 +107,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
       );
 
       // Extract references within the method
-      const references = this.extractReferencesFromMethod(
-        methodNode,
-        extractcomponentsfromcode
-      );
+      const references = this.extractReferencesFromMethod(methodNode, FECFC);
       console.log(`[ATFD] References in method ${method.name}:`, references);
 
       references.forEach((reference) => {
@@ -122,194 +129,285 @@ export class JavaAccessToForeignData extends MetricCalculator {
           referenceClass?.name
         );
 
-        // Check if the reference is from a different class and not an ancestor
+        // Check if the reference is a method or field and if it's from a different class
         if (
           referenceClass &&
           !this.isLocalClassAccess(referenceClass, currentClasses)
         ) {
-          console.log(`[ATFD] Adding foreign class: ${referenceClass.name}`);
-          foreignClassesAccessed.add(referenceClass.name);
+          if (reference.type === "method") {
+            // Additional check for isAccessor
+            const referencedMethod = methods.find(
+              (m) => m.name === reference.name
+            );
+            if (referencedMethod?.isAccessor) {
+              console.log(`[ATFD] Skipping accessor method: ${reference.name}`);
+              return;
+            }
+
+            console.log(`[ATFD] Adding foreign method: ${reference.name}`);
+            foreignReferences.add(`method:${reference.name}`);
+          } else {
+            console.log(`[ATFD] Adding foreign field: ${reference.name}`);
+            foreignReferences.add(`field:${reference.name}`);
+          }
         }
       });
     });
 
     console.log(
-      "[ATFD] Foreign Classes Accessed:",
-      Array.from(foreignClassesAccessed)
+      "[ATFD] Foreign References Accessed:",
+      Array.from(foreignReferences)
     );
-    return foreignClassesAccessed.size;
-  }
-
-  private getClassAndAncestorFields(
-    method: MethodInfo,
-    currentClasses: ClassInfo[],
-    allFields: FieldInfo[]
-  ): string[] {
-    console.log("[getClassAndAncestorFields] Starting method");
-
-    // Find the class containing the method
-    const methodClass = currentClasses.find(
-      (cls) =>
-        method.startPosition.row >= cls.startPosition.row &&
-        method.endPosition.row <= cls.endPosition.row
-    );
-    console.log("[getClassAndAncestorFields] Method Class:", methodClass?.name);
-
-    if (!methodClass) {
-      console.log("[getClassAndAncestorFields] No method class found");
-      return [];
-    }
-
-    // Collect fields from the current class and its ancestors
-    const classFields = allFields
-      .filter(
-        (field) =>
-          field.startPosition.row >= methodClass.startPosition.row &&
-          field.endPosition.row <= methodClass.endPosition.row
-      )
-      .map((field) => field.name);
-    console.log(
-      "[getClassAndAncestorFields] Current Class Fields:",
-      classFields
-    );
-
-    // If the class has a parent, include its fields too
-    if (methodClass.parent) {
-      const ancestorFields = allFields
-        .filter((field) => {
-          const ancestorClass = currentClasses.find(
-            (cls) => cls.name === methodClass.parent
-          );
-          return (
-            ancestorClass &&
-            field.startPosition.row >= ancestorClass.startPosition.row &&
-            field.endPosition.row <= ancestorClass.endPosition.row
-          );
-        })
-        .map((field) => field.name);
-      console.log(
-        "[getClassAndAncestorFields] Ancestor Fields:",
-        ancestorFields
-      );
-
-      return [...classFields, ...ancestorFields];
-    }
-
-    return classFields;
+    return foreignReferences.size;
   }
 
   private findMethodNodeByPosition(
     rootNode: Parser.SyntaxNode,
     method: MethodInfo
   ): Parser.SyntaxNode | null {
-    console.log("[findMethodNodeByPosition] Starting method");
-    console.log("[findMethodNodeByPosition] Method:", method.name);
-
-    // Traverse the tree to find the method node matching the MethodInfo positions
-    const methodNodes = rootNode.descendantsOfType("method_declaration");
-    console.log(
-      "[findMethodNodeByPosition] Total method nodes found:",
-      methodNodes.length
-    );
-
-    for (const node of methodNodes) {
-      const methodName = node.childForFieldName("name")?.text;
-      const startPos = node.startPosition;
-      const endPos = node.endPosition;
-
-      // Match by method name and position
+    const findMethodNode = (
+      node: Parser.SyntaxNode
+    ): Parser.SyntaxNode | null => {
+      // Check if the node is a method declaration and matches the position
       if (
-        methodName === method.name &&
-        startPos.row === method.startPosition.row &&
-        startPos.column === method.startPosition.column &&
-        endPos.row === method.endPosition.row &&
-        endPos.column === method.endPosition.column
+        node.type === "method_declaration" &&
+        this.isNodePositionMatch(node, method.startPosition, method.endPosition)
       ) {
-        console.log("[findMethodNodeByPosition] Matching method node found");
         return node;
       }
-    }
 
-    console.log("[findMethodNodeByPosition] No matching method node found");
-    return null;
+      // Recursively search child nodes
+      for (let child of node.children) {
+        const foundNode = findMethodNode(child);
+        if (foundNode) return foundNode;
+      }
+
+      return null;
+    };
+
+    return findMethodNode(rootNode);
   }
 
-  private extractReferencesFromMethod(
-    methodNode: Parser.SyntaxNode,
-    extractcomponentsfromcode: FileExtractComponentsFromCode
-  ): any[] {
-    console.log("[extractReferencesFromMethod] Starting method");
+  /**
+   * Check if a node's position matches the given method positions
+   */
+  private isNodePositionMatch(
+    node: Parser.SyntaxNode,
+    startPos: Parser.Point,
+    endPos: Parser.Point
+  ): boolean {
+    const nodeStart = node.startPosition;
+    const nodeEnd = node.endPosition;
 
-    const references: any[] = [];
-    const bodyNode = methodNode.childForFieldName("body");
-
-    console.log("[extractReferencesFromMethod] Body node exists:", !!bodyNode);
-
-    if (bodyNode) {
-      // Extract identifiers and member access nodes
-      const referenceNodes = bodyNode.descendantsOfType([
-        "identifier",
-        "member_access",
-      ]);
-
-      console.log(
-        "[extractReferencesFromMethod] Reference nodes found:",
-        referenceNodes.length
-      );
-
-      referenceNodes.forEach((node) => {
-        const reference = {
-          name: node.text,
-          startPosition: node.startPosition,
-          endPosition: node.endPosition,
-        };
-        references.push(reference);
-      });
-    }
-
-    console.log(
-      "[extractReferencesFromMethod] Total references:",
-      references.length
+    return (
+      nodeStart.row === startPos.row &&
+      nodeStart.column === startPos.column &&
+      nodeEnd.row === endPos.row &&
+      nodeEnd.column === endPos.column
     );
-    return references;
   }
 
-  private findReferenceOwnerClass(
-    reference: any,
-    currentClasses: ClassInfo[]
-  ): ClassInfo | null {
-    console.log("[findReferenceOwnerClass] Starting method");
-    console.log("[findReferenceOwnerClass] Reference:", reference.name);
+  /**
+   * Get fields from the current class and its ancestors
+   */
+  private getClassAndAncestorFields(
+    method: MethodInfo,
+    classes: ClassInfo[],
+    fields: FieldInfo[]
+  ): string[] {
+    // Find the class containing the method
+    const containingClass = classes.find(
+      (cls) =>
+        method.startPosition.row >= cls.startPosition.row &&
+        method.endPosition.row <= cls.endPosition.row
+    );
 
-    // Iterate over classes to find the one that contains the reference
-    for (const cls of currentClasses) {
-      if (
-        reference.startPosition.row >= cls.startPosition.row &&
-        reference.endPosition.row <= cls.endPosition.row
-      ) {
-        console.log("[findReferenceOwnerClass] Owner class found:", cls.name);
-        return cls;
+    if (!containingClass) return [];
+
+    // Collect fields from the current class and its ancestors
+    const classFields = fields
+      .filter(
+        (field) =>
+          field.startPosition.row >= containingClass.startPosition.row &&
+          field.startPosition.row <= containingClass.endPosition.row
+      )
+      .map((field) => field.name);
+
+    // If the class has a parent, also include fields from parent classes
+    if (containingClass.parent) {
+      const parentClass = classes.find(
+        (cls) => cls.name === containingClass.parent
+      );
+      if (parentClass) {
+        const parentFields = fields
+          .filter(
+            (field) =>
+              field.startPosition.row >= parentClass.startPosition.row &&
+              field.startPosition.row <= parentClass.endPosition.row
+          )
+          .map((field) => field.name);
+
+        return [...classFields, ...parentFields];
       }
     }
 
-    console.log("[findReferenceOwnerClass] No owner class found");
-    return null;
+    return classFields;
   }
 
+  /**
+   * Extract references from a method node
+   */
+  private extractReferencesFromMethod(
+    methodNode: Parser.SyntaxNode,
+    FECFC: FolderExtractComponentsFromCode
+  ): Reference[] {
+    const references: Reference[] = [];
+
+    // Helper function to traverse and find references
+    const findReferences = (node: Parser.SyntaxNode) => {
+      // Check for field or method references
+      if (node.type === "identifier") {
+        // You might want to add more sophisticated checks here
+        references.push({
+          name: node.text,
+          type: this.determineReferenceType(node, FECFC),
+        });
+      }
+
+      // Recursively search child nodes
+      for (let child of node.children) {
+        findReferences(child);
+      }
+    };
+
+    findReferences(methodNode);
+
+    // Remove duplicates
+    return Array.from(new Set(references.map((r) => r.name)))
+      .map((name) => references.find((r) => r.name === name)!)
+      .filter(Boolean);
+  }
+
+  /**
+   * Determine if a reference is a field or method
+   */
+  private determineReferenceType(
+    node: Parser.SyntaxNode,
+    FECFC: FolderExtractComponentsFromCode
+  ): "field" | "method" {
+    // This is a simplified implementation. You might need to enhance it.
+    const parsedComponents = FECFC.getParsedComponentsFromFile();
+
+    for (const fileComponents of parsedComponents) {
+      for (const classInfo of fileComponents.classes) {
+        // Check if the reference is a field
+        const isField = classInfo.fields.some((f) => f.name === node.text);
+        if (isField) {
+          console.log(
+            `Debug: Reference to field '${node.text}' found in class '${classInfo.name}'`
+          );
+          return "field";
+        }
+
+        // Check if the reference is a method
+        const isMethod = classInfo.methods.some((m) => m.name === node.text);
+        if (isMethod) {
+          console.log(
+            `Debug: Reference to method '${node.text}' found in class '${classInfo.name}'`
+          );
+          return "method"; // Correctly handle method references here
+        }
+      }
+    }
+
+    console.log(`Debug: Defaulting reference to 'field' for '${node.text}'`);
+    return "field"; // Default to field if cannot determine
+  }
+
+  /**
+   * Find the class that owns the referenced entity
+   */
+  private findReferenceOwnerClass(
+    reference: Reference,
+    currentClasses: ClassInfo[]
+  ): ClassInfo | undefined {
+    const parsedComponents = this.getParsedComponentsFromFolder();
+
+    const nonModelClasses = [
+      "String",
+      "Integer",
+      "Double",
+      "Boolean",
+      "int",
+      "double",
+      "boolean",
+      "float",
+      "long",
+      "char",
+      "byte",
+      "short",
+    ];
+
+    // Skip non-model classes
+    if (nonModelClasses.includes(reference.name)) {
+      return undefined;
+    }
+
+    for (const fileComponents of parsedComponents) {
+      for (const classInfo of fileComponents.classes) {
+        // More flexible matching to catch various reference types
+        const matchField = classInfo.fields.some(
+          (f) =>
+            f.name.split(" ")[0] === reference.name &&
+            reference.type === "field"
+        );
+
+        const matchMethod = classInfo.methods.some(
+          (m) => m.name === reference.name && reference.type === "method"
+        );
+
+        if (matchField || matchMethod) {
+          return {
+            name: classInfo.name,
+            extendedclass: "",
+            isAbstract: false,
+            isInterface: false,
+            startPosition: { row: 0, column: 0 },
+            endPosition: { row: 0, column: 0 },
+          };
+        }
+      }
+    }
+
+    return undefined;
+  }
+  /**
+   * Check if the reference is from a local class or its ancestors
+   */
   private isLocalClassAccess(
-    accessedClass: ClassInfo,
+    referenceClass: ClassInfo,
     currentClasses: ClassInfo[]
   ): boolean {
-    console.log("[isLocalClassAccess] Starting method");
-    console.log("[isLocalClassAccess] Accessed class:", accessedClass.name);
-
-    const isLocal = currentClasses.some(
-      (cls) =>
-        cls.name === accessedClass.name ||
-        (cls.parent && cls.parent === accessedClass.name)
+    // Check if the reference class is in the current set of classes
+    const isInCurrentClasses = currentClasses.some(
+      (cls) => cls.name === referenceClass.name
     );
 
-    console.log("[isLocalClassAccess] Is local access:", isLocal);
-    return isLocal;
+    // Check for ancestor relationship
+    const hasAncestorRelationship = currentClasses.some(
+      (cls) => cls.parent === referenceClass.name
+    );
+
+    return isInCurrentClasses || hasAncestorRelationship;
+  }
+
+  /**
+   * Helper method to get parsed components from the folder
+   * This should be implemented based on your specific implementation
+   */
+  private getParsedComponentsFromFolder(): FileParsedComponents[] {
+    // Use the method from FolderExtractComponentsFromCode
+    const folderExtractor = new FolderExtractComponentsFromCode();
+    return folderExtractor.getParsedComponentsFromFile();
   }
 }
