@@ -298,7 +298,7 @@ async function analyzeCode(
       const metricsToCalculate = [
         "LOC",
         "AMW",
-        "AFTD",
+        "ATFD",
         "DAC",
         "WMC",
         "WOC",
