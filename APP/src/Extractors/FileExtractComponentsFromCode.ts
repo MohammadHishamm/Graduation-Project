@@ -53,10 +53,11 @@ export class FileExtractComponentsFromCode {
 
     let extendedClass: string;
     const classNodes = rootNode.descendantsOfType("class_declaration");
-
+    let bodyNode : any;
     classNodes.forEach((node) => {
       // Try to find the 'superclass' node
       const extendsNode = node.childForFieldName("superclass");
+       bodyNode = node.childForFieldName("body"); // Extract class body
 
       if (extendsNode) {
         // Extract the text and trim 'extends' from the start
@@ -71,8 +72,9 @@ export class FileExtractComponentsFromCode {
         (child) => child.type === "modifier" && child.text === "abstract"
       ),
       isInterface: node.type === "interface_declaration",
-      startPosition: node.startPosition,
-      endPosition: node.endPosition,
+      startPosition: bodyNode?.startPosition ?? node.startPosition, // Use body start
+      endPosition: bodyNode?.endPosition ?? node.endPosition, // Use body end
+
     }));
 
   }

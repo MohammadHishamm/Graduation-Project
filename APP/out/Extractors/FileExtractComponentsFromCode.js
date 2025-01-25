@@ -33,9 +33,11 @@ class FileExtractComponentsFromCode {
     extractClasses(rootNode) {
         let extendedClass;
         const classNodes = rootNode.descendantsOfType("class_declaration");
+        let bodyNode;
         classNodes.forEach((node) => {
             // Try to find the 'superclass' node
             const extendsNode = node.childForFieldName("superclass");
+            bodyNode = node.childForFieldName("body"); // Extract class body
             if (extendsNode) {
                 // Extract the text and trim 'extends' from the start
                 extendedClass = extendsNode.text.trim().replace(/^(extends|implements)\s*/, "");
@@ -46,8 +48,8 @@ class FileExtractComponentsFromCode {
             extendedclass: extendedClass,
             isAbstract: node.children.some((child) => child.type === "modifier" && child.text === "abstract"),
             isInterface: node.type === "interface_declaration",
-            startPosition: node.startPosition,
-            endPosition: node.endPosition,
+            startPosition: bodyNode?.startPosition ?? node.startPosition, // Use body start
+            endPosition: bodyNode?.endPosition ?? node.endPosition, // Use body end
         }));
     }
     extractMethods(rootNode, classes) {

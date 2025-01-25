@@ -1,7 +1,7 @@
 # Ignore macOS system files
 .DS_Store
 
-src/Results/ 
+Results/ 
 
 # Ignore node.js dependencies
 node_modules/
