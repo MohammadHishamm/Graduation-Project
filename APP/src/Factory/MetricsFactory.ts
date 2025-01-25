@@ -1,6 +1,6 @@
 import { MetricCalculator } from "../Core/MetricCalculator";
 
-import { JavaAccessToForeignData } from "../Metrics/Java/JavaAFTD ";
+// ..
 import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
 // import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
 import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
@@ -31,8 +31,8 @@ import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
-import { NODCalculation } from "../Metrics/Java/JavaNOD";
-import { NODDCalculation } from "../Metrics/Java/JavaNODD";
+// import { NODCalculation } from "../Metrics/Java/JavaNOD";
+// import { NODDCalculation } from "../Metrics/Java/JavaNODD";
 
 export class MetricsFactory {
   // Public static method to create a metric object based on the language and metric name
@@ -61,8 +61,8 @@ export class MetricsFactory {
         return new JavaWeightOfAClass();
       case `AMW`:
         return new JavaAverageMethodWeight();
-      case `AFTD`:
-        return new JavaAccessToForeignData();
+      // case `AFTD`:
+      //   return new JavaAccessToForeignData();
       case `DAC`:
         return new JavaDataAbstractionCoupling();
       case "NOA":
@@ -85,10 +85,10 @@ export class MetricsFactory {
         return new JavaNumberOfAddedServices();
       case "BUR":
         // return new BURCalculation();
-      case "NOD":
-        return new NODCalculation();
-      case "NODD":
-        return new NODDCalculation();
+      // case "NOD":
+      //   return new NODCalculation();
+      // case "NODD":
+      //   return new NODDCalculation();
       case "TCC":
         return new TCCCalculation();  
 

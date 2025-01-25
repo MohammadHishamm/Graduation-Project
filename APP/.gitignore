@@ -1,6 +1,8 @@
 # Ignore macOS system files
 .DS_Store
 
+src/Results/ 
+
 # Ignore node.js dependencies
 node_modules/
 
@@ -44,3 +46,5 @@ doc/
 
 # Ignore OS-specific files
 Thumbs.db
+
+

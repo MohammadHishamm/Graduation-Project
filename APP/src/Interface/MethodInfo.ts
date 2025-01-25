@@ -6,6 +6,7 @@ export interface MethodInfo {
   isConstructor: boolean;
   isAccessor: boolean;
   isOverridden: boolean;
+  fieldsUsed: String[];
   startPosition: Parser.Point;
   endPosition: Parser.Point;
 }

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
-const JavaAFTD_1 = require("../Metrics/Java/JavaAFTD ");
+// ..
 const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
 // import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
@@ -25,8 +25,8 @@ const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
-const JavaNOD_1 = require("../Metrics/Java/JavaNOD");
-const JavaNODD_1 = require("../Metrics/Java/JavaNODD");
+// import { NODCalculation } from "../Metrics/Java/JavaNOD";
+// import { NODDCalculation } from "../Metrics/Java/JavaNODD";
 class MetricsFactory {
     // Public static method to create a metric object based on the language and metric name
     static CreateMetric(metricName, language) {
@@ -50,8 +50,8 @@ class MetricsFactory {
                 return new JavaWOC_1.JavaWeightOfAClass();
             case `AMW`:
                 return new JavaAMW_1.JavaAverageMethodWeight();
-            case `AFTD`:
-                return new JavaAFTD_1.JavaAccessToForeignData();
+            // case `AFTD`:
+            //   return new JavaAccessToForeignData();
             case `DAC`:
                 return new JavaDAC_1.JavaDataAbstractionCoupling();
             case "NOA":
@@ -74,10 +74,10 @@ class MetricsFactory {
                 return new JavaNAS_1.JavaNumberOfAddedServices();
             case "BUR":
             // return new BURCalculation();
-            case "NOD":
-                return new JavaNOD_1.NODCalculation();
-            case "NODD":
-                return new JavaNODD_1.NODDCalculation();
+            // case "NOD":
+            //   return new NODCalculation();
+            // case "NODD":
+            //   return new NODDCalculation();
             case "TCC":
                 return new JavaTCC_1.TCCCalculation();
             //       case "FANOUT":

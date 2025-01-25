@@ -9,11 +9,8 @@ export class JavaWeightOfAClass extends MetricCalculator {
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
     const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-    const filteredFields =
-      extractcomponentsfromcode.filterPublicNonEncapsulatedFields(
-        Fields,
-        methods
-      );
+    const filteredFields = extractcomponentsfromcode.filterPublicNonEncapsulatedFields( Fields, methods);
+    
     const WOC = this.calculateWeight(methods, filteredFields);
 
     return WOC;
@@ -26,7 +23,7 @@ export class JavaWeightOfAClass extends MetricCalculator {
 
     methods.forEach((method) => {
       if (!method.isConstructor && method.modifiers.includes("public")) {
-        ++nom;
+        ++nom; 
         if (method.isAccessor) {
           ++den;
         }
