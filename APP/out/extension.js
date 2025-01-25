@@ -209,6 +209,7 @@ async function analyzeCode(document, sourceCode) {
             "LOC",
             "AMW",
             "ATFD",
+            "CBO",
             "DAC",
             "WMC",
             "WOC",

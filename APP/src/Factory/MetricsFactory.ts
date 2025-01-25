@@ -25,6 +25,7 @@ import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
 import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
+import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -59,6 +60,8 @@ export class MetricsFactory {
         return new JavaAverageMethodWeight();
       case `ATFD`:
         return new JavaAccessToForeignData();
+      case `CBO`:
+        return new JavaCouplingBetweenObjects();
       case `DAC`:
         return new JavaDataAbstractionCoupling();
       case "NOA":

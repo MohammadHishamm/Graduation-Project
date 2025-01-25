@@ -299,6 +299,7 @@ async function analyzeCode(
         "LOC",
         "AMW",
         "ATFD",
+        "CBO",
         "DAC",
         "WMC",
         "WOC",
