@@ -5,26 +5,6 @@ const MetricCalculator_1 = require("../../Core/MetricCalculator");
 const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
 class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
-<<<<<<< HEAD
-        // console.log("[ATFD] Starting calculation");
-        // console.log("[ATFD] Input node type:", node ? node.type : "null/undefined");
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        // console.log(
-        //   "[ATFD] Extracted Classes:",
-        //   Classes.map((c) => c.name)
-        // );
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        // console.log(
-        //   "[ATFD] Extracted Methods:",
-        //   methods.map((m) => m.name)
-        // );
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        // console.log(
-        //   "[ATFD] Extracted Fields:",
-        //   Fields.map((f) => f.name)
-        // );
-=======
         console.log("[ATFD] Starting calculation");
         console.log("[ATFD] Input node type:", node ? node.type : "null/undefined");
         const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
@@ -34,73 +14,38 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
         console.log("[ATFD] Extracted Methods:", methods.map((m) => m.name));
         const Fields = extractcomponentsfromcode.extractFields(node, Classes);
         console.log("[ATFD] Extracted Fields:", Fields.map((f) => f.name));
->>>>>>> b3ff913bee6168c7e674ab6a0789ae172ed1abc3
         const ATFD = this.calculateAccessToForeignData(node, Classes, methods, Fields, extractcomponentsfromcode);
         console.log("[ATFD] Final Metric Value:", ATFD);
         return ATFD;
     }
     calculateAccessToForeignData(rootNode, currentClasses, methods, fields, extractcomponentsfromcode) {
-<<<<<<< HEAD
-        // console.log("[ATFD:calculateAccessToForeignData] Starting method");
-        // Filter out constant fields
-        const nonConstantFields = fields.filter((field) => !field.modifiers.includes("final") &&
-            !field.modifiers.includes("static"));
-        // console.log(
-        //   "[ATFD] Non-constant Fields:",
-        //   nonConstantFields.map((f) => f.name)
-        // );
-=======
         console.log("[ATFD:calculateAccessToForeignData] Starting method");
         // Filter out constant fields
         const nonConstantFields = fields.filter((field) => !field.modifiers.includes("final") &&
             !field.modifiers.includes("static"));
         console.log("[ATFD] Non-constant Fields:", nonConstantFields.map((f) => f.name));
->>>>>>> b3ff913bee6168c7e674ab6a0789ae172ed1abc3
         // Track unique foreign classes accessed
         const foreignClassesAccessed = new Set();
         // Check each method for foreign data access
         methods.forEach((method) => {
-<<<<<<< HEAD
-            // console.log(`[ATFD] Processing method: ${method.name}`);
-            // Skip constructors and accessors
-            if (method.isConstructor || method.isAccessor) {
-                // console.log(
-                //   `[ATFD] Skipping method ${method.name} - constructor or accessor`
-                // );
-=======
             console.log(`[ATFD] Processing method: ${method.name}`);
             // Skip constructors and accessors
             if (method.isConstructor || method.isAccessor) {
                 console.log(`[ATFD] Skipping method ${method.name} - constructor or accessor`);
->>>>>>> b3ff913bee6168c7e674ab6a0789ae172ed1abc3
                 return;
             }
             // Find the method's node in the syntax tree
             const methodNode = this.findMethodNodeByPosition(rootNode, method);
             if (!methodNode) {
-<<<<<<< HEAD
-                // console.log(`[ATFD] No node found for method ${method.name}`);
-=======
                 console.log(`[ATFD] No node found for method ${method.name}`);
->>>>>>> b3ff913bee6168c7e674ab6a0789ae172ed1abc3
                 return;
             }
             // Get all fields from current class and its ancestors
             const currentClassFields = this.getClassAndAncestorFields(method, currentClasses, fields);
-<<<<<<< HEAD
-            // console.log(
-            //   `[ATFD] Current class fields for ${method.name}:`,
-            //   currentClassFields
-            // );
-            // Extract references within the method
-            const references = this.extractReferencesFromMethod(methodNode, extractcomponentsfromcode);
-            // console.log(`[ATFD] References in method ${method.name}:`, references);
-=======
             console.log(`[ATFD] Current class fields for ${method.name}:`, currentClassFields);
             // Extract references within the method
             const references = this.extractReferencesFromMethod(methodNode, extractcomponentsfromcode);
             console.log(`[ATFD] References in method ${method.name}:`, references);
->>>>>>> b3ff913bee6168c7e674ab6a0789ae172ed1abc3
             references.forEach((reference) => {
                 // Skip if reference is a local class field
                 if (currentClassFields.includes(reference.name)) {
@@ -214,13 +159,8 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
         return null;
     }
     isLocalClassAccess(accessedClass, currentClasses) {
-<<<<<<< HEAD
-        // console.log("[isLocalClassAccess] Starting method");
-        // console.log("[isLocalClassAccess] Accessed class:", accessedClass.name);
-=======
         console.log("[isLocalClassAccess] Starting method");
         console.log("[isLocalClassAccess] Accessed class:", accessedClass.name);
->>>>>>> b3ff913bee6168c7e674ab6a0789ae172ed1abc3
         const isLocal = currentClasses.some((cls) => cls.name === accessedClass.name ||
             (cls.parent && cls.parent === accessedClass.name));
         console.log("[isLocalClassAccess] Is local access:", isLocal);

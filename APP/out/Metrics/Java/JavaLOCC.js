@@ -21,7 +21,7 @@ class JavaLOCMetric extends MetricCalculator_1.MetricCalculator {
             const endLine = classInfo.endPosition.row;
             totalLOCC += (endLine - startLine + 1);
         });
-        return totalLOCC + 1;
+        return totalLOCC;
     }
 }
 exports.JavaLOCMetric = JavaLOCMetric;

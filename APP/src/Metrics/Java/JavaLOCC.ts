@@ -26,6 +26,6 @@ export class JavaLOCMetric extends MetricCalculator {
             totalLOCC += (endLine - startLine + 1);
         });
 
-        return totalLOCC+1;
+        return totalLOCC;
     }
 }
