@@ -23,34 +23,54 @@ export class FolderExtractComponentsFromCode
 
   public async parseAllJavaFiles() {
     const javaFiles = await vscode.workspace.findFiles("**/*.java");
-    const allParsedComponents: FileParsedComponents[] = [];
+
+    // Load existing parsed components from the file
+    const existingComponents = this.getParsedComponentsFromFile();
+    const allParsedComponents: FileParsedComponents[] = [...existingComponents];
+    console.log("Existing Parsed Components: ", existingComponents);
 
     for (const fileUri of javaFiles) {
-      const filePath = fileUri.fsPath;
+        const filePath = fileUri.fsPath;
+        const fileContent = await this.fetchFileContent(fileUri);
+        const fileHash = FileCacheManager.computeHash(fileContent);
 
-      const fileContent = await this.fetchFileContent(fileUri);
+        // Check cache to see if the file has been processed before
+        const cachedComponents = this.cacheManager.get(filePath, fileHash);
 
-      const fileHash = FileCacheManager.computeHash(fileContent);
-
-      const cachedComponents = this.cacheManager.get(filePath, fileHash);
-
-      if (cachedComponents) {
-        console.log(`Cache hit: ${filePath}`);
-      } else {
-        const parsedComponents = await this.parseFile(fileUri);
-        if (parsedComponents) {
-          allParsedComponents.push(parsedComponents);
-          this.cacheManager.set(filePath, fileHash, parsedComponents);
-
-          this.saveParsedComponents(allParsedComponents);
-          console.log("changes detected , New Metrics saved");
-          console.log(`Cache updated: ${filePath}`);
+        if (cachedComponents) {
+            console.log(`Cache hit: ${filePath}`);
         } else {
-          console.error(`Error parsing file: ${filePath}`);
+            const parsedComponents = await this.parseFile(fileUri);
+            if (parsedComponents) {
+                // Check if the file is already in the parsed components list
+                const existingIndex = allParsedComponents.findIndex((component) =>
+                  component.classes.some((classGroup) => classGroup.fileName === path.basename(filePath))
+                );
+                
+
+                if (existingIndex !== -1) {
+                    // Update the existing parsed component
+                    allParsedComponents[existingIndex] = parsedComponents;
+                } else {
+                    // Add the new parsed component
+                    allParsedComponents.push(parsedComponents);
+                }
+
+                // Update the cache
+                this.cacheManager.set(filePath, fileHash, parsedComponents);
+
+                console.log("Changes detected. New metrics saved.");
+                console.log(`Cache updated: ${filePath}`);
+            } else {
+                console.error(`Error parsing file: ${filePath}`);
+            }
         }
-      }
     }
-  }
+
+    // Save the combined parsed components back to the file
+    this.saveParsedComponents(allParsedComponents);
+}
+
 
   private saveParsedComponents(parsedComponents: FileParsedComponents[]) {
     try {
@@ -104,6 +124,7 @@ export class FolderExtractComponentsFromCode
       const tree = this.parseCode(fileContent);
 
       const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+      console.log( extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath));
       return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
     } catch (error) {
       console.error("Error parsing file ${fileUri.fsPath}:, error");

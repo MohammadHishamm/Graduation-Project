@@ -15,6 +15,7 @@ const JavaNOPA_1 = require("../Metrics/Java/JavaNOPA");
 const JavaNProtM_1 = require("../Metrics/Java/JavaNProtM");
 const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
 const JavaWOC_1 = require("../Metrics/Java/JavaWOC");
+const JavaDIT_1 = require("../Metrics/Java/JavaDIT");
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
@@ -87,6 +88,8 @@ class MetricsFactory {
             //   return new NODDCalculation();
             case "TCC":
                 return new JavaTCC_1.TCCCalculation();
+            case "DIT":
+                return new JavaDIT_1.DepthOfInheritanceTree();
             //       case "FANOUT":
             //         const javaCode = `
             // public class Dog extends Animal {

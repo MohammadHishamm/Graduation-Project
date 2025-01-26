@@ -15,23 +15,13 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -54,11 +44,15 @@ class FolderExtractComponentsFromCode {
     }
     async parseAllJavaFiles() {
         const javaFiles = await vscode.workspace.findFiles("**/*.java");
-        const allParsedComponents = [];
+        // Load existing parsed components from the file
+        const existingComponents = this.getParsedComponentsFromFile();
+        const allParsedComponents = [...existingComponents];
+        console.log("Existing Parsed Components: ", existingComponents);
         for (const fileUri of javaFiles) {
             const filePath = fileUri.fsPath;
             const fileContent = await this.fetchFileContent(fileUri);
             const fileHash = FileCacheManager_1.FileCacheManager.computeHash(fileContent);
+            // Check cache to see if the file has been processed before
             const cachedComponents = this.cacheManager.get(filePath, fileHash);
             if (cachedComponents) {
                 console.log(`Cache hit: ${filePath}`);
@@ -66,10 +60,19 @@ class FolderExtractComponentsFromCode {
             else {
                 const parsedComponents = await this.parseFile(fileUri);
                 if (parsedComponents) {
-                    allParsedComponents.push(parsedComponents);
+                    // Check if the file is already in the parsed components list
+                    const existingIndex = allParsedComponents.findIndex((component) => component.classes.some((classGroup) => classGroup.fileName === path.basename(filePath)));
+                    if (existingIndex !== -1) {
+                        // Update the existing parsed component
+                        allParsedComponents[existingIndex] = parsedComponents;
+                    }
+                    else {
+                        // Add the new parsed component
+                        allParsedComponents.push(parsedComponents);
+                    }
+                    // Update the cache
                     this.cacheManager.set(filePath, fileHash, parsedComponents);
-                    this.saveParsedComponents(allParsedComponents);
-                    console.log("changes detected , New Metrics saved");
+                    console.log("Changes detected. New metrics saved.");
                     console.log(`Cache updated: ${filePath}`);
                 }
                 else {
@@ -77,6 +80,8 @@ class FolderExtractComponentsFromCode {
                 }
             }
         }
+        // Save the combined parsed components back to the file
+        this.saveParsedComponents(allParsedComponents);
     }
     saveParsedComponents(parsedComponents) {
         try {
@@ -112,6 +117,7 @@ class FolderExtractComponentsFromCode {
             const fileContent = await this.fetchFileContent(fileUri);
             const tree = this.parseCode(fileContent);
             const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+            console.log(extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath));
             return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
         }
         catch (error) {

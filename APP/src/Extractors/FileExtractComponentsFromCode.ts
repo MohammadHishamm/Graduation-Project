@@ -90,6 +90,7 @@ export class FileExtractComponentsFromCode {
       const modifiersNode = node.children.find(
         (child) => child.type === "modifiers"
       );
+      
       const modifiers = modifiersNode ? modifiersNode.text : "";
 
       // Check if the method is overridden by looking for '@Override' in the modifiers

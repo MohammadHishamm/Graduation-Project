@@ -22,16 +22,16 @@ export class JavaAccessToForeignData extends MetricCalculator {
 
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-    console.log(
-      "[ATFD] Extracted Methods:",
-      methods.map((m) => m.name)
-    );
+    // console.log(
+    //   "[ATFD] Extracted Methods:",
+    //   methods.map((m) => m.name)
+    // );
 
     const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-    console.log(
-      "[ATFD] Extracted Fields:",
-      Fields.map((f) => f.name)
-    );
+    // console.log(
+    //   "[ATFD] Extracted Fields:",
+    //   Fields.map((f) => f.name)
+    // );
 
     const ATFD = this.calculateAccessToForeignData(
       node,
@@ -41,7 +41,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
       FECFC
     );
 
-    console.log("[ATFD] Final Metric Value:", ATFD);
+    // console.log("[ATFD] Final Metric Value:", ATFD);
     return ATFD;
   }
 
@@ -116,10 +116,10 @@ export class JavaAccessToForeignData extends MetricCalculator {
       });
     });
 
-    console.log(
-      "[ATFD] Foreign References Accessed:",
-      Array.from(foreignReferences)
-    );
+    // console.log(
+    //   "[ATFD] Foreign References Accessed:",
+    //   Array.from(foreignReferences)
+    // );
     return foreignReferences.size;
   }
 
@@ -263,24 +263,24 @@ export class JavaAccessToForeignData extends MetricCalculator {
         // Check if the reference is a field
         const isField = classInfo.fields.some((f) => f.name === node.text);
         if (isField) {
-          console.log(
-            `Debug: Reference to field '${node.text}' found in class '${classInfo.name}'`
-          );
+          // console.log(
+          //   `Debug: Reference to field '${node.text}' found in class '${classInfo.name}'`
+          // );
           return "field";
         }
 
         // Check if the reference is a method
         const isMethod = classInfo.methods.some((m) => m.name === node.text);
         if (isMethod) {
-          console.log(
-            `Debug: Reference to method '${node.text}' found in class '${classInfo.name}'`
-          );
+          // console.log(
+          //   `Debug: Reference to method '${node.text}' found in class '${classInfo.name}'`
+          // );
           return "method"; // Correctly handle method references here
         }
       }
     }
 
-    console.log(`Debug: Defaulting reference to 'field' for '${node.text}'`);
+    // console.log(`Debug: Defaulting reference to 'field' for '${node.text}'`);
     return "field"; // Default to field if cannot determine
   }
 

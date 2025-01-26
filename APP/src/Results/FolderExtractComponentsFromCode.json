@@ -1,0 +1,627 @@
+[
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Person.java",
+        "name": "Person",
+        "classes": [
+          {
+            "name": "Person",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 20
+            },
+            "endPosition": {
+              "row": 4,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [],
+        "fields": [
+          {
+            "name": ";",
+            "type": "x",
+            "modifiers": "int",
+            "startPosition": {
+              "row": 2,
+              "column": 0
+            },
+            "endPosition": {
+              "row": 2,
+              "column": 6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\Animal.java",
+        "name": "Animal",
+        "classes": [
+          {
+            "name": "Animal",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 20
+            },
+            "endPosition": {
+              "row": 2,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [],
+        "fields": []
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Person.java",
+        "name": "Person",
+        "classes": [
+          {
+            "name": "Person",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 20
+            },
+            "endPosition": {
+              "row": 4,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [],
+        "fields": [
+          {
+            "name": ";",
+            "type": "x",
+            "modifiers": "int",
+            "startPosition": {
+              "row": 2,
+              "column": 0
+            },
+            "endPosition": {
+              "row": 2,
+              "column": 6
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Main.java",
+        "name": "Main",
+        "classes": [
+          {
+            "name": "Main",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 2,
+              "column": 18
+            },
+            "endPosition": {
+              "row": 17,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "main",
+            "modifiers": "public",
+            "params": "(String[] args)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "library",
+              "book1",
+              "book2",
+              "addBook",
+              "member1",
+              "registerMember",
+              "lendBook"
+            ],
+            "startPosition": {
+              "row": 3,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 16,
+              "column": 5
+            }
+          }
+        ],
+        "fields": []
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Library.java",
+        "name": "Library",
+        "classes": [
+          {
+            "name": "Library",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 4,
+              "column": 21
+            },
+            "endPosition": {
+              "row": 40,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "addBook",
+            "modifiers": "public",
+            "params": "(Book book)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "books",
+              "add",
+              "book"
+            ],
+            "startPosition": {
+              "row": 8,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 10,
+              "column": 5
+            }
+          },
+          {
+            "name": "removeBook",
+            "modifiers": "public",
+            "params": "(Book book)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "books",
+              "remove",
+              "book"
+            ],
+            "startPosition": {
+              "row": 12,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 14,
+              "column": 5
+            }
+          },
+          {
+            "name": "registerMember",
+            "modifiers": "public",
+            "params": "(Member member)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "members",
+              "add",
+              "member"
+            ],
+            "startPosition": {
+              "row": 16,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 18,
+              "column": 5
+            }
+          },
+          {
+            "name": "lendBook",
+            "modifiers": "public",
+            "params": "(String title, String memberId)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "book",
+              "findBook",
+              "title",
+              "member",
+              "findMember",
+              "memberId",
+              "isLent",
+              "setLent",
+              "borrowBook",
+              "System",
+              "out",
+              "println"
+            ],
+            "startPosition": {
+              "row": 20,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 31,
+              "column": 5
+            }
+          },
+          {
+            "name": "findBook",
+            "modifiers": "private",
+            "params": "(String title)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "books",
+              "stream",
+              "filter",
+              "b",
+              "getTitle",
+              "equalsIgnoreCase",
+              "title",
+              "findFirst",
+              "orElse"
+            ],
+            "startPosition": {
+              "row": 33,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 35,
+              "column": 5
+            }
+          },
+          {
+            "name": "findMember",
+            "modifiers": "private",
+            "params": "(String memberId)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "members",
+              "stream",
+              "filter",
+              "m",
+              "getId",
+              "equals",
+              "memberId",
+              "findFirst",
+              "orElse"
+            ],
+            "startPosition": {
+              "row": 37,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 39,
+              "column": 5
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "books = new ArrayList<>()",
+            "type": "List<Book>",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 5,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 5,
+              "column": 49
+            }
+          },
+          {
+            "name": "members = new ArrayList<>()",
+            "type": "List<Member>",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 6,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 6,
+              "column": 53
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Dog.java",
+        "name": "Dog",
+        "classes": [
+          {
+            "name": "Dog",
+            "extendedclass": "Animal",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 32
+            },
+            "endPosition": {
+              "row": 38,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "toString",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": true,
+            "fieldsUsed": [],
+            "startPosition": {
+              "row": 8,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 12,
+              "column": 5
+            }
+          },
+          {
+            "name": "getS",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": true,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "s"
+            ],
+            "startPosition": {
+              "row": 15,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 17,
+              "column": 5
+            }
+          },
+          {
+            "name": "setS",
+            "modifiers": "public",
+            "params": "(int s)",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "s"
+            ],
+            "startPosition": {
+              "row": 19,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 21,
+              "column": 5
+            }
+          },
+          {
+            "name": "makeSound",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": true,
+            "fieldsUsed": [
+              "System",
+              "out",
+              "println"
+            ],
+            "startPosition": {
+              "row": 23,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 26,
+              "column": 5
+            }
+          },
+          {
+            "name": "test_priv",
+            "modifiers": "private",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [],
+            "startPosition": {
+              "row": 29,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 32,
+              "column": 5
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": ";",
+            "type": "s",
+            "modifiers": "int",
+            "startPosition": {
+              "row": 3,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 3,
+              "column": 10
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Animal.java",
+        "name": "Animal",
+        "classes": [
+          {
+            "name": "Animal",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 3,
+              "column": 20
+            },
+            "endPosition": {
+              "row": 13,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "getmakeSound",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "System",
+              "out",
+              "println"
+            ],
+            "startPosition": {
+              "row": 8,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 10,
+              "column": 5
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "books = new ArrayList<>()",
+            "type": "List<Librarian>",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 5,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 5,
+              "column": 54
+            }
+          },
+          {
+            "name": "k",
+            "type": "Librarian",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 6,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 6,
+              "column": 25
+            }
+          },
+          {
+            "name": "f",
+            "type": "Librarian",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 7,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 7,
+              "column": 25
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\sss\\zayaty.java",
+        "name": "zayaty",
+        "classes": [
+          {
+            "name": "zayaty",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 2,
+              "column": 20
+            },
+            "endPosition": {
+              "row": 4,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [],
+        "fields": []
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Person.java",
+        "name": "Person",
+        "classes": [
+          {
+            "name": "Person",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 20
+            },
+            "endPosition": {
+              "row": 4,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [],
+        "fields": []
+      }
+    ]
+  }
+]
