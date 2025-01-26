@@ -18,17 +18,9 @@ export class JavaAccessToForeignData extends MetricCalculator {
     sourceCode: string,
     FECFC: FolderExtractComponentsFromCode
   ): number {
-    console.log("[ATFD] Starting calculation");
-    console.log("[ATFD] Input node type:", node ? node.type : "null/undefined");
-
     const extractcomponentsfromcode = new FileExtractComponentsFromCode();
 
     const Classes = extractcomponentsfromcode.extractClasses(node);
-    console.log(
-      "[ATFD] Extracted Classes:",
-      Classes.map((c) => c.name)
-    );
-
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
     console.log(
       "[ATFD] Extracted Methods:",
@@ -60,17 +52,11 @@ export class JavaAccessToForeignData extends MetricCalculator {
     fields: FieldInfo[],
     FECFC: FolderExtractComponentsFromCode
   ): number {
-    console.log("[ATFD:calculateAccessToForeignData] Starting method");
-
     // Filter out constant fields (including static final variables)
     const nonConstantFields = fields.filter(
       (field) =>
         !field.modifiers.includes("final") &&
         !field.modifiers.includes("static")
-    );
-    console.log(
-      "[ATFD] Non-constant Fields:",
-      nonConstantFields.map((f) => f.name)
     );
 
     // Track unique foreign field and method references
@@ -78,20 +64,14 @@ export class JavaAccessToForeignData extends MetricCalculator {
 
     // Check each method for foreign data access
     methods.forEach((method) => {
-      console.log(`[ATFD] Processing method: ${method.name}`);
-
       // Skip constructors and accessors
       if (method.isConstructor || method.isAccessor) {
-        console.log(
-          `[ATFD] Skipping method ${method.name} - constructor or accessor`
-        );
         return; // Skip this method if it is a constructor or accessor
       }
 
       // Find the method's node in the syntax tree
       const methodNode = this.findMethodNodeByPosition(rootNode, method);
       if (!methodNode) {
-        console.log(`[ATFD] No node found for method ${method.name}`);
         return;
       }
 
@@ -101,21 +81,13 @@ export class JavaAccessToForeignData extends MetricCalculator {
         currentClasses,
         fields
       );
-      console.log(
-        `[ATFD] Current class fields for ${method.name}:`,
-        currentClassFields
-      );
 
       // Extract references within the method
       const references = this.extractReferencesFromMethod(methodNode, FECFC);
-      console.log(`[ATFD] References in method ${method.name}:`, references);
 
       references.forEach((reference) => {
         // Skip if reference is a local class field
         if (currentClassFields.includes(reference.name)) {
-          console.log(
-            `[ATFD] Skipping local field reference: ${reference.name}`
-          );
           return;
         }
 
@@ -123,10 +95,6 @@ export class JavaAccessToForeignData extends MetricCalculator {
         const referenceClass = this.findReferenceOwnerClass(
           reference,
           currentClasses
-        );
-        console.log(
-          `[ATFD] Reference class for ${reference.name}:`,
-          referenceClass?.name
         );
 
         // Check if the reference is a method or field and if it's from a different class
@@ -139,15 +107,9 @@ export class JavaAccessToForeignData extends MetricCalculator {
             const referencedMethod = methods.find(
               (m) => m.name === reference.name
             );
-            if (referencedMethod?.isAccessor) {
-              console.log(`[ATFD] Skipping accessor method: ${reference.name}`);
-              return;
-            }
 
-            console.log(`[ATFD] Adding foreign method: ${reference.name}`);
             foreignReferences.add(`method:${reference.name}`);
           } else {
-            console.log(`[ATFD] Adding foreign field: ${reference.name}`);
             foreignReferences.add(`field:${reference.name}`);
           }
         }
@@ -263,7 +225,6 @@ export class JavaAccessToForeignData extends MetricCalculator {
   ): Reference[] {
     const references: Reference[] = [];
 
-    // Helper function to traverse and find references
     const findReferences = (node: Parser.SyntaxNode) => {
       // Check for field or method references
       if (node.type === "identifier") {
@@ -295,7 +256,6 @@ export class JavaAccessToForeignData extends MetricCalculator {
     node: Parser.SyntaxNode,
     FECFC: FolderExtractComponentsFromCode
   ): "field" | "method" {
-    // This is a simplified implementation. You might need to enhance it.
     const parsedComponents = FECFC.getParsedComponentsFromFile();
 
     for (const fileComponents of parsedComponents) {
@@ -363,7 +323,13 @@ export class JavaAccessToForeignData extends MetricCalculator {
         );
 
         const matchMethod = classInfo.methods.some(
-          (m) => m.name === reference.name && reference.type === "method"
+          (m) =>
+            m.name === reference.name &&
+            reference.type === "method" &&
+            (m.name.startsWith("get") ||
+              m.name.startsWith("Get") ||
+              m.name.startsWith("set") ||
+              m.name.startsWith("Set"))
         );
 
         if (matchField || matchMethod) {
@@ -401,10 +367,6 @@ export class JavaAccessToForeignData extends MetricCalculator {
     return isInCurrentClasses || hasAncestorRelationship;
   }
 
-  /**
-   * Helper method to get parsed components from the folder
-   * This should be implemented based on your specific implementation
-   */
   private getParsedComponentsFromFolder(): FileParsedComponents[] {
     // Use the method from FolderExtractComponentsFromCode
     const folderExtractor = new FolderExtractComponentsFromCode();
