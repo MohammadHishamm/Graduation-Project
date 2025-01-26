@@ -81,10 +81,10 @@ export class JavaAccessofImportData extends MetricCalculator {
       });
     });
 
-    console.log(
-      "[FDP] Foreign Classes Accessed:",
-      Array.from(foreignClassesAccessed)
-    );
+    // console.log(
+    //   "[FDP] Foreign Classes Accessed:",
+    //   Array.from(foreignClassesAccessed)
+    // );
     return foreignClassesAccessed.size;
   }
 
@@ -106,7 +106,7 @@ export class JavaAccessofImportData extends MetricCalculator {
       // Recursively search child nodes
       for (let child of node.children) {
         const foundNode = findMethodNode(child);
-        if (foundNode) return foundNode;
+        if (foundNode) {return foundNode;}
       }
 
       return null;
@@ -146,7 +146,7 @@ export class JavaAccessofImportData extends MetricCalculator {
         method.endPosition.row <= cls.endPosition.row
     );
 
-    if (!containingClass) return [];
+    if (!containingClass) {return [];}
 
     // Collect fields from the current class and its ancestors
     const classFields = fields

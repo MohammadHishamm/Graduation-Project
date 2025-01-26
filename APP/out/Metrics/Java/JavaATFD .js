@@ -80,8 +80,9 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
             // Recursively search child nodes
             for (let child of node.children) {
                 const foundNode = findMethodNode(child);
-                if (foundNode)
+                if (foundNode) {
                     return foundNode;
+                }
             }
             return null;
         };
@@ -105,8 +106,9 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
         // Find the class containing the method
         const containingClass = classes.find((cls) => method.startPosition.row >= cls.startPosition.row &&
             method.endPosition.row <= cls.endPosition.row);
-        if (!containingClass)
+        if (!containingClass) {
             return [];
+        }
         // Collect fields from the current class and its ancestors
         const classFields = fields
             .filter((field) => field.startPosition.row >= containingClass.startPosition.row &&

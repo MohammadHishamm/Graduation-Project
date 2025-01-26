@@ -141,7 +141,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
       // Recursively search child nodes
       for (let child of node.children) {
         const foundNode = findMethodNode(child);
-        if (foundNode) return foundNode;
+        if (foundNode) {return foundNode;}
       }
 
       return null;
@@ -184,7 +184,7 @@ export class JavaAccessToForeignData extends MetricCalculator {
         method.endPosition.row <= cls.endPosition.row
     );
 
-    if (!containingClass) return [];
+    if (!containingClass) {return [];}
 
     // Collect fields from the current class and its ancestors
     const classFields = fields

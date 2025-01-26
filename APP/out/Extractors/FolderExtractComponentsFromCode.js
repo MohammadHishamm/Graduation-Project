@@ -47,6 +47,8 @@ class FolderExtractComponentsFromCode {
         // Load existing parsed components from the file
         const existingComponents = this.getParsedComponentsFromFile();
         const allParsedComponents = [...existingComponents];
+        console.log("Cache and file service started: ");
+        console.log("..................................................................................................");
         console.log("Existing Parsed Components: ", existingComponents);
         for (const fileUri of javaFiles) {
             const filePath = fileUri.fsPath;
@@ -61,7 +63,7 @@ class FolderExtractComponentsFromCode {
                 const parsedComponents = await this.parseFile(fileUri);
                 if (parsedComponents) {
                     // Check if the file is already in the parsed components list
-                    const existingIndex = allParsedComponents.findIndex((component) => component.classes.some((classGroup) => classGroup.fileName === path.basename(filePath)));
+                    const existingIndex = allParsedComponents.findIndex((component) => component.classes.some((classGroup) => classGroup.fileName === filePath));
                     if (existingIndex !== -1) {
                         // Update the existing parsed component
                         allParsedComponents[existingIndex] = parsedComponents;
@@ -82,6 +84,8 @@ class FolderExtractComponentsFromCode {
         }
         // Save the combined parsed components back to the file
         this.saveParsedComponents(allParsedComponents);
+        console.log("Stopped");
+        console.log("..................................................................................................");
     }
     saveParsedComponents(parsedComponents) {
         try {
@@ -105,7 +109,19 @@ class FolderExtractComponentsFromCode {
             const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
             const adjustedPath = filePath.replace(/out[\\\/]?/, "");
             const fileContent = fs.readFileSync(adjustedPath, "utf8");
-            return JSON.parse(fileContent);
+            // Check if the file content is empty or only contains whitespace
+            if (!fileContent.trim()) {
+                console.warn("The file is empty or contains only whitespace.");
+                return [];
+            }
+            // Try to parse the content, handle potential JSON parsing errors
+            try {
+                return JSON.parse(fileContent);
+            }
+            catch (parseError) {
+                console.error("Failed to parse JSON from file:", parseError);
+                return [];
+            }
         }
         catch (err) {
             console.error("Failed to read parsed components from file:", err);
@@ -117,7 +133,6 @@ class FolderExtractComponentsFromCode {
             const fileContent = await this.fetchFileContent(fileUri);
             const tree = this.parseCode(fileContent);
             const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
-            console.log(extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath));
             return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
         }
         catch (error) {

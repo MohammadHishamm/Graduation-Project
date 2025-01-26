@@ -90,7 +90,7 @@ export class FileExtractComponentsFromCode {
       const modifiersNode = node.children.find(
         (child) => child.type === "modifiers"
       );
-      
+
       const modifiers = modifiersNode ? modifiersNode.text : "";
 
       // Check if the method is overridden by looking for '@Override' in the modifiers
@@ -143,58 +143,52 @@ export class FileExtractComponentsFromCode {
     return fieldsUsed;
   }
 
-  public isAccessor(rootNode: Parser.SyntaxNode, methodName: string): boolean 
-  {
+  public isAccessor(rootNode: Parser.SyntaxNode, methodName: string): boolean {
     let isAccessor = false;
-  
+
     // Check if the method name matches a getter or setter naming convention
     if (/^get[A-Z]/.test(methodName) || /^set[A-Z]/.test(methodName)) {
       const methodNodes = rootNode.descendantsOfType("method_declaration");
-  
+
       methodNodes.forEach((node) => {
         const nameNode = node.childForFieldName("name")?.text;
         if (nameNode === methodName) {
           const bodyNode = node.childForFieldName("body");
           if (bodyNode) {
             const statements = bodyNode.children;
-  
+
             // Ensure the body has only [SyntaxNode, ReturnStatementNode, SyntaxNode] for get or  [SyntaxNode, ExpressionStatementNode, SyntaxNode] for set
-            if (statements.length === 3) 
-            {
+            if (statements.length === 3) {
               // get the middle statment returnstatment or expressionstatment
               const statement = statements[1];
               console.log(statement.type);
 
-              if (statement.type === "expression_statement") 
-              {
-                  // get the return statment and gets its child which is field accesed so it is a set
-                  const returnValue = statement.childrenForFieldName("ExpressionStatementNode");
-    
-                  if (returnValue) 
-                  {
-                    isAccessor = true;
-                  }
-              }
-              else if (statement.type === "return_statement") 
-              {
-                // get the return statment and gets its child which is field accesed so it is a get 
-                const returnValue = statement.childrenForFieldName("FieldAccessNode");
-  
-                if (returnValue) 
-                {
+              if (statement.type === "expression_statement") {
+                // get the return statment and gets its child which is field accesed so it is a set
+                const returnValue = statement.childrenForFieldName("ExpressionStatementNode");
+
+                if (returnValue) {
                   isAccessor = true;
                 }
-               }
+              }
+              else if (statement.type === "return_statement") {
+                // get the return statment and gets its child which is field accesed so it is a get 
+                const returnValue = statement.childrenForFieldName("FieldAccessNode");
+
+                if (returnValue) {
+                  isAccessor = true;
+                }
+              }
             }
           }
         }
         return isAccessor;
       });
     }
-  
+
     return isAccessor;
   }
-  
+
 
 
   public isClass(rootNode: Parser.SyntaxNode): boolean {
@@ -245,23 +239,32 @@ export class FileExtractComponentsFromCode {
     // Find all the field declaration nodes in the syntax tree
     const fieldNodes = rootNode.descendantsOfType("field_declaration");
 
+    
     return fieldNodes.map((node) => {
-      // Log node to inspect its children (useful for debugging)
-      // console.log('Field Node:', node.toString());
 
-      // The modifiers are usually on the first child (public, private, etc.)
-      const modifiersNode = node.child(0); // Use child(0) to access the first child
-      const modifiers = modifiersNode ? modifiersNode.text : "";
 
-      // The type of the field (like int, String)
-      const typeNode = node.child(1); // Access second child for the type
-      const type = typeNode ? typeNode.text : "";
+      let modifiersNode : any ; 
+      let typeNode : any ; 
+      let nameNode : any ; 
 
-      // The name of the field is usually the third child
-      const nameNode = node.child(2); // Access third child for the name
-      const name = nameNode ? nameNode.text : "Unknown";
+      if (node.type === "modifiers") 
+      {
+         modifiersNode = node.child(0); 
+         typeNode = node.child(1); 
+         nameNode = node.child(2); 
+      }
+      else
+      {
+         typeNode = node.child(0); 
+         nameNode = node.child(1);
 
-      // Return the field information
+      }
+
+
+      const modifiers = modifiersNode?.text ?? "public"; 
+      const type = typeNode?.text ?? "Unknown"; 
+      const name = nameNode?.text ?? "Unnamed"; 
+
       return {
         name,
         type,

@@ -336,6 +336,7 @@ async function analyzeCode(
           increment: 20,
         });
         await pause(500);
+        
         FECFcode.parseAllJavaFiles();
 
         progress.report({ message: "Calculating metrics...", increment: 40 });

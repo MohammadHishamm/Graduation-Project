@@ -170,18 +170,21 @@ class FileExtractComponentsFromCode {
         // Find all the field declaration nodes in the syntax tree
         const fieldNodes = rootNode.descendantsOfType("field_declaration");
         return fieldNodes.map((node) => {
-            // Log node to inspect its children (useful for debugging)
-            // console.log('Field Node:', node.toString());
-            // The modifiers are usually on the first child (public, private, etc.)
-            const modifiersNode = node.child(0); // Use child(0) to access the first child
-            const modifiers = modifiersNode ? modifiersNode.text : "";
-            // The type of the field (like int, String)
-            const typeNode = node.child(1); // Access second child for the type
-            const type = typeNode ? typeNode.text : "";
-            // The name of the field is usually the third child
-            const nameNode = node.child(2); // Access third child for the name
-            const name = nameNode ? nameNode.text : "Unknown";
-            // Return the field information
+            let modifiersNode;
+            let typeNode;
+            let nameNode;
+            if (node.type === "modifiers") {
+                modifiersNode = node.child(0);
+                typeNode = node.child(1);
+                nameNode = node.child(2);
+            }
+            else {
+                typeNode = node.child(0);
+                nameNode = node.child(1);
+            }
+            const modifiers = modifiersNode?.text ?? "public";
+            const type = typeNode?.text ?? "Unknown";
+            const name = nameNode?.text ?? "Unnamed";
             return {
                 name,
                 type,
