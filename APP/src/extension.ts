@@ -317,6 +317,7 @@ async function analyzeCode(
         "NOD",
         "NODD",
         "TCC",
+        "DIT"
       ];
 
       try {
