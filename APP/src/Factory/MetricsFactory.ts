@@ -14,7 +14,7 @@ import { JavaNumberOfPublicAttributesM } from "../Metrics/Java/JavaNOPA";
 import { JavaNumberOfProtectedMethodsMetric } from "../Metrics/Java/JavaNProtM";
 import { JavaWeightedMethodCount } from "../Metrics/Java/JavaWMC";
 import { JavaWeightOfAClass } from "../Metrics/Java/JavaWOC";
-
+import {DepthOfInheritanceTree} from "../Metrics/Java/JavaDIT";
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
 import { TCCCalculation } from "../Metrics/Java/JavaTCC";
@@ -93,7 +93,8 @@ export class MetricsFactory {
       //   return new NODDCalculation();
       case "TCC":
         return new TCCCalculation();
-
+      case "DIT":
+        return new DepthOfInheritanceTree();  
       //       case "FANOUT":
       //         const javaCode = `
 
