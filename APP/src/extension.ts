@@ -300,6 +300,8 @@ async function analyzeCode(
         "AMW",
         "ATFD",
         "FDP",
+        "LAA",
+        "NrFE",
         "CBO",
         "DAC",
         "WMC",
@@ -317,7 +319,7 @@ async function analyzeCode(
         "NOD",
         "NODD",
         "TCC",
-        "DIT"
+        "DIT",
       ];
 
       try {
@@ -336,7 +338,7 @@ async function analyzeCode(
           increment: 20,
         });
         await pause(500);
-        
+
         FECFcode.parseAllJavaFiles();
 
         progress.report({ message: "Calculating metrics...", increment: 40 });

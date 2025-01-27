@@ -1,65 +1,95 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JavaAccessofImportData = void 0;
+exports.JavaLocalityofAttributeAccess = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
-const FolderExtractComponentsFromCode_1 = require("../../Extractors/FolderExtractComponentsFromCode");
-class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
+class JavaLocalityofAttributeAccess extends MetricCalculator_1.MetricCalculator {
     calculate(node, sourceCode, FECFC) {
         const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const FDP = this.calculateFDP(node, Classes, methods, Fields, FECFC);
-        return FDP;
+        const LAA = this.calculateLAA(node, Classes, methods, Fields, FECFC);
+        console.log("[LAA] Final Metric Value:", LAA);
+        return LAA;
     }
-    calculateFDP(rootNode, currentClasses, methods, fields, FECFC) {
-        // Track unique foreign classes accessed
-        const foreignClassesAccessed = new Set();
-        // Check each method for foreign data access
+    calculateLAA(rootNode, currentClasses, methods, fields, FECFC) {
+        let totalAttributeAccesses = 0;
+        let localAttributeAccesses = 0;
+        // Track unique accesses
+        const localAccessSet = new Set();
+        const foreignAccessSet = new Set();
+        console.log("\n[LAA] Starting attribute access analysis...");
         methods.forEach((method) => {
-            // Find the method's node in the syntax tree
-            const methodNode = this.findMethodNodeByPosition(rootNode, method);
-            if (!methodNode) {
+            // Skip constructors and accessors
+            if (method.isConstructor) {
                 return;
             }
-            // Get all fields from current class and its ancestors
+            console.log(`\n[LAA] Analyzing method: ${method.name}`);
+            const methodNode = this.findMethodNodeByPosition(rootNode, method);
+            if (!methodNode)
+                return;
+            // Get local fields (including inherited ones)
             const currentClassFields = this.getClassAndAncestorFields(method, currentClasses, fields);
-            // Extract references within the method
+            // Extract unique references within the method
             const references = this.extractReferencesFromMethod(methodNode, FECFC);
             references.forEach((reference) => {
-                // Skip if reference is a local class field
-                if (currentClassFields.includes(reference.name)) {
-                    return;
-                }
-                // Determine the class of the referenced entity
-                const referenceClass = this.findReferenceOwnerClass(reference, currentClasses);
-                // Check if the reference is from a different class and not an ancestor
-                if (referenceClass &&
-                    !this.isLocalClassAccess(referenceClass, currentClasses)) {
-                    foreignClassesAccessed.add(referenceClass.name);
+                if (reference.type === "field") {
+                    if (currentClassFields.includes(reference.name)) {
+                        localAccessSet.add(reference.name);
+                    }
+                    else {
+                        foreignAccessSet.add(reference.name);
+                    }
                 }
             });
         });
-        // console.log(
-        //   "[FDP] Foreign Classes Accessed:",
-        //   Array.from(foreignClassesAccessed)
-        // );
-        return foreignClassesAccessed.size;
+        // Calculate totals based on unique accesses
+        localAttributeAccesses = localAccessSet.size;
+        totalAttributeAccesses = localAccessSet.size + foreignAccessSet.size;
+        // Log detailed statistics
+        console.log("\n[LAA] Local Attributes Accessed:");
+        if (localAccessSet.size === 0) {
+            console.log("No local attributes accessed");
+        }
+        else {
+            Array.from(localAccessSet)
+                .sort()
+                .forEach((name) => {
+                console.log(`${name}`);
+            });
+        }
+        console.log("\n[LAA] Foreign Attributes Accessed:");
+        if (foreignAccessSet.size === 0) {
+            console.log("No foreign attributes accessed");
+        }
+        else {
+            Array.from(foreignAccessSet)
+                .sort()
+                .forEach((name) => {
+                console.log(`${name}`);
+            });
+        }
+        console.log("\n[LAA] Summary:");
+        console.log("Total Unique Attribute Accesses:", totalAttributeAccesses);
+        console.log("Local Unique Attribute Accesses:", localAttributeAccesses);
+        console.log("Foreign Unique Attribute Accesses:", foreignAccessSet.size);
+        // Calculate LAA
+        const laa = totalAttributeAccesses > 0
+            ? localAttributeAccesses / totalAttributeAccesses
+            : 0;
+        return laa;
     }
     findMethodNodeByPosition(rootNode, method) {
         const findMethodNode = (node) => {
-            // Check if the node is a method declaration and matches the position
             if (node.type === "method_declaration" &&
                 this.isNodePositionMatch(node, method.startPosition, method.endPosition)) {
                 return node;
             }
-            // Recursively search child nodes
             for (let child of node.children) {
                 const foundNode = findMethodNode(child);
-                if (foundNode) {
+                if (foundNode)
                     return foundNode;
-                }
             }
             return null;
         };
@@ -73,22 +103,15 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
             nodeEnd.row === endPos.row &&
             nodeEnd.column === endPos.column);
     }
-    /**
-     * Get fields from the current class and its ancestors
-     */
     getClassAndAncestorFields(method, classes, fields) {
-        // Find the class containing the method
         const containingClass = classes.find((cls) => method.startPosition.row >= cls.startPosition.row &&
             method.endPosition.row <= cls.endPosition.row);
-        if (!containingClass) {
+        if (!containingClass)
             return [];
-        }
-        // Collect fields from the current class and its ancestors
         const classFields = fields
             .filter((field) => field.startPosition.row >= containingClass.startPosition.row &&
             field.startPosition.row <= containingClass.endPosition.row)
             .map((field) => field.name);
-        // If the class has a parent, also include fields from parent classes
         if (containingClass.parent) {
             const parentClass = classes.find((cls) => cls.name === containingClass.parent);
             if (parentClass) {
@@ -101,15 +124,12 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
         }
         return classFields;
     }
-    /**
-     * Extract references from a method node
-     */
     extractReferencesFromMethod(methodNode, FECFC) {
         const references = [];
-        // Helper function to traverse and find references
         const findReferences = (node) => {
             // Check for field or method references
             if (node.type === "identifier") {
+                // You might want to add more sophisticated checks here
                 references.push({
                     name: node.text,
                     type: this.determineReferenceType(node, FECFC),
@@ -126,11 +146,7 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
             .map((name) => references.find((r) => r.name === name))
             .filter(Boolean);
     }
-    /**
-     * Determine if a reference is a field or method
-     */
     determineReferenceType(node, FECFC) {
-        // This is a simplified implementation. You might need to enhance it.
         const parsedComponents = FECFC.getParsedComponentsFromFile();
         for (const fileComponents of parsedComponents) {
             for (const classInfo of fileComponents.classes) {
@@ -142,50 +158,12 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
                 // Check if the reference is a method
                 const isMethod = classInfo.methods.some((m) => m.name === node.text);
                 if (isMethod) {
-                    return "method";
+                    return "method"; // Correctly handle method references here
                 }
             }
         }
         return "field"; // Default to field if cannot determine
     }
-    /**
-     * Find the class that owns the referenced entity
-     */
-    findReferenceOwnerClass(reference, currentClasses) {
-        const parsedComponents = this.getParsedComponentsFromFolder();
-        for (const fileComponents of parsedComponents) {
-            for (const classInfo of fileComponents.classes) {
-                const matchField = classInfo.fields.some((f) => f.name.split(" ")[0] === reference.name &&
-                    reference.type === "field");
-                const matchMethod = classInfo.methods.some((m) => m.name === reference.name && reference.type === "method");
-                if (matchField || matchMethod) {
-                    return {
-                        name: classInfo.name,
-                        extendedclass: "",
-                        isAbstract: false,
-                        isInterface: false,
-                        startPosition: { row: 0, column: 0 },
-                        endPosition: { row: 0, column: 0 },
-                    };
-                }
-            }
-        }
-        return undefined;
-    }
-    /**
-     * Check if the reference is from a local class or its ancestors
-     */
-    isLocalClassAccess(referenceClass, currentClasses) {
-        // Check if the reference class is in the current set of classes
-        const isInCurrentClasses = currentClasses.some((cls) => cls.name === referenceClass.name);
-        // Check for ancestor relationship
-        const hasAncestorRelationship = currentClasses.some((cls) => cls.parent === referenceClass.name);
-        return isInCurrentClasses || hasAncestorRelationship;
-    }
-    getParsedComponentsFromFolder() {
-        const folderExtractor = new FolderExtractComponentsFromCode_1.FolderExtractComponentsFromCode();
-        return folderExtractor.getParsedComponentsFromFile();
-    }
 }
-exports.JavaAccessofImportData = JavaAccessofImportData;
-//# sourceMappingURL=JavaFDP.js.map
+exports.JavaLocalityofAttributeAccess = JavaLocalityofAttributeAccess;
+//# sourceMappingURL=JavaLAA.js.map

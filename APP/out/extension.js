@@ -210,6 +210,8 @@ async function analyzeCode(document, sourceCode) {
             "AMW",
             "ATFD",
             "FDP",
+            "LAA",
+            "NrFE",
             "CBO",
             "DAC",
             "WMC",
@@ -227,7 +229,7 @@ async function analyzeCode(document, sourceCode) {
             "NOD",
             "NODD",
             "TCC",
-            "DIT"
+            "DIT",
         ];
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });

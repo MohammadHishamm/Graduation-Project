@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaCouplingBetweenObjects = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
+const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaCouplingBetweenObjects extends MetricCalculator_1.MetricCalculator {
     calculate(node) {
-        const extractor = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+        const extractor = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const extractedClasses = extractor.extractClasses(node);
         if (!extractedClasses || extractedClasses.length === 0) {
             console.warn("Warning: No classes extracted from the file.");

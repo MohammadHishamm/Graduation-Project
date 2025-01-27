@@ -1,12 +1,12 @@
 import Parser from "tree-sitter";
 
-import { FileParsedComponents } from "../../Interface/FileParsedComponents";
 import { MetricCalculator } from "../../Core/MetricCalculator";
+import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
-import { MethodInfo } from "../../Interface/MethodInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
+import { FileParsedComponents } from "../../Interface/FileParsedComponents";
+import { MethodInfo } from "../../Interface/MethodInfo";
 interface Reference {
   name: string;
   type: "field" | "method";
@@ -18,7 +18,7 @@ export class JavaAccessofImportData extends MetricCalculator {
     sourceCode: string,
     FECFC: FolderExtractComponentsFromCode
   ): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+    const extractcomponentsfromcode = new ExtractComponentsFromCode();
 
     const Classes = extractcomponentsfromcode.extractClasses(node);
 

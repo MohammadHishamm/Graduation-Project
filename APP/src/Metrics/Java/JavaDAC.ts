@@ -1,11 +1,11 @@
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 
 import { FieldInfo } from "../../Interface/FieldInfo";
 
 export class JavaDataAbstractionCoupling extends MetricCalculator {
   calculate(node: any): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+    const extractcomponentsfromcode = new ExtractComponentsFromCode();
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const Fields = extractcomponentsfromcode.extractFields(node, Classes);
     const DAC = this.findDataAbstractionCoupling(Fields);

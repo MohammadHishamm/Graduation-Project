@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DepthOfInheritanceTree = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
+const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class DepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
     calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         return this.findDIT(Classes, node, FECFC);
@@ -14,13 +14,15 @@ class DepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
     findDIT(Classes, rootNode, FECFC) {
         let DIT = 0;
         let isExtended; // To track the extended class
+        let isinterface;
         const fileParsedComponents = FECFC.getParsedComponentsFromFile(); // Get all parsed file components
         // Loop through Classes to identify the extended class
         for (const c of Classes) {
             isExtended = c.extendedclass; // The class that extends another class
+            isinterface = c.isInterface; // is interface class
         }
-        // If the class has an extended class (i.e., it's not a root class)
-        if (isExtended) {
+        // If the class has an extended class (i.e., it's not a root class) and not an interface 
+        if (isExtended && !isinterface) {
             // Loop through the parsed components of the file
             for (const fileComponents of fileParsedComponents) {
                 // Loop through class groups to find matching extended class

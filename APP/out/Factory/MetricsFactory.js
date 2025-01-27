@@ -27,6 +27,8 @@ const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
+const JavaLAA_1 = require("../Metrics/Java/JavaLAA");
+const JavaNrFE_1 = require("../Metrics/Java/JavaNrFE");
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -58,6 +60,10 @@ class MetricsFactory {
                 return new JavaATFD_1.JavaAccessToForeignData();
             case `FDP`:
                 return new JavaFDP_1.JavaAccessofImportData();
+            case `LAA`:
+                return new JavaLAA_1.JavaLocalityofAttributeAccess();
+            case `NrFE`:
+                return new JavaNrFE_1.JavaNumberofFeatureEnvyMethods();
             case `CBO`:
                 return new JavaCBO_1.JavaCouplingBetweenObjects();
             case `DAC`:

@@ -1,7 +1,7 @@
 import Parser from "tree-sitter";
 
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
 
@@ -12,7 +12,7 @@ export class DepthOfInheritanceTree extends MetricCalculator {
     sourceCode: string,
     FECFC: FolderExtractComponentsFromCode
   ): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+    const extractcomponentsfromcode = new ExtractComponentsFromCode();
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
 
@@ -26,16 +26,18 @@ export class DepthOfInheritanceTree extends MetricCalculator {
 ): number {
     let DIT = 0;
     let isExtended; // To track the extended class
-    
+    let isinterface;
+
     const fileParsedComponents = FECFC.getParsedComponentsFromFile(); // Get all parsed file components
 
     // Loop through Classes to identify the extended class
     for (const c of Classes) {
         isExtended = c.extendedclass; // The class that extends another class
+        isinterface = c.isInterface; // is interface class
     }
 
-    // If the class has an extended class (i.e., it's not a root class)
-    if (isExtended) {
+    // If the class has an extended class (i.e., it's not a root class) and not an interface 
+    if (isExtended && !isinterface ) {
         // Loop through the parsed components of the file
         for (const fileComponents of fileParsedComponents) {
             // Loop through class groups to find matching extended class
