@@ -1,23 +1,27 @@
 [
   {
-    "fullPath": "c:\\Users\\zayaty\\Downloads\\JavaMetricsTest\\LibraryManagement test\\LibraryManagement test\\src\\Person.java",
-    "folderName": "src/Person.java",
+    "fullPath": "c:\\Users\\PC\\Desktop\\laa\\LAAExample.java",
+    "folderName": "laa/LAAExample.java",
     "metrics": [
       {
         "name": "LOC",
-        "value": 5
+        "value": 26
       },
       {
         "name": "AMW",
-        "value": 0
+        "value": 1
       },
       {
         "name": "ATFD",
-        "value": 0
+        "value": 2
       },
       {
         "name": "FDP",
-        "value": 0
+        "value": 1
+      },
+      {
+        "name": "LAA",
+        "value": 0.4
       },
       {
         "name": "CBO",
@@ -25,23 +29,23 @@
       },
       {
         "name": "DAC",
-        "value": 0
+        "value": 1
       },
       {
         "name": "WMC",
-        "value": 0
+        "value": 2
       },
       {
         "name": "WOC",
-        "value": 0
+        "value": 1
       },
       {
         "name": "NOA",
-        "value": 0
+        "value": 2
       },
       {
         "name": "NOM",
-        "value": 0
+        "value": 2
       },
       {
         "name": "NOAM",
@@ -61,19 +65,19 @@
       },
       {
         "name": "NDU",
-        "value": 0
+        "value": 1
       },
       {
         "name": "NAS",
-        "value": 0
+        "value": 1
       },
       {
         "name": "BUR",
-        "value": 0
+        "value": 1
       },
       {
         "name": "TCC",
-        "value": 0
+        "value": 1
       },
       {
         "name": "DIT",

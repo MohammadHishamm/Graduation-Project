@@ -14,7 +14,7 @@ import { JavaNumberOfPublicAttributesM } from "../Metrics/Java/JavaNOPA";
 import { JavaNumberOfProtectedMethodsMetric } from "../Metrics/Java/JavaNProtM";
 import { JavaWeightedMethodCount } from "../Metrics/Java/JavaWMC";
 import { JavaWeightOfAClass } from "../Metrics/Java/JavaWOC";
-import {DepthOfInheritanceTree} from "../Metrics/Java/JavaDIT";
+import { DepthOfInheritanceTree } from "../Metrics/Java/JavaDIT";
 // import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
 import { TCCCalculation } from "../Metrics/Java/JavaTCC";
@@ -27,6 +27,7 @@ import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
 import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
+import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -63,6 +64,8 @@ export class MetricsFactory {
         return new JavaAccessToForeignData();
       case `FDP`:
         return new JavaAccessofImportData();
+      case `LAA`:
+        return new JavaLocalityofAttributeAccess();
       case `CBO`:
         return new JavaCouplingBetweenObjects();
       case `DAC`:
@@ -94,7 +97,7 @@ export class MetricsFactory {
       case "TCC":
         return new TCCCalculation();
       case "DIT":
-        return new DepthOfInheritanceTree();  
+        return new DepthOfInheritanceTree();
       //       case "FANOUT":
       //         const javaCode = `
 
