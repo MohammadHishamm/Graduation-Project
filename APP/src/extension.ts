@@ -301,6 +301,7 @@ async function analyzeCode(
         "ATFD",
         "FDP",
         "LAA",
+        "NrFE",
         "CBO",
         "DAC",
         "WMC",

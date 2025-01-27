@@ -28,6 +28,7 @@ import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
 import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
+import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -66,6 +67,8 @@ export class MetricsFactory {
         return new JavaAccessofImportData();
       case `LAA`:
         return new JavaLocalityofAttributeAccess();
+      case `NrFE`:
+        return new JavaNumberofFeatureEnvyMethods();
       case `CBO`:
         return new JavaCouplingBetweenObjects();
       case `DAC`:

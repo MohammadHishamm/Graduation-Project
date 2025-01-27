@@ -221,6 +221,7 @@ async function analyzeCode(document, sourceCode) {
             "ATFD",
             "FDP",
             "LAA",
+            "NrFE",
             "CBO",
             "DAC",
             "WMC",

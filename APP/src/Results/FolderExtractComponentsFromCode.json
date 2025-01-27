@@ -154,5 +154,228 @@
         ]
       }
     ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\PC\\Desktop\\fffffffffff\\ExternalData.java",
+        "name": "ExternalData",
+        "classes": [
+          {
+            "name": "ExternalData",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 26
+            },
+            "endPosition": {
+              "row": 25,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "foreignAccess",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "foreign",
+              "value1",
+              "foreignVariable",
+              "value2",
+              "getForeignVariable",
+              "anotherForeign",
+              "value3",
+              "anotherField",
+              "value4",
+              "anotherMethod",
+              "value5",
+              "localVariable",
+              "value6",
+              "CONSTANT",
+              "str"
+            ],
+            "startPosition": {
+              "row": 5,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 24,
+              "column": 5
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "localVariable",
+            "type": "int",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 1,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 1,
+              "column": 35
+            }
+          },
+          {
+            "name": "CONSTANT",
+            "type": "int",
+            "modifiers": "private",
+            "startPosition": {
+              "row": 2,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 2,
+              "column": 44
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\PC\\Desktop\\fffffffffff\\ForeignClass.java",
+        "name": "ForeignClass",
+        "classes": [
+          {
+            "name": "ForeignClass",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 19
+            },
+            "endPosition": {
+              "row": 5,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "getForeignVariable",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "foreignVariable"
+            ],
+            "startPosition": {
+              "row": 2,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 4,
+              "column": 5
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "foreignVariable",
+            "type": "int",
+            "modifiers": "public",
+            "startPosition": {
+              "row": 1,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 1,
+              "column": 36
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "classes": [
+      {
+        "fileName": "c:\\Users\\PC\\Desktop\\fffffffffff\\AnotherForeignClass.java",
+        "name": "AnotherForeignClass",
+        "classes": [
+          {
+            "name": "AnotherForeignClass",
+            "isAbstract": false,
+            "isInterface": false,
+            "startPosition": {
+              "row": 0,
+              "column": 26
+            },
+            "endPosition": {
+              "row": 8,
+              "column": 1
+            }
+          }
+        ],
+        "methods": [
+          {
+            "name": "anotherMethod",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "anotherField"
+            ],
+            "startPosition": {
+              "row": 2,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 4,
+              "column": 5
+            }
+          },
+          {
+            "name": "getfield",
+            "modifiers": "public",
+            "params": "()",
+            "isConstructor": false,
+            "isAccessor": false,
+            "isOverridden": false,
+            "fieldsUsed": [
+              "anotherField"
+            ],
+            "startPosition": {
+              "row": 5,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 7,
+              "column": 5
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "anotherField",
+            "type": "int",
+            "modifiers": "public",
+            "startPosition": {
+              "row": 1,
+              "column": 4
+            },
+            "endPosition": {
+              "row": 1,
+              "column": 33
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
