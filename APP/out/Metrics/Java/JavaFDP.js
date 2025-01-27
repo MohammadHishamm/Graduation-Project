@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaAccessofImportData = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
+const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 const FolderExtractComponentsFromCode_1 = require("../../Extractors/FolderExtractComponentsFromCode");
-const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
 class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
     calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         const Fields = extractcomponentsfromcode.extractFields(node, Classes);
@@ -41,7 +41,10 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
                 }
             });
         });
-        console.log("[FDP] Foreign Classes Accessed:", Array.from(foreignClassesAccessed));
+        // console.log(
+        //   "[FDP] Foreign Classes Accessed:",
+        //   Array.from(foreignClassesAccessed)
+        // );
         return foreignClassesAccessed.size;
     }
     findMethodNodeByPosition(rootNode, method) {
@@ -54,8 +57,9 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
             // Recursively search child nodes
             for (let child of node.children) {
                 const foundNode = findMethodNode(child);
-                if (foundNode)
+                if (foundNode) {
                     return foundNode;
+                }
             }
             return null;
         };
@@ -76,8 +80,9 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
         // Find the class containing the method
         const containingClass = classes.find((cls) => method.startPosition.row >= cls.startPosition.row &&
             method.endPosition.row <= cls.endPosition.row);
-        if (!containingClass)
+        if (!containingClass) {
             return [];
+        }
         // Collect fields from the current class and its ancestors
         const classFields = fields
             .filter((field) => field.startPosition.row >= containingClass.startPosition.row &&

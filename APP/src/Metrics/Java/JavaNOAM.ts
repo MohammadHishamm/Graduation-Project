@@ -1,10 +1,10 @@
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { MethodInfo } from "../../Interface/MethodInfo";
 
 export class JavaNumberOfAccessorMethods extends MetricCalculator {
   calculate(node: any): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+    const extractcomponentsfromcode = new ExtractComponentsFromCode();
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
 

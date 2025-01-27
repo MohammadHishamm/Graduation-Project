@@ -1,11 +1,12 @@
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FieldInfo } from "../../Interface/FieldInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
 
 export class JavaWeightOfAClass extends MetricCalculator {
-  calculate(node: any): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+  calculate(node: any): number 
+  {
+    const extractcomponentsfromcode = new ExtractComponentsFromCode();
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
     const Fields = extractcomponentsfromcode.extractFields(node, Classes);

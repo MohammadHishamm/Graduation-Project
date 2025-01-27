@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DepthOfInheritanceTree = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const FileExtractComponentsFromCode_1 = require("../../Extractors/FileExtractComponentsFromCode");
+const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class DepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
     calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
         return this.findDIT(Classes, node, FECFC);

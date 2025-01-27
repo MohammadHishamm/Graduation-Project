@@ -27,13 +27,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FolderExtractComponentsFromCode = void 0;
-const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+const vscode = __importStar(require("vscode"));
 const tree_sitter_1 = __importDefault(require("tree-sitter"));
 const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
-const FileExtractComponentsFromCode_1 = require("./FileExtractComponentsFromCode");
 const FileCacheManager_1 = require("../Cache/FileCacheManager");
+const ExtractComponentsFromCode_1 = require("./ExtractComponentsFromCode");
 class FolderExtractComponentsFromCode {
     parser;
     cacheManager;
@@ -47,9 +47,8 @@ class FolderExtractComponentsFromCode {
         // Load existing parsed components from the file
         const existingComponents = this.getParsedComponentsFromFile();
         const allParsedComponents = [...existingComponents];
-        console.log("Cache and file service started: ");
-        console.log("..................................................................................................");
-        console.log("Existing Parsed Components: ", existingComponents);
+        console.log("");
+        console.log("Cache and file service started... ");
         for (const fileUri of javaFiles) {
             const filePath = fileUri.fsPath;
             const fileContent = await this.fetchFileContent(fileUri);
@@ -74,7 +73,7 @@ class FolderExtractComponentsFromCode {
                     }
                     // Update the cache
                     this.cacheManager.set(filePath, fileHash, parsedComponents);
-                    console.log("Changes detected. New metrics saved.");
+                    console.log("Changes detected. New Components saved.");
                     console.log(`Cache updated: ${filePath}`);
                 }
                 else {
@@ -84,8 +83,8 @@ class FolderExtractComponentsFromCode {
         }
         // Save the combined parsed components back to the file
         this.saveParsedComponents(allParsedComponents);
-        console.log("Stopped");
-        console.log("..................................................................................................");
+        console.log("Cache and file service Stopped");
+        console.log("");
     }
     saveParsedComponents(parsedComponents) {
         try {
@@ -104,7 +103,7 @@ class FolderExtractComponentsFromCode {
             console.error("Failed to save parsedComponents to file:", err);
         }
     }
-    getParsedComponentsFromFile() {
+    getParsedComponentsFromFile(fileName) {
         try {
             const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json");
             const adjustedPath = filePath.replace(/out[\\\/]?/, "");
@@ -128,11 +127,26 @@ class FolderExtractComponentsFromCode {
             return [];
         }
     }
+    getParsedComponentsByFileName(fileName) {
+        try {
+            const parsedComponents = this.getParsedComponentsFromFile();
+            const matchingComponent = parsedComponents.find((component) => component.classes.some((classGroup) => classGroup.fileName === fileName));
+            if (!matchingComponent) {
+                console.warn(`No data found for file name: ${fileName}`);
+                return null;
+            }
+            return matchingComponent;
+        }
+        catch (err) {
+            console.error(`Failed to get parsed components for file: ${fileName}`, err);
+            return null;
+        }
+    }
     async parseFile(fileUri) {
         try {
             const fileContent = await this.fetchFileContent(fileUri);
             const tree = this.parseCode(fileContent);
-            const extractcomponentsfromcode = new FileExtractComponentsFromCode_1.FileExtractComponentsFromCode();
+            const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
             return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
         }
         catch (error) {

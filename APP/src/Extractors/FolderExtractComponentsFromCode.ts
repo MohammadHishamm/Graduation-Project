@@ -1,13 +1,13 @@
-import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
+import * as vscode from "vscode";
 
 import Parser from "tree-sitter";
 import java from "tree-sitter-java";
 
-import { FileParsedComponents } from "../Interface/FileParsedComponents";
-import { FileExtractComponentsFromCode } from "./FileExtractComponentsFromCode";
 import { FileCacheManager } from "../Cache/FileCacheManager";
+import { FileParsedComponents } from "../Interface/FileParsedComponents";
+import { ExtractComponentsFromCode } from "./ExtractComponentsFromCode";
 
 export class FolderExtractComponentsFromCode 
 {
@@ -28,10 +28,8 @@ export class FolderExtractComponentsFromCode
     const existingComponents = this.getParsedComponentsFromFile();
     const allParsedComponents: FileParsedComponents[] = [...existingComponents];
 
-    console.log("Cache and file service started: ");
-    console.log("..................................................................................................");
-    console.log("Existing Parsed Components: ", existingComponents);
-
+    console.log("");
+    console.log("Cache and file service started... ");
     for (const fileUri of javaFiles) {
         const filePath = fileUri.fsPath;
         const fileContent = await this.fetchFileContent(fileUri);
@@ -64,7 +62,7 @@ export class FolderExtractComponentsFromCode
                 // Update the cache
                 this.cacheManager.set(filePath, fileHash, parsedComponents);
 
-                console.log("Changes detected. New metrics saved.");
+                console.log("Changes detected. New Components saved.");
                 console.log(`Cache updated: ${filePath}`);
             } else {
                 console.error(`Error parsing file: ${filePath}`);
@@ -74,8 +72,8 @@ export class FolderExtractComponentsFromCode
 
     // Save the combined parsed components back to the file
     this.saveParsedComponents(allParsedComponents);
-    console.log("Stopped");
-    console.log("..................................................................................................");
+    console.log("Cache and file service Stopped");
+    console.log("");
 }
 
 
@@ -101,7 +99,7 @@ export class FolderExtractComponentsFromCode
     }
   }
 
-  public getParsedComponentsFromFile(): FileParsedComponents[] {
+  public getParsedComponentsFromFile(fileName?: string): FileParsedComponents[] {
     try {
       const filePath = path.join(
         __dirname,
@@ -134,6 +132,26 @@ export class FolderExtractComponentsFromCode
     }
   }
   
+  public getParsedComponentsByFileName(fileName: string): FileParsedComponents | null {
+    try {
+      const parsedComponents = this.getParsedComponentsFromFile();
+  
+      const matchingComponent = parsedComponents.find((component) =>
+        component.classes.some((classGroup) => classGroup.fileName === fileName));
+
+      if (!matchingComponent) {
+        console.warn(`No data found for file name: ${fileName}`);
+        return null;
+      }
+  
+      return matchingComponent;
+    } catch (err) {
+      console.error(`Failed to get parsed components for file: ${fileName}`, err);
+      return null;
+    }
+  }
+
+  
   public async parseFile(
     fileUri: vscode.Uri
   ): Promise<FileParsedComponents | null> {
@@ -142,7 +160,7 @@ export class FolderExtractComponentsFromCode
 
       const tree = this.parseCode(fileContent);
 
-      const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+      const extractcomponentsfromcode = new ExtractComponentsFromCode();
 
       return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
     } catch (error) {

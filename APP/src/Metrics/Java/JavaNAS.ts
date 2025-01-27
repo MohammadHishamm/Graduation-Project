@@ -1,7 +1,7 @@
 import Parser from "tree-sitter";
 
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { MethodInfo } from "../../Interface/MethodInfo";
 
@@ -10,9 +10,9 @@ export class JavaNumberOfAddedServices extends MetricCalculator {
   calculate(
     node: any,
     sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode
+    
   ): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
+    const extractcomponentsfromcode = new ExtractComponentsFromCode();
     const Classes = extractcomponentsfromcode.extractClasses(node);
     const methods = extractcomponentsfromcode.extractMethods(node, Classes);
 

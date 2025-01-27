@@ -1,10 +1,10 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { FileExtractComponentsFromCode } from '../../Extractors/FileExtractComponentsFromCode';
+import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
 import { ClassInfo } from '../../Interface/ClassInfo';
 
 export class JavaCouplingBetweenObjects extends MetricCalculator {
     calculate(node: any): number {
-        const extractor = new FileExtractComponentsFromCode();
+        const extractor = new ExtractComponentsFromCode();
         const extractedClasses: ClassInfo[] = extractor.extractClasses(node);
 
         if (!extractedClasses || extractedClasses.length === 0) {
