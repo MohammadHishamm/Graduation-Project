@@ -1,89 +1,170 @@
-import { MetricCalculator } from '../../Core/MetricCalculator';
-import { FileExtractComponentsFromCode } from '../../Extractors/FileExtractComponentsFromCode';
-import { ClassInfo } from '../../Interface/ClassInfo';
+import Parser from "tree-sitter";
+import { MetricCalculator } from "../../Core/MetricCalculator";
+import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+import { ClassInfo } from "../../Interface/ClassInfo";
+import { MethodInfo } from "../../Interface/MethodInfo";
+import { FieldInfo } from "../../Interface/FieldInfo";
 
 export class JavaCouplingBetweenObjects extends MetricCalculator {
-    calculate(node: any): number {
-        const extractor = new FileExtractComponentsFromCode();
-        const extractedClasses: ClassInfo[] = extractor.extractClasses(node);
+  calculate(node: any): number {
+    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
 
-        if (!extractedClasses || extractedClasses.length === 0) {
-            console.warn("Warning: No classes extracted from the file.");
-            return 0;
+    const Classes = extractcomponentsfromcode.extractClasses(node);
+    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
+     const Fields = extractcomponentsfromcode.extractFields(node, Classes);
+
+    let totalCBO =0;
+    
+    
+    totalCBO += this.parameter_TypesCount(methods, node) + this.accessTypesCount(Fields) +  this.callTypesCount(methods,node) ;
+
+   
+    
+
+    return totalCBO;
+  }
+
+  private parameter_TypesCount(
+    methods: MethodInfo[],
+    node: Parser.SyntaxNode
+  ): number {
+    const methodNodes = node.descendantsOfType("method_declaration");
+    let total = 0;
+  
+    const primitiveTypes = new Set([
+      "int",
+      "float",
+      "double",
+      "boolean",
+      "char",
+      "byte",
+      "short",
+      "long",
+      "void",
+      "string",
+    ]);
+  
+    const uniqueParamTypes = new Set<string>(); // Use a Set to store unique type identifiers
+    const classReturnTypes = new Set<string>(); // Set to track class return types
+  
+    methodNodes.forEach((methodNode) => {
+      const returnTypeNode = methodNode.childForFieldName("return_type");
+      const paramsNode = methodNode.childForFieldName("parameters");
+  
+      // Check return type for class (non-primitive)
+      if (returnTypeNode && returnTypeNode.type === "type_identifier") {
+        const returnType = returnTypeNode.text ?? "Unknown Type";
+        if (!primitiveTypes.has(returnType.toLowerCase())) {
+          classReturnTypes.add(returnType); // Add to set if it's not a primitive type
         }
-
-        let totalCBO = 0;
-
-        extractedClasses.forEach((classInfo: ClassInfo) => {
-            // const paraRetTypesCount = this.para_retTypesCount(classInfo);
-            // const accessTypesCount = this.accessTypesCount(classInfo);
-            // const callTypesCount = this.callTypesCount(classInfo);
-
-            // Combine the results of the three metrics
-            const cboForClass = new Set([
-                // ...paraRetTypesCount,
-                // ...accessTypesCount,
-                // ...callTypesCount,
-            ]);
-
-            totalCBO += cboForClass.size;
+      }
+  
+      if (paramsNode) {
+        paramsNode.children.forEach((paramNode) => {
+          if (paramNode.type === "formal_parameter") {
+            const typeNode = paramNode.childForFieldName("type");
+            if (typeNode && typeNode.type === "type_identifier") {
+              const paramType = typeNode.text ?? "Unknown Type";
+  
+              // Only add if it's NOT a primitive type
+              if (!primitiveTypes.has(paramType.toLowerCase())) {
+                uniqueParamTypes.add(paramType);
+              }
+            }
+          }
         });
+      }
+    });
+  
+    // Combine the return values and unique parameter types
+    total = classReturnTypes.size + uniqueParamTypes.size;
+  
+    return total;
+  }
+  
+  
 
-        return totalCBO;
+
+  private accessTypesCount(Fields: FieldInfo[]): number {
+    let CBO = 0; // Initialize DAC counter
+    const usedClassTypes = new Set<string>(); // To track unique types
+
+    // List of primitive types to ignore
+    const primitiveTypes = new Set([
+      "int",
+      "float",
+      "double",
+      "boolean",
+      "char",
+      "byte",
+      "short",
+      "long",
+      "void",
+      "string",
+    ]);
+
+    for (const field of Fields) {
+      const fieldType = field.type;
+
+      if (!fieldType) {
+        return CBO;
+      }
+
+      // Extract generic types if present (e.g., "List<Book>")
+      const genericMatch = fieldType.match(/^(\w+)<(.+)>$/);
+      if (!genericMatch) {
+        if (
+          !primitiveTypes.has(fieldType.toLowerCase()) &&
+          !usedClassTypes.has(fieldType)
+        ) {
+          usedClassTypes.add(fieldType);
+          CBO++;
+        }
+      }
     }
 
-    // private para_retTypesCount(classInfo: ClassInfo): Set<string> {
-    //     const uniqueTypes = new Set<string>();
-    //     const { methods } = classInfo;
+    return CBO; // Return the final count
+  }
+  
 
-    //     methods.forEach((method) => {
-    //         // Extract parameter types
-    //         const paramTypes = method.params.match(/[\w.$]+/g) || [];
-    //         paramTypes.forEach((type) => uniqueTypes.add(type));
+  private callTypesCount(methods: MethodInfo[], node: Parser.SyntaxNode): number {
+    const uniqueCalledClasses = new Set<string>(); // Store unique class calls
+    const primitiveTypes = new Set([
+        "int", "float", "double", "boolean", "char", 
+        "byte", "short", "long", "void", "string"
+    ]);
 
-    //         // Extract return type
-    //         const returnTypeMatch = method.modifiers.match(/(?:[\w.$]+)\s+\w+\(/);
-    //         if (returnTypeMatch) {
-    //             const returnType = returnTypeMatch[0];
-    //             uniqueTypes.add(returnType);
-    //         }
-    //     });
+    const methodNodes = node.descendantsOfType("method_declaration");
 
-    //     return uniqueTypes;
-    // }
+    methodNodes.forEach((method) => {
+        const methodName = method.childForFieldName("name")?.text ?? "Unknown";
+        console.log(`Checking method: ${methodName}`);
 
-    // private accessTypesCount(classInfo: ClassInfo): Set<string> {
-    //     const uniqueTypes = new Set<string>();
-    //     const { fields, methods } = classInfo;
+        // Find method calls inside the method
+        const callNodes = method.descendantsOfType("method_invocation");
 
-    //     fields.forEach((field) => {
-    //         uniqueTypes.add(field.type);
-    //     });
+        callNodes.forEach((callNode) => {
+            const calledObject = callNode.childForFieldName("object");
+            const calledMethod = callNode.childForFieldName("name")?.text ?? "Unknown";
 
-    //     methods.forEach((method) => {
-    //         method.fieldsUsed.forEach((field) => {
-    //             uniqueTypes.add(field);
-    //         });
-    //     });
+            if (calledObject && calledObject.type === "identifier") {
+                const classCall = calledObject.text;
+                
+                // Only add non-primitive types
+                if (!primitiveTypes.has(classCall.toLowerCase())) {
+                    uniqueCalledClasses.add(classCall);
+                }
 
-    //     return uniqueTypes;
-    // }
+                console.log(`- Method "${methodName}" calls "${calledMethod}" on "${classCall}"`);
+            }
+        });
+    });
 
-    // private callTypesCount(classInfo: ClassInfo): Set<string> {
-    //     const uniqueTypes = new Set<string>();
-    //     const { methods } = classInfo;
+    // Convert Set to an Array
+    const uniqueClassCallsArray = Array.from(uniqueCalledClasses);
+    console.log("Unique Called Classes:", uniqueClassCallsArray);
 
-    //     methods.forEach((method) => {
-    //         const methodBody = method.body;
-    //         if (methodBody) {
-    //             const callMatches = methodBody.match(/[\w.$]+\(/g) || [];
-    //             callMatches.forEach((call) => {
-    //                 const className = call.split(".")[0];
-    //                 uniqueTypes.add(className);
-    //             });
-    //         }
-    //     });
+    return uniqueCalledClasses.size;
+}
 
-    //     return uniqueTypes;
-    // }
 }
