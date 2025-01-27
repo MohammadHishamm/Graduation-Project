@@ -1,28 +1,25 @@
-<<<<<<< HEAD
+
 import Parser from "tree-sitter";
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { FileExtractComponentsFromCode } from "../../Extractors/FileExtractComponentsFromCode";
+
 import { ClassInfo } from "../../Interface/ClassInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
 
-export class JavaCouplingBetweenObjects extends MetricCalculator {
-  calculate(node: any): number {
-    const extractcomponentsfromcode = new FileExtractComponentsFromCode();
-=======
-import { MetricCalculator } from '../../Core/MetricCalculator';
+
+
+
 import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
-import { ClassInfo } from '../../Interface/ClassInfo';
 
 export class JavaCouplingBetweenObjects extends MetricCalculator {
     calculate(node: any): number {
         const extractor = new ExtractComponentsFromCode();
         const extractedClasses: ClassInfo[] = extractor.extractClasses(node);
->>>>>>> 3f22c7725082f21062632985a7216c63a0eae39e
 
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-     const Fields = extractcomponentsfromcode.extractFields(node, Classes);
+
+    const Classes = extractor.extractClasses(node);
+    const methods = extractor.extractMethods(node, Classes);
+    const Fields = extractor.extractFields(node, Classes);
 
     let totalCBO =0;
     
