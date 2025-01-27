@@ -6,7 +6,7 @@ import { MethodInfo } from "../Interface/MethodInfo";
 import { FieldInfo } from "../Interface/FieldInfo";
 
 export class ExtractComponentsFromCode {
-  
+
   public extractFileComponents(
     tree: Parser.Tree,
     fileName: string
@@ -121,7 +121,6 @@ export class ExtractComponentsFromCode {
       };
     });
   }
-
   public extractFields(
     rootNode: Parser.SyntaxNode,
     classes: ClassInfo[]
@@ -129,31 +128,30 @@ export class ExtractComponentsFromCode {
     // Find all the field declaration nodes in the syntax tree
     const fieldNodes = rootNode.descendantsOfType("field_declaration");
 
-    
     return fieldNodes.map((node) => {
+      let modifiers: string = "public";  // Default modifier is 'public'
+      let type: string = "Unknown";     // Default type is 'Unknown'
+      let name: string = "Unnamed";     // Default name is 'Unnamed'
 
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        console.log(child.type);
 
-      let modifiersNode : any ; 
-      let typeNode : any ; 
-      let nameNode : any ; 
-
-      if (node.type === "modifiers") 
-      {
-         modifiersNode = node.child(0); 
-         typeNode = node.child(1); 
-         nameNode = node.child(2); 
+        // If a modifier is found
+        if (child.type === "modifiers") {
+          // Only save the first modifier (e.g., 'private' from 'private static')
+          modifiers = child.children.length > 0 ? child.children[0].text : "";
+        }
+        else if (child.type.includes('type')) {
+          type = child.text;
+        }
+        else if (child.type.includes('variable_declarator')) {
+          const identifierNode = child.children.find(subChild => subChild.type === "identifier");
+          if (identifierNode) {
+            name = identifierNode.text;  
+          }
+        }
       }
-      else
-      {
-         typeNode = node.child(0); 
-         nameNode = node.child(1);
-
-      }
-
-
-      const modifiers = modifiersNode?.text ?? "public"; 
-      const type = typeNode?.text ?? "Unknown"; 
-      const name = nameNode?.text ?? "Unnamed"; 
 
       return {
         name,

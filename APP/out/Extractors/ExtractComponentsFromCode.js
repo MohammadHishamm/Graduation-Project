@@ -88,21 +88,27 @@ class ExtractComponentsFromCode {
         // Find all the field declaration nodes in the syntax tree
         const fieldNodes = rootNode.descendantsOfType("field_declaration");
         return fieldNodes.map((node) => {
-            let modifiersNode;
-            let typeNode;
-            let nameNode;
-            if (node.type === "modifiers") {
-                modifiersNode = node.child(0);
-                typeNode = node.child(1);
-                nameNode = node.child(2);
+            let modifiers = "public"; // Default modifier is 'public'
+            let type = "Unknown"; // Default type is 'Unknown'
+            let name = "Unnamed"; // Default name is 'Unnamed'
+            for (let i = 0; i < node.children.length; i++) {
+                const child = node.children[i];
+                console.log(child.type);
+                // If a modifier is found
+                if (child.type === "modifiers") {
+                    // Only save the first modifier (e.g., 'private' from 'private static')
+                    modifiers = child.children.length > 0 ? child.children[0].text : "";
+                }
+                else if (child.type.includes('type')) {
+                    type = child.text;
+                }
+                else if (child.type.includes('variable_declarator')) {
+                    const identifierNode = child.children.find(subChild => subChild.type === "identifier");
+                    if (identifierNode) {
+                        name = identifierNode.text;
+                    }
+                }
             }
-            else {
-                typeNode = node.child(0);
-                nameNode = node.child(1);
-            }
-            const modifiers = modifiersNode?.text ?? "public";
-            const type = typeNode?.text ?? "Unknown";
-            const name = nameNode?.text ?? "Unnamed";
             return {
                 name,
                 type,
