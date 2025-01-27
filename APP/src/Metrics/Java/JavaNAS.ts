@@ -10,7 +10,7 @@ export class JavaNumberOfAddedServices extends MetricCalculator {
   calculate(
     node: any,
     sourceCode: string,
-    
+    FECFC: FolderExtractComponentsFromCode
   ): number {
     const extractcomponentsfromcode = new ExtractComponentsFromCode();
     const Classes = extractcomponentsfromcode.extractClasses(node);

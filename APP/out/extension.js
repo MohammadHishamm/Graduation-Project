@@ -145,7 +145,7 @@ async function AnalyzeSelctedCode(document, sourceCode) {
         metricsToCalculate.forEach((metricName) => {
             const metricCalculator = MetricsFactory_1.MetricsFactory.CreateMetric(metricName, document.languageId);
             if (metricCalculator) {
-                const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode, document.fileName);
+                const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode);
                 analysisResults.push(`${metricName}: ${value}`);
             }
         });
@@ -247,7 +247,7 @@ async function analyzeCode(document, sourceCode) {
             for (const [index, metricName] of metricsToCalculate.entries()) {
                 const metricCalculator = MetricsFactory_1.MetricsFactory.CreateMetric(metricName, document.languageId);
                 if (metricCalculator) {
-                    const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode, document.fileName);
+                    const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode);
                     analysisResults.push(`${metricName}: ${value}`);
                     progress.report({
                         message: `Calculating ${metricName}...`,

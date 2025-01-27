@@ -5,7 +5,7 @@ const MetricCalculator_1 = require("../../Core/MetricCalculator");
 const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
-    calculate(node, sourceCode) {
+    calculate(node, sourceCode, FECFC) {
         const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
         const Classes = extractcomponentsfromcode.extractClasses(node);
         const methods = extractcomponentsfromcode.extractMethods(node, Classes);
