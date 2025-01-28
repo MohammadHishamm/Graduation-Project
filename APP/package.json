@@ -42,7 +42,6 @@
       ]
     },
     "commands": [
-      
       {
         "command": "extension.activateCommand",
         "title": "CodePure: Activate"
@@ -157,6 +156,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
+    "@types/node-fetch": "^2.6.12",
     "@types/vscode": "^1.93.0",
     "@typescript-eslint/eslint-plugin": "^8.3.0",
     "@typescript-eslint/parser": "^8.3.0",
@@ -166,6 +166,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "node-fetch": "^2.6.1",
     "python-ast": "^0.1.0",
     "tree-sitter": "^0.21.1",
     "tree-sitter-java": "^0.23.4",

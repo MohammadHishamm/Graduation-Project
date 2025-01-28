@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 const vscode = __importStar(require("vscode"));
@@ -29,8 +39,9 @@ const dashboard_1 = require("./dashboard");
 const MetricsFactory_1 = require("./Factory/MetricsFactory");
 const javaParser_1 = require("./Languages/javaParser");
 const pythonParser_1 = require("./Languages/pythonParser");
-const ProblemsChecker_1 = require("./Validator/ProblemsChecker");
-const SupportedFileTypes_1 = require("./Validator/SupportedFileTypes");
+const ProblemsChecker_1 = require("./Services/ProblemsChecker");
+const SupportedFileTypes_1 = require("./Services/SupportedFileTypes");
+const ServerMetricsManager_1 = require("./Services/ServerMetricsManager");
 const MetricsNotifier_1 = require("./Core/MetricsNotifier");
 const MetricsSaver_1 = require("./Saver/MetricsSaver");
 const FolderExtractComponentsFromCode_1 = require("./Extractors/FolderExtractComponentsFromCode");
@@ -38,6 +49,7 @@ const Metric_1 = require("./Core/Metric");
 let isActive = true;
 let outputChannel;
 let statusBarItem;
+const servermetricsmanager = new ServerMetricsManager_1.ServerMetricsManager();
 const FECFcode = new FolderExtractComponentsFromCode_1.FolderExtractComponentsFromCode();
 const metricsNotifier = new MetricsNotifier_1.MetricsNotifier();
 const metricsSaver = new MetricsSaver_1.MetricsSaver(metricsNotifier); // Pass notifier to MetricsSaver
@@ -47,6 +59,7 @@ metricsNotifier.addObserver(customTreeProvider);
 async function activate(context) {
     // Start timer
     console.time("Extension Execution Time");
+    servermetricsmanager.checkServerStatus();
     console.log("Codepure extension is now active!");
     // Fetch selected metrics initially
     const selectedMetrics = getSelectedMetrics();
@@ -275,6 +288,7 @@ async function analyzeCode(document, sourceCode) {
             return errorMessage;
         }
         finally {
+            servermetricsmanager.sendMetricsFile();
             isAnalyzing = false; // Reset the flag once the analysis is complete
         }
     });

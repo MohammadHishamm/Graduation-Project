@@ -7,8 +7,9 @@ import { MetricsFactory } from "./Factory/MetricsFactory";
 import { javaParser } from "./Languages/javaParser";
 import { pythonParser } from "./Languages/pythonParser";
 
-import { ProblemsChecker } from "./Validator/ProblemsChecker";
-import { isSupportedFileType } from "./Validator/SupportedFileTypes";
+import { ProblemsChecker } from "./Services/ProblemsChecker";
+import { isSupportedFileType } from "./Services/SupportedFileTypes";
+import { ServerMetricsManager } from "./Services/ServerMetricsManager";
 
 import { MetricsNotifier } from "./Core/MetricsNotifier";
 
@@ -21,6 +22,8 @@ let isActive = true;
 
 let outputChannel: vscode.OutputChannel;
 let statusBarItem: vscode.StatusBarItem;
+
+const servermetricsmanager = new ServerMetricsManager();
 
 const FECFcode = new FolderExtractComponentsFromCode();
 
@@ -35,6 +38,8 @@ export async function activate(context: vscode.ExtensionContext) {
   // Start timer
   console.time("Extension Execution Time");
 
+  servermetricsmanager.checkServerStatus();
+  
   console.log("Codepure extension is now active!");
 
   // Fetch selected metrics initially
@@ -54,6 +59,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   statusBarItem.text = "CodePure: Ready";
   statusBarItem.show();
+
 
   const activateCommand = vscode.commands.registerCommand(
     "extension.activateCommand",
@@ -385,11 +391,13 @@ async function analyzeCode(
         vscode.window.showErrorMessage(errorMessage);
         return errorMessage;
       } finally {
+        servermetricsmanager.sendMetricsFile();
         isAnalyzing = false; // Reset the flag once the analysis is complete
       }
     }
   );
 }
+
 
 // Helper function to create a delay
 function pause(ms: number): Promise<void> {

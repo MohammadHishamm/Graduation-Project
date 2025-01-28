@@ -27,8 +27,6 @@ export class MetricsSaver {
       console.log(`'Results' folder created at: ${resultsDir}`);
     }
 
-    console.log(`Metrics will be saved to: ${this.filePath}`);
-
     // Inject the MetricsNotifier to the class
     this.notifier = notifier;
   }
