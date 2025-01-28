@@ -33,25 +33,25 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.activate = activate;
-exports.deactivate = deactivate;
+exports.handleEvents = handleEvents;
 const vscode = __importStar(require("vscode"));
-const initialize_1 = require("./initialize");
-const commands_1 = require("./commands");
-const events_1 = require("./events");
-async function activate(context) {
-    console.time("Extension Execution Time");
-    // Initialize extension components
-    (0, initialize_1.initializeExtension)(context);
-    // Register commands
-    (0, commands_1.registerCommands)(context);
-    // Handle events (e.g., file save)
-    (0, events_1.handleEvents)(context);
-    // Register Tree View
-    vscode.window.registerTreeDataProvider("codepureTreeView", initialize_1.customTreeProvider);
-    console.timeEnd("Extension Execution Time");
+const ProblemsChecker_1 = require("./services/ProblemsChecker");
+const SupportedFileTypes_1 = require("./services/SupportedFileTypes");
+const AnalyzeCode_1 = require("./services/AnalyzeCode");
+function handleEvents(context) {
+    vscode.workspace.onDidSaveTextDocument(async (document) => {
+        const problemsChecker = new ProblemsChecker_1.ProblemsChecker(document);
+        const isSupportedfiletype = new SupportedFileTypes_1.isSupportedFileType(document);
+        if (!problemsChecker.checkForErrors() && isSupportedfiletype.isSupported()) {
+            const sourceCode = document.getText();
+            await (0, AnalyzeCode_1.analyzeCode)(document, sourceCode);
+        }
+    });
+    vscode.workspace.onDidChangeConfiguration((event) => {
+        if (event.affectsConfiguration("extension.selectedMetrics")) {
+            const updatedMetrics = vscode.workspace.getConfiguration("codepure").get("selectedMetrics", []);
+            vscode.window.showInformationMessage(`Metrics updated: ${updatedMetrics.join(", ")}`);
+        }
+    });
 }
-function deactivate() {
-    console.log("CodePure extension is now deactivated.");
-}
-//# sourceMappingURL=extension.js.map
+//# sourceMappingURL=events.js.map

@@ -33,25 +33,13 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.activate = activate;
-exports.deactivate = deactivate;
+exports.getSelectedMetrics = getSelectedMetrics;
+exports.pause = pause;
 const vscode = __importStar(require("vscode"));
-const initialize_1 = require("./initialize");
-const commands_1 = require("./commands");
-const events_1 = require("./events");
-async function activate(context) {
-    console.time("Extension Execution Time");
-    // Initialize extension components
-    (0, initialize_1.initializeExtension)(context);
-    // Register commands
-    (0, commands_1.registerCommands)(context);
-    // Handle events (e.g., file save)
-    (0, events_1.handleEvents)(context);
-    // Register Tree View
-    vscode.window.registerTreeDataProvider("codepureTreeView", initialize_1.customTreeProvider);
-    console.timeEnd("Extension Execution Time");
+function getSelectedMetrics() {
+    return vscode.workspace.getConfiguration("codepure").get("selectedMetrics", ["LOC", "NOM", "NOPA"]);
 }
-function deactivate() {
-    console.log("CodePure extension is now deactivated.");
+function pause(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
-//# sourceMappingURL=extension.js.map
+//# sourceMappingURL=utils.js.map

@@ -33,25 +33,26 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.activate = activate;
-exports.deactivate = deactivate;
+exports.isSupportedFileType = void 0;
 const vscode = __importStar(require("vscode"));
-const initialize_1 = require("./initialize");
-const commands_1 = require("./commands");
-const events_1 = require("./events");
-async function activate(context) {
-    console.time("Extension Execution Time");
-    // Initialize extension components
-    (0, initialize_1.initializeExtension)(context);
-    // Register commands
-    (0, commands_1.registerCommands)(context);
-    // Handle events (e.g., file save)
-    (0, events_1.handleEvents)(context);
-    // Register Tree View
-    vscode.window.registerTreeDataProvider("codepureTreeView", initialize_1.customTreeProvider);
-    console.timeEnd("Extension Execution Time");
+class isSupportedFileType {
+    document;
+    supportedFileTypes;
+    constructor(document, supportedFileTypes = ["java", "python"]) {
+        this.document = document;
+        this.supportedFileTypes = supportedFileTypes;
+    }
+    ;
+    isSupported() {
+        const fileType = this.document.languageId;
+        if (this.supportedFileTypes.includes(fileType)) {
+            return true;
+        }
+        else {
+            vscode.window.showWarningMessage(`Unsupported file type: ${fileType}`);
+            return false;
+        }
+    }
 }
-function deactivate() {
-    console.log("CodePure extension is now deactivated.");
-}
-//# sourceMappingURL=extension.js.map
+exports.isSupportedFileType = isSupportedFileType;
+//# sourceMappingURL=SupportedFileTypes.js.map

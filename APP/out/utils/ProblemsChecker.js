@@ -33,25 +33,23 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.activate = activate;
-exports.deactivate = deactivate;
+exports.ProblemsChecker = void 0;
 const vscode = __importStar(require("vscode"));
-const initialize_1 = require("./initialize");
-const commands_1 = require("./commands");
-const events_1 = require("./events");
-async function activate(context) {
-    console.time("Extension Execution Time");
-    // Initialize extension components
-    (0, initialize_1.initializeExtension)(context);
-    // Register commands
-    (0, commands_1.registerCommands)(context);
-    // Handle events (e.g., file save)
-    (0, events_1.handleEvents)(context);
-    // Register Tree View
-    vscode.window.registerTreeDataProvider("codepureTreeView", initialize_1.customTreeProvider);
-    console.timeEnd("Extension Execution Time");
+class ProblemsChecker {
+    document;
+    constructor(document) {
+        this.document = document;
+    }
+    checkForErrors() {
+        const diagnostics = vscode.languages.getDiagnostics(this.document.uri);
+        const errors = diagnostics.filter(diagnostic => diagnostic.severity === vscode.DiagnosticSeverity.Error);
+        if (errors.length !== 0) {
+            vscode.window.showWarningMessage('Fix the Problems before analyzing!');
+            return true;
+        }
+        // No errors found
+        return false;
+    }
 }
-function deactivate() {
-    console.log("CodePure extension is now deactivated.");
-}
-//# sourceMappingURL=extension.js.map
+exports.ProblemsChecker = ProblemsChecker;
+//# sourceMappingURL=ProblemsChecker.js.map
