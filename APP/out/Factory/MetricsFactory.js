@@ -16,6 +16,7 @@ const JavaNProtM_1 = require("../Metrics/Java/JavaNProtM");
 const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
 const JavaWOC_1 = require("../Metrics/Java/JavaWOC");
 const JavaDIT_1 = require("../Metrics/Java/JavaDIT");
+const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
@@ -87,7 +88,7 @@ class MetricsFactory {
             case "NDU":
             // return new NDUCalculation();
             case "NAS":
-            // return new JavaNumberOfAddedServices();
+                return new JavaNAS_1.JavaNumberOfAddedServices();
             case "BUR":
             // return new BURCalculation();
             // case "NOD":

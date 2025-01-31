@@ -94,7 +94,7 @@ export class MetricsFactory {
       case "NDU":
       // return new NDUCalculation();
       case "NAS":
-        // return new JavaNumberOfAddedServices();
+        return new JavaNumberOfAddedServices();
       case "BUR":
       // return new BURCalculation();
       // case "NOD":
