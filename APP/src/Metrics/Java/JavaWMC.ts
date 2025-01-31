@@ -1,59 +1,60 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import * as vscode from 'vscode';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
+
+import { FolderExtractComponentsFromCode } from '../../Extractors/FolderExtractComponentsFromCode';
+
+import { ClassInfo } from '../../Interface/ClassInfo';
+import { MethodInfo } from '../../Interface/MethodInfo';
+import { FieldInfo } from '../../Interface/FieldInfo';
 
 
 
 export class JavaWeightedMethodCount extends MetricCalculator {
 
-    calculate(node: any): number {
-        let complexity = 0; 
-    
-     
-        const traverse = (currentNode: any) => 
-        {
-            // console.log(`${currentNode.type}`);            
-            // Increment for each control flow statement
-            if ([
-                'if_statement', 
-                'for_statement', 
-                'while_statement', 
-                'do_statement', 
-                'catch_clause', 
-                'case', 
-                'throw_statement', 
-                'break_statement', 
-                'continue_statement'
-            ].includes(currentNode.type)) {
-                complexity++;
-            }
+    calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number {
+        let allClasses: ClassInfo[] = [];
+        let allMethods: MethodInfo[] = [];
+        let allFields: FieldInfo[] = [];
 
-            // Check guard conditions for boolean operators (&&, ||)
-            if (currentNode.type === 'condition') { 
-                const conditionText = currentNode.text || ''; // Assume 'text' contains the source code of the condition
-                const booleanOperators = (conditionText.match(/&&|\|\|/g) || []).length;
-                complexity += booleanOperators;
-            }
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
 
-            if(currentNode.type === 'method_declaration'  || currentNode.type === 'constructor_declaration')
-            {
-                complexity++;
-            }
-            
-            // Increment for ternary conditional expressions (?:)
-            if (currentNode.type === 'ternary_expression') {
-                complexity++;
-            }
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = allClasses.concat(classGroup.classes);
+                allMethods = allMethods.concat(classGroup.methods);
+                allFields = allFields.concat(classGroup.fields);
+            });
+        }
 
-            // Recursively traverse child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
+        return this.calculateWeightedMethodCount(allMethods);
+    }
+
+    private calculateWeightedMethodCount(methods: MethodInfo[]): number 
+    {
+        let complexity = 0;
+
+        methods.forEach((method) => {
+            method.methodBody.forEach((statement) => {
+
+                if (
+                    statement.includes("if_statement") ||
+                    statement.includes("while_statement") ||
+                    statement.includes("do_statement") ||
+                    statement.includes("catch_clause") ||
+                    statement.includes("case") ||
+                    statement.includes("throw_statement") ||
+                    statement.includes("break_statement") ||
+                    statement.includes("continue_statement") ||
+                    statement.includes("for_statement") ||
+                    statement.includes("condition") ||
+                    statement.includes("ternary_expression") ||
+                    method
+                ) {
+                    complexity++;
                 }
-            }
-        };
+            });
+        });
 
-        traverse(node);
         return complexity;
     }
 }

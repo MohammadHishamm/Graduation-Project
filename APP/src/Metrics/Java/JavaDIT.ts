@@ -1,22 +1,34 @@
 import Parser from "tree-sitter";
 
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
+import { FieldInfo } from "../../Interface/FieldInfo";
+import { MethodInfo } from "../../Interface/MethodInfo";
 
-export class DepthOfInheritanceTree extends MetricCalculator {
+export class JavaDepthOfInheritanceTree extends MetricCalculator {
   // Return a Promise from calculate
-  calculate(
-    node: any,
-    sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode
-  ): number {
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
+  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  { 
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
 
-    return this.findDIT(Classes, node, FECFC);
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+
+    if (fileParsedComponents) 
+    {
+      const classGroups = fileParsedComponents.classes;
+      classGroups.forEach((classGroup) => 
+      {
+        allClasses = [...allClasses, ...classGroup.classes];
+        allMethods = [...allMethods, ...classGroup.methods];
+        allFields = [...allFields, ...classGroup.fields];
+      });
+    }
+
+
+    return this.findDIT(allClasses, node, FECFC);
   }
 
   private findDIT(
@@ -25,14 +37,14 @@ export class DepthOfInheritanceTree extends MetricCalculator {
     FECFC: FolderExtractComponentsFromCode
 ): number {
     let DIT = 0;
-    let isExtended; // To track the extended class
+    let isExtended; 
     let isinterface;
 
-    const fileParsedComponents = FECFC.getParsedComponentsFromFile(); // Get all parsed file components
+    const fileParsedComponents = FECFC.getParsedComponentsFromFile(); 
 
     // Loop through Classes to identify the extended class
     for (const c of Classes) {
-        isExtended = c.extendedclass; // The class that extends another class
+        isExtended = c.parent; // The class that extends another class
         isinterface = c.isInterface; // is interface class
     }
 
@@ -48,8 +60,7 @@ export class DepthOfInheritanceTree extends MetricCalculator {
                     
                     // Recursively traverse through subclasses (if they exist)
                     for (const classInfo of classGroup.classes) {
-                        if (classInfo.extendedclass) {
-                            console.log(classInfo);
+                        if (classInfo.parent) {
                             // Recursively call findDIT to calculate DIT for subclass
                             DIT += this.findDIT([classInfo], rootNode, FECFC);
                             

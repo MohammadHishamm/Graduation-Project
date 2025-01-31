@@ -5,26 +5,34 @@ import { MetricCalculator } from "../../Core/MetricCalculator";
 import { ClassInfo } from "../../Interface/ClassInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
+import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 
 
-
-
-import { ExtractComponentsFromCode } from '../../Extractors/ExtractComponentsFromCode';
 
 export class JavaCouplingBetweenObjects extends MetricCalculator {
-    calculate(node: any): number {
-        const extractor = new ExtractComponentsFromCode();
-        const extractedClasses: ClassInfo[] = extractor.extractClasses(node);
-
-
-    const Classes = extractor.extractClasses(node);
-    const methods = extractor.extractMethods(node, Classes);
-    const Fields = extractor.extractFields(node, Classes);
+    calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+    { 
+      let allClasses: ClassInfo[] = [];
+      let allMethods: MethodInfo[] = [];
+      let allFields: FieldInfo[] = [];
+  
+      const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+  
+      if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = [...allClasses, ...classGroup.classes];
+          allMethods = [...allMethods, ...classGroup.methods];
+          allFields = [...allFields, ...classGroup.fields];
+        });
+      }
 
     let totalCBO =0;
     
     
-    totalCBO += this.parameter_TypesCount(methods, node) + this.accessTypesCount(Fields) +  this.callTypesCount(methods,node) ;
+    totalCBO += this.parameter_TypesCount(allMethods, node) + this.accessTypesCount(allFields) +  this.callTypesCount(allMethods,node) ;
 
    
     

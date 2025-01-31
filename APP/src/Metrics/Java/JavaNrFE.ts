@@ -1,10 +1,12 @@
 import Parser from "tree-sitter";
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
+
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
-import { FieldInfo } from "../../Interface/FieldInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
+import { FieldInfo } from "../../Interface/FieldInfo";
+
+
 import { JavaAccessToForeignData } from "./JavaATFD ";
 import { JavaAccessofImportData } from "./JavaFDP";
 import { JavaLocalityofAttributeAccess } from "./JavaLAA";
@@ -15,30 +17,40 @@ interface Reference {
 }
 
 export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
-  calculate(
-    node: any,
-    sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode
-  ): number {
+    calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+    { 
+      let allClasses: ClassInfo[] = [];
+      let allMethods: MethodInfo[] = [];
+      let allFields: FieldInfo[] = [];
+  
+      const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+  
+      if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = [...allClasses, ...classGroup.classes];
+          allMethods = [...allMethods, ...classGroup.methods];
+          allFields = [...allFields, ...classGroup.fields];
+        });
+      }
+
     const AccessToForeignData = new JavaAccessToForeignData();
     const AccessofImportData = new JavaAccessofImportData();
     const LocalityofAttributeAccess = new JavaLocalityofAttributeAccess();
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
 
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-    const Fields = extractcomponentsfromcode.extractFields(node, Classes);
+
 
     const NrFE = this.calculateNrFE(
       node,
-      Classes,
-      methods,
-      Fields,
+      allMethods,
       FECFC,
       AccessToForeignData,
       AccessofImportData,
       LocalityofAttributeAccess,
-      sourceCode
+      sourceCode,
+      Filename
     );
 
     console.log("[NrFE] Final Metric Value:", NrFE);
@@ -47,14 +59,13 @@ export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
 
   private calculateNrFE(
     rootNode: Parser.SyntaxNode,
-    currentClasses: ClassInfo[],
     methods: MethodInfo[],
-    fields: FieldInfo[],
     FECFC: FolderExtractComponentsFromCode,
     AccessToForeignData: JavaAccessToForeignData,
     AccessofImportData: JavaAccessofImportData,
     LocalityofAttributeAccess: JavaLocalityofAttributeAccess,
-    sourceCode: string
+    sourceCode: string,
+    Filename: string
   ): number {
     let featureEnvyCount = 0;
 
@@ -65,12 +76,13 @@ export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
       }
 
       // Calculate metrics for the current method
-      const ATFD = AccessToForeignData.calculate(rootNode, sourceCode, FECFC);
-      const FDP = AccessofImportData.calculate(rootNode, sourceCode, FECFC);
+      const ATFD = AccessToForeignData.calculate(rootNode, sourceCode, FECFC , Filename);
+      const FDP = AccessofImportData.calculate(rootNode, sourceCode, FECFC , Filename);
       const LAA = LocalityofAttributeAccess.calculate(
         rootNode,
         sourceCode,
-        FECFC
+        FECFC ,
+        Filename
       );
 
       // Check Feature Envy conditions

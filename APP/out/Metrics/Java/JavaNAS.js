@@ -2,35 +2,40 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaNumberOfAddedServices = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
-    calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        return this.findNAS(methods, node, FECFC);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
+        return this.findNAS(allClasses, allMethods, FECFC);
     }
-    findNAS(methods, rootNode, FECFC) {
+    findNAS(classes, methods, FECFC) {
         let NAS = 0;
-        let extendedClass;
+        let isExtended;
+        let isinterface;
         const fileParsedComponents = FECFC.getParsedComponentsFromFile();
-        const classNodes = rootNode.descendantsOfType("class_declaration");
-        classNodes.forEach((node) => {
-            // Try to find the 'superclass' node
-            const extendsNode = node.childForFieldName("superclass");
-            if (extendsNode) {
-                // Extract the text and trim 'extends' from the start
-                extendedClass = extendsNode.text.trim().replace(/^extends\s*/, "");
-            }
-        });
-        if (extendedClass) {
+        // Loop through Classes to identify the extended class
+        for (const c of classes) {
+            isExtended = c.parent; // The class that extends another class
+            isinterface = c.isInterface; // is interface class
+        }
+        if (isExtended) {
             for (const method of methods) {
                 if (method.isOverridden) {
                     let found = false;
                     for (const fileComponents of fileParsedComponents) {
                         for (const classGroup of fileComponents.classes) {
-                            if (extendedClass === classGroup.name) {
+                            if (isExtended === classGroup.name) {
                                 for (const classMethod of classGroup.methods) {
                                     if (classMethod.name === method.name) {
                                         found = true;

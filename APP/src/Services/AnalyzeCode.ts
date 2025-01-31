@@ -26,7 +26,33 @@ export async function analyzeCode(document: vscode.TextDocument, sourceCode: str
       parser.selectLanguage();
 
       const rootNode = parser.parse(sourceCode);
-      const metricsToCalculate = ["LOC", "NOM", "CBO", "WMC", "NOPA"]; 
+
+      const metricsToCalculate = [
+        "LOC",
+        "AMW",
+        "ATFD",
+        "FDP",
+        "LAA",
+        "NrFE",
+        "CBO",
+        "DAC",
+        "WMC",
+        "WOC",
+        "NOA",
+        "NOM",
+        "NOAM",
+        "NOPA",
+        "NAbsm",
+        "NProtM",
+        "FANOUT",
+        "NDU",
+        "NAS",
+        "BUR",
+        "NOD",
+        "NODD",
+        "TCC",
+        "DIT"
+      ]; 
 
       FECFcode.parseAllJavaFiles();
 
@@ -39,7 +65,16 @@ export async function analyzeCode(document: vscode.TextDocument, sourceCode: str
 
         const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
 
-        servermetricsmanager.sendMetricsFile();
+        if(results)
+        {
+          vscode.window.showInformationMessage("Analysis is Finished.");
+          servermetricsmanager.sendMetricsFile();
+        }
+        else
+        {
+          vscode.window.showInformationMessage("Error Occured While Analyzing.");
+        }
+   
 
         return results;
       } finally {
@@ -104,7 +139,7 @@ async function calculateMetricsWithProgress(
   for (const [index, metricName] of metrics.entries()) {
     const metricCalculator = MetricsFactory.CreateMetric(metricName, languageId);
     if (metricCalculator) {
-      const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode);
+      const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode , document.fileName);
       results.push(`${metricName}: ${value}`);
       
       // Update progress

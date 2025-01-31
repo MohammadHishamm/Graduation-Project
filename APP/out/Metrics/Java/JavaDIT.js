@@ -1,24 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DepthOfInheritanceTree = void 0;
+exports.JavaDepthOfInheritanceTree = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
-class DepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
+class JavaDepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
-    calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        return this.findDIT(Classes, node, FECFC);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
+        return this.findDIT(allClasses, node, FECFC);
     }
     findDIT(Classes, rootNode, FECFC) {
         let DIT = 0;
-        let isExtended; // To track the extended class
+        let isExtended;
         let isinterface;
-        const fileParsedComponents = FECFC.getParsedComponentsFromFile(); // Get all parsed file components
+        const fileParsedComponents = FECFC.getParsedComponentsFromFile();
         // Loop through Classes to identify the extended class
         for (const c of Classes) {
-            isExtended = c.extendedclass; // The class that extends another class
+            isExtended = c.parent; // The class that extends another class
             isinterface = c.isInterface; // is interface class
         }
         // If the class has an extended class (i.e., it's not a root class) and not an interface 
@@ -32,8 +40,7 @@ class DepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
                         DIT++;
                         // Recursively traverse through subclasses (if they exist)
                         for (const classInfo of classGroup.classes) {
-                            if (classInfo.extendedclass) {
-                                console.log(classInfo);
+                            if (classInfo.parent) {
                                 // Recursively call findDIT to calculate DIT for subclass
                                 DIT += this.findDIT([classInfo], rootNode, FECFC);
                             }
@@ -45,5 +52,5 @@ class DepthOfInheritanceTree extends MetricCalculator_1.MetricCalculator {
         return DIT;
     }
 }
-exports.DepthOfInheritanceTree = DepthOfInheritanceTree;
+exports.JavaDepthOfInheritanceTree = JavaDepthOfInheritanceTree;
 //# sourceMappingURL=JavaDIT.js.map

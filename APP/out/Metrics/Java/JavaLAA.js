@@ -2,14 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaLocalityofAttributeAccess = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaLocalityofAttributeAccess extends MetricCalculator_1.MetricCalculator {
-    calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const LAA = this.calculateLAA(node, Classes, methods, Fields, FECFC);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
+        const LAA = this.calculateLAA(node, allClasses, allMethods, allFields, FECFC);
         console.log("[LAA] Final Metric Value:", LAA);
         return LAA;
     }
@@ -27,8 +34,9 @@ class JavaLocalityofAttributeAccess extends MetricCalculator_1.MetricCalculator 
             }
             console.log(`\n[LAA] Analyzing method: ${method.name}`);
             const methodNode = this.findMethodNodeByPosition(rootNode, method);
-            if (!methodNode)
+            if (!methodNode) {
                 return;
+            }
             // Get local fields (including inherited ones)
             const currentClassFields = this.getClassAndAncestorFields(method, currentClasses, fields);
             // Extract unique references within the method
@@ -88,8 +96,9 @@ class JavaLocalityofAttributeAccess extends MetricCalculator_1.MetricCalculator 
             }
             for (let child of node.children) {
                 const foundNode = findMethodNode(child);
-                if (foundNode)
+                if (foundNode) {
                     return foundNode;
+                }
             }
             return null;
         };
@@ -106,8 +115,9 @@ class JavaLocalityofAttributeAccess extends MetricCalculator_1.MetricCalculator 
     getClassAndAncestorFields(method, classes, fields) {
         const containingClass = classes.find((cls) => method.startPosition.row >= cls.startPosition.row &&
             method.endPosition.row <= cls.endPosition.row);
-        if (!containingClass)
+        if (!containingClass) {
             return [];
+        }
         const classFields = fields
             .filter((field) => field.startPosition.row >= containingClass.startPosition.row &&
             field.startPosition.row <= containingClass.endPosition.row)

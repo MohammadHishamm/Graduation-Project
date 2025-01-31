@@ -1,6 +1,5 @@
 import Parser from "tree-sitter";
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
@@ -12,18 +11,26 @@ interface Reference {
 }
 
 export class JavaLocalityofAttributeAccess extends MetricCalculator {
-  calculate(
-    node: any,
-    sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode
-  ): number {
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
+    calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+    { 
+      let allClasses: ClassInfo[] = [];
+      let allMethods: MethodInfo[] = [];
+      let allFields: FieldInfo[] = [];
+  
+      const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+  
+      if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = [...allClasses, ...classGroup.classes];
+          allMethods = [...allMethods, ...classGroup.methods];
+          allFields = [...allFields, ...classGroup.fields];
+        });
+      }
 
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-    const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-
-    const LAA = this.calculateLAA(node, Classes, methods, Fields, FECFC);
+    const LAA = this.calculateLAA(node, allClasses, allMethods, allFields, FECFC);
 
     console.log("[LAA] Final Metric Value:", LAA);
     return LAA;
@@ -54,7 +61,7 @@ export class JavaLocalityofAttributeAccess extends MetricCalculator {
       console.log(`\n[LAA] Analyzing method: ${method.name}`);
 
       const methodNode = this.findMethodNodeByPosition(rootNode, method);
-      if (!methodNode) return;
+      if (!methodNode) {return;}
 
       // Get local fields (including inherited ones)
       const currentClassFields = this.getClassAndAncestorFields(
@@ -134,7 +141,7 @@ export class JavaLocalityofAttributeAccess extends MetricCalculator {
 
       for (let child of node.children) {
         const foundNode = findMethodNode(child);
-        if (foundNode) return foundNode;
+        if (foundNode) {return foundNode;}
       }
 
       return null;
@@ -170,7 +177,7 @@ export class JavaLocalityofAttributeAccess extends MetricCalculator {
         method.endPosition.row <= cls.endPosition.row
     );
 
-    if (!containingClass) return [];
+    if (!containingClass) {return [];}
 
     const classFields = fields
       .filter(

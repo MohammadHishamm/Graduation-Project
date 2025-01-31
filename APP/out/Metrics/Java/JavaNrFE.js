@@ -2,24 +2,31 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaNumberofFeatureEnvyMethods = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 const JavaATFD_1 = require("./JavaATFD ");
 const JavaFDP_1 = require("./JavaFDP");
 const JavaLAA_1 = require("./JavaLAA");
 class JavaNumberofFeatureEnvyMethods extends MetricCalculator_1.MetricCalculator {
-    calculate(node, sourceCode, FECFC) {
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
         const AccessToForeignData = new JavaATFD_1.JavaAccessToForeignData();
         const AccessofImportData = new JavaFDP_1.JavaAccessofImportData();
         const LocalityofAttributeAccess = new JavaLAA_1.JavaLocalityofAttributeAccess();
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const NrFE = this.calculateNrFE(node, Classes, methods, Fields, FECFC, AccessToForeignData, AccessofImportData, LocalityofAttributeAccess, sourceCode);
+        const NrFE = this.calculateNrFE(node, allMethods, FECFC, AccessToForeignData, AccessofImportData, LocalityofAttributeAccess, sourceCode, Filename);
         console.log("[NrFE] Final Metric Value:", NrFE);
         return NrFE;
     }
-    calculateNrFE(rootNode, currentClasses, methods, fields, FECFC, AccessToForeignData, AccessofImportData, LocalityofAttributeAccess, sourceCode) {
+    calculateNrFE(rootNode, methods, FECFC, AccessToForeignData, AccessofImportData, LocalityofAttributeAccess, sourceCode, Filename) {
         let featureEnvyCount = 0;
         for (const method of methods) {
             // Skip constructors
@@ -27,9 +34,9 @@ class JavaNumberofFeatureEnvyMethods extends MetricCalculator_1.MetricCalculator
                 continue;
             }
             // Calculate metrics for the current method
-            const ATFD = AccessToForeignData.calculate(rootNode, sourceCode, FECFC);
-            const FDP = AccessofImportData.calculate(rootNode, sourceCode, FECFC);
-            const LAA = LocalityofAttributeAccess.calculate(rootNode, sourceCode, FECFC);
+            const ATFD = AccessToForeignData.calculate(rootNode, sourceCode, FECFC, Filename);
+            const FDP = AccessofImportData.calculate(rootNode, sourceCode, FECFC, Filename);
+            const LAA = LocalityofAttributeAccess.calculate(rootNode, sourceCode, FECFC, Filename);
             // Check Feature Envy conditions
             if (ATFD > 2.0 && FDP <= 2.0 && LAA < 0.333) {
                 featureEnvyCount++;

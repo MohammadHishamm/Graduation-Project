@@ -1,39 +1,34 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
-export class JavaNumberOfMethodsMetric extends MetricCalculator {
+import { FolderExtractComponentsFromCode } from '../../Extractors/FolderExtractComponentsFromCode';
 
+import { ClassInfo } from '../../Interface/ClassInfo';
+import { FieldInfo } from '../../Interface/FieldInfo';
 
-    calculate(node: any): number {
-        let methodCount = 0;
- 
-            const traverse = (currentNode: any) => {
-                // Check if the current node represents a class declaration
+import { MethodInfo } from '../../Interface/MethodInfo';
 
-                
-                if (currentNode.type === 'class_declaration') {
-                    // Traverse only the class's body to count field declarations
-                    const classBody = currentNode.children.find((child: any) => child.type === 'class_body');
-                    if (classBody && classBody.children) {
-                        for (const child of classBody.children) {
-                            if (child.type === 'method_declaration' || child.type === 'constructor_declaration' ) 
-                            {
-                                methodCount++;
-                            }
-                        }
-                    }
-                }
-    
-                // Avoid traversing deeper into nested methods or irrelevant nodes
-                if (currentNode.children) {
-                    for (const child of currentNode.children) {
-                        traverse(child);
-                    }
-                }
-            };
-        
+export class JavaNumberOfMethods extends MetricCalculator {
 
-        traverse(node); // Start with isInsideClass as false
-        return methodCount;
-    }
+  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  { 
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
+
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+
+    if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = allClasses.concat(classGroup.classes);
+          allMethods = allMethods.concat(classGroup.methods);
+          allFields = allFields.concat(classGroup.fields);
+        });
+      }
+
+      return allMethods.length;
+    } 
+
 }

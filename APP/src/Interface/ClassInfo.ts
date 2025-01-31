@@ -2,10 +2,16 @@ import Parser from "tree-sitter";
 
 export interface ClassInfo {
   name: string;
-  extendedclass: String;
-  isAbstract: Boolean;
-  isInterface: Boolean;
-  startPosition: Parser.Point; // Comes from Tree-sitter
+  implementedInterfaces?: string[];
+  isAbstract?: boolean;
+  isFinal?: boolean;
+  isInterface?: boolean;
+  modifiers?: string[];
+  annotations?: string[];
+  startPosition: Parser.Point;
   endPosition: Parser.Point;
-  parent?: string; // Optional property for the parent class name (direct inheritance)
+  isNested?: boolean;
+  genericParams?: string;
+  hasConstructor?: boolean;
+  parent?: string;  
 }

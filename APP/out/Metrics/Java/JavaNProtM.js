@@ -1,38 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JavaNumberOfProtectedMethodsMetric = void 0;
+exports.JavaNumberOfProtectedMethods = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-class JavaNumberOfProtectedMethodsMetric extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
-        let numberOfProtectedMethods = 0;
-        const traverse = (currentNode) => {
-            // Check if the current node represents a class declaration
-            if (currentNode.type === 'class_declaration') {
-                // Traverse the class body to count method declarations
-                const classBody = currentNode.children.find((child) => child.type === 'class_body');
-                if (classBody && classBody.children) {
-                    for (const child of classBody.children) {
-                        // Check for method declarations
-                        if (child.type === 'method_declaration') {
-                            // Check for the "protected" modifier in the method
-                            const modifiers = child.children.find((subChild) => subChild.type === 'modifiers');
-                            if (modifiers && modifiers.children.some((modifier) => modifier.type === 'protected')) {
-                                numberOfProtectedMethods++;
-                            }
-                        }
-                    }
-                }
+class JavaNumberOfProtectedMethods extends MetricCalculator_1.MetricCalculator {
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = allClasses.concat(classGroup.classes);
+                allMethods = allMethods.concat(classGroup.methods);
+                allFields = allFields.concat(classGroup.fields);
+            });
+        }
+        const NProtM = this.claculateNumberOfProtectedMethods(allMethods);
+        return NProtM;
+    }
+    claculateNumberOfProtectedMethods(Methods) {
+        let NProtM = 0; // Initialize DAC counter
+        for (const Method of Methods) {
+            if (Method.modifiers.includes("protected")) {
+                NProtM++;
             }
-            // Traverse through child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
-                }
-            }
-        };
-        traverse(node);
-        return numberOfProtectedMethods;
+        }
+        return NProtM; // Return the final count
     }
 }
-exports.JavaNumberOfProtectedMethodsMetric = JavaNumberOfProtectedMethodsMetric;
+exports.JavaNumberOfProtectedMethods = JavaNumberOfProtectedMethods;
 //# sourceMappingURL=JavaNProtM.js.map

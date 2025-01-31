@@ -54,7 +54,32 @@ async function analyzeCode(document, sourceCode) {
         const parser = document.languageId === "java" ? new initialize_1.javaParser() : new initialize_1.pythonParser();
         parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
-        const metricsToCalculate = ["LOC", "NOM", "CBO", "WMC", "NOPA"];
+        const metricsToCalculate = [
+            "LOC",
+            "AMW",
+            "ATFD",
+            "FDP",
+            "LAA",
+            "NrFE",
+            "CBO",
+            "DAC",
+            "WMC",
+            "WOC",
+            "NOA",
+            "NOM",
+            "NOAM",
+            "NOPA",
+            "NAbsm",
+            "NProtM",
+            "FANOUT",
+            "NDU",
+            "NAS",
+            "BUR",
+            "NOD",
+            "NODD",
+            "TCC",
+            "DIT"
+        ];
         initialize_1.FECFcode.parseAllJavaFiles();
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
@@ -62,7 +87,13 @@ async function analyzeCode(document, sourceCode) {
             progress.report({ message: "Parsing source code...", increment: 20 });
             await (0, utils_1.pause)(500);
             const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
-            initialize_1.servermetricsmanager.sendMetricsFile();
+            if (results) {
+                vscode.window.showInformationMessage("Analysis is Finished.");
+                initialize_1.servermetricsmanager.sendMetricsFile();
+            }
+            else {
+                vscode.window.showInformationMessage("Error Occured While Analyzing.");
+            }
             return results;
         }
         finally {
@@ -104,7 +135,7 @@ async function calculateMetricsWithProgress(document, rootNode, sourceCode, lang
     for (const [index, metricName] of metrics.entries()) {
         const metricCalculator = MetricsFactory_1.MetricsFactory.CreateMetric(metricName, languageId);
         if (metricCalculator) {
-            const value = metricCalculator.calculate(rootNode, sourceCode, initialize_1.FECFcode);
+            const value = metricCalculator.calculate(rootNode, sourceCode, initialize_1.FECFcode, document.fileName);
             results.push(`${metricName}: ${value}`);
             // Update progress
             progress.report({

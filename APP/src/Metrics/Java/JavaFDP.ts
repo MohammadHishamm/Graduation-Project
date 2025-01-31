@@ -1,7 +1,7 @@
 import Parser from "tree-sitter";
 
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
+
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
@@ -16,17 +16,28 @@ export class JavaAccessofImportData extends MetricCalculator {
   calculate(
     node: any,
     sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode
+    FECFC: FolderExtractComponentsFromCode ,
+    Filename: string
   ): number {
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
 
-    const Classes = extractcomponentsfromcode.extractClasses(node);
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
 
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
+    if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = allClasses.concat(classGroup.classes);
+          allMethods = allMethods.concat(classGroup.methods);
+          allFields = allFields.concat(classGroup.fields);
+        });
+      }
 
-    const Fields = extractcomponentsfromcode.extractFields(node, Classes);
 
-    const FDP = this.calculateFDP(node, Classes, methods, Fields, FECFC);
+    const FDP = this.calculateFDP(node, allClasses, allMethods, allFields, FECFC);
 
     return FDP;
   }
@@ -264,7 +275,6 @@ export class JavaAccessofImportData extends MetricCalculator {
         if (matchField || matchMethod) {
           return {
             name: classInfo.name,
-            extendedclass: "",
             isAbstract: false,
             isInterface: false,
             startPosition: { row: 0, column: 0 },

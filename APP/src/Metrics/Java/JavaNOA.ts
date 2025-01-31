@@ -1,35 +1,34 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
+import { FolderExtractComponentsFromCode } from '../../Extractors/FolderExtractComponentsFromCode';
+import { ClassInfo } from '../../Interface/ClassInfo';
+import { MethodInfo } from '../../Interface/MethodInfo';
+import { FieldInfo } from '../../Interface/FieldInfo';
 
-export class JavaNumberOfAttributesMetric extends MetricCalculator {
+
+
+export class JavaNumberOfAttributes extends MetricCalculator {
 
     
-    calculate(node: any): number {
-        let numberOfAttributes = 0;
+  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  { 
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
 
-        const traverse = (currentNode: any) => {
-            // Check if the current node represents a class declaration
-            if (currentNode.type === 'class_declaration') {
-                // Traverse only the class's body to count field declarations
-                const classBody = currentNode.children.find((child: any) => child.type === 'class_body');
-                if (classBody && classBody.children) {
-                    for (const child of classBody.children) {
-                        if (child.type === 'field_declaration') {
-                            numberOfAttributes++;
-                        }
-                    }
-                }
-            }
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
 
-            // Avoid traversing deeper into nested methods or irrelevant nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
-                }
-            }
-        };
+    if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = allClasses.concat(classGroup.classes);
+          allMethods = allMethods.concat(classGroup.methods);
+          allFields = allFields.concat(classGroup.fields);
+        });
+      }
 
-        traverse(node);
-        return numberOfAttributes;
+        return allFields.length ; 
     }
+
 }

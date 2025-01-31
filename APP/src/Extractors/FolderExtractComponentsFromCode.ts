@@ -7,7 +7,7 @@ import java from "tree-sitter-java";
 
 import { FileCacheManager } from "../Cache/FileCacheManager";
 import { FileParsedComponents } from "../Interface/FileParsedComponents";
-import { ExtractComponentsFromCode } from "./ExtractComponentsFromCode";
+import { CompositeExtractor } from "./CompositeExtractor";
 
 export class FolderExtractComponentsFromCode 
 {
@@ -160,15 +160,29 @@ export class FolderExtractComponentsFromCode
 
       const tree = this.parseCode(fileContent);
 
-      const extractcomponentsfromcode = new ExtractComponentsFromCode();
-
-      return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
+      return this.extractFileComponents(tree, fileUri.fsPath);
     } catch (error) {
       console.error("Error parsing file ${fileUri.fsPath}:, error");
       return null;
     }
   }
 
+    public extractFileComponents(
+      tree: Parser.Tree,
+      fileName: string
+    ): FileParsedComponents {
+      const rootNode = tree.rootNode;
+  
+      const compositeextractor = new CompositeExtractor();
+
+      const classgroup = compositeextractor.extractClassGroup(rootNode, fileName);
+  
+      return {
+        classes: classgroup,
+      };
+    }
+  
+    
   private async fetchFileContent(fileUri: vscode.Uri): Promise<string> {
     const fileContent = await vscode.workspace.fs.readFile(fileUri);
     return Buffer.from(fileContent).toString("utf8");

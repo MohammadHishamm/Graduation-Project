@@ -43,7 +43,7 @@ const vscode = __importStar(require("vscode"));
 const tree_sitter_1 = __importDefault(require("tree-sitter"));
 const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
 const FileCacheManager_1 = require("../Cache/FileCacheManager");
-const ExtractComponentsFromCode_1 = require("./ExtractComponentsFromCode");
+const CompositeExtractor_1 = require("./CompositeExtractor");
 class FolderExtractComponentsFromCode {
     parser;
     cacheManager;
@@ -156,13 +156,20 @@ class FolderExtractComponentsFromCode {
         try {
             const fileContent = await this.fetchFileContent(fileUri);
             const tree = this.parseCode(fileContent);
-            const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-            return extractcomponentsfromcode.extractFileComponents(tree, fileUri.fsPath);
+            return this.extractFileComponents(tree, fileUri.fsPath);
         }
         catch (error) {
             console.error("Error parsing file ${fileUri.fsPath}:, error");
             return null;
         }
+    }
+    extractFileComponents(tree, fileName) {
+        const rootNode = tree.rootNode;
+        const compositeextractor = new CompositeExtractor_1.CompositeExtractor();
+        const classgroup = compositeextractor.extractClassGroup(rootNode, fileName);
+        return {
+            classes: classgroup,
+        };
     }
     async fetchFileContent(fileUri) {
         const fileContent = await vscode.workspace.fs.readFile(fileUri);

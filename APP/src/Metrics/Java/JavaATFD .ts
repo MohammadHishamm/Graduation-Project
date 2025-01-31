@@ -1,7 +1,6 @@
 import Parser from "tree-sitter";
 
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
 import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
 import { ClassInfo } from "../../Interface/ClassInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
@@ -13,23 +12,30 @@ interface Reference {
 }
 
 export class JavaAccessToForeignData extends MetricCalculator {
-  calculate(
-    node: any,
-    sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode
-  ): number {
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
-
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-
-    const Fields = extractcomponentsfromcode.extractFields(node, Classes);
+    calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+    { 
+      let allClasses: ClassInfo[] = [];
+      let allMethods: MethodInfo[] = [];
+      let allFields: FieldInfo[] = [];
+  
+      const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+  
+      if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = [...allClasses, ...classGroup.classes];
+          allMethods = [...allMethods, ...classGroup.methods];
+          allFields = [...allFields, ...classGroup.fields];
+        });
+      }
 
     const ATFD = this.calculateAccessToForeignData(
       node,
-      Classes,
-      methods,
-      Fields,
+      allClasses,
+      allMethods,
+      allFields,
       FECFC
     );
 
@@ -324,7 +330,6 @@ export class JavaAccessToForeignData extends MetricCalculator {
         if (matchField || matchMethod) {
           return {
             name: classInfo.name,
-            extendedclass: "",
             isAbstract: false,
             isInterface: false,
             startPosition: { row: 0, column: 0 },

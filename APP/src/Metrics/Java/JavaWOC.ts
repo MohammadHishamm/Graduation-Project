@@ -1,38 +1,52 @@
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
+import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
+import { ClassInfo } from "../../Interface/ClassInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
 
 export class JavaWeightOfAClass extends MetricCalculator {
-  calculate(node: any): number 
-  {
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-    const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-    const filteredFields = extractcomponentsfromcode.filterPublicNonEncapsulatedFields( Fields, methods);
-    
-    const WOC = this.calculateWeight(methods, filteredFields);
+  //TODO FECFC , FileParsedComponents
+  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  { 
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
+
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+
+    if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = allClasses.concat(classGroup.classes);
+          allMethods = allMethods.concat(classGroup.methods);
+          allFields = allFields.concat(classGroup.fields);
+        });
+      }
+
+    const WOC = this.calculateWeight(allMethods, allFields);
 
     return WOC;
   }
 
-  // Calculate the weight of the class
+
   private calculateWeight(methods: MethodInfo[], fields: FieldInfo[]): number {
     let nom = 0; // Numerator: public methods (non-constructor and non-accessor) + public attributes
     let den = 0; // Denominator: public methods that are not accessors
 
     methods.forEach((method) => {
       if (!method.isConstructor && method.modifiers.includes("public")) {
-        ++nom; 
-        if (method.isAccessor) {
+        ++nom;
+        if (method.isAccessor) 
+        {
           ++den;
         }
       }
     });
 
     fields.forEach((field) => {
-      if (field.modifiers.includes("public")) {
+      if (field.modifiers.includes("public") && !field.isEncapsulated ) {
         ++nom;
         ++den;
       }

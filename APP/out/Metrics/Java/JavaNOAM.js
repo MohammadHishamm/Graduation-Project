@@ -2,14 +2,22 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaNumberOfAccessorMethods = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaNumberOfAccessorMethods extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        const WOC = this.findaccessedmethods(methods);
-        return WOC;
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = allClasses.concat(classGroup.classes);
+                allMethods = allMethods.concat(classGroup.methods);
+                allFields = allFields.concat(classGroup.fields);
+            });
+        }
+        const NOAM = this.findaccessedmethods(allMethods);
+        return NOAM;
     }
     findaccessedmethods(Methods) {
         let NOAM = 0; // Initialize DAC counter

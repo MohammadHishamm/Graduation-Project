@@ -1,20 +1,34 @@
-import Parser from "tree-sitter";
 import { MetricCalculator } from "../../Core/MetricCalculator";
-import { ExtractComponentsFromCode } from "../../Extractors/ExtractComponentsFromCode";
-import { FieldInfo } from "../../Interface/FieldInfo";
-import { MethodInfo } from "../../Interface/MethodInfo";
 
+import { FolderExtractComponentsFromCode } from "../../Extractors/FolderExtractComponentsFromCode";
+
+import { ClassInfo } from "../../Interface/ClassInfo";
+import { MethodInfo } from "../../Interface/MethodInfo";
+import { FieldInfo } from "../../Interface/FieldInfo";
 export class TCCCalculation extends MetricCalculator {
-  calculate(node: any): number {
-    const extractcomponentsfromcode = new ExtractComponentsFromCode();
-    const Classes = extractcomponentsfromcode.extractClasses(node);
-    const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-    const Fields = extractcomponentsfromcode.extractFields(node, Classes);
+ calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  { 
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
+
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+
+    if (fileParsedComponents) 
+    {
+      const classGroups = fileParsedComponents.classes;
+      classGroups.forEach((classGroup) => 
+      {
+        allClasses = [...allClasses, ...classGroup.classes];
+        allMethods = [...allMethods, ...classGroup.methods];
+        allFields = [...allFields, ...classGroup.fields];
+      });
+    }
+    
+
     const TCC = this.calculateTCC(
-      node,
-      methods,
-      Fields,
-      extractcomponentsfromcode
+      allMethods,
+      allFields
     );
 
     return TCC;
@@ -22,29 +36,21 @@ export class TCCCalculation extends MetricCalculator {
 
   // Simulate field usage extraction for a method
   private calculateTCC(
-    rootNode: Parser.SyntaxNode,
     methods: MethodInfo[],
-    fields: FieldInfo[],
-    extractcomponentsfromcode: ExtractComponentsFromCode
+    fields: FieldInfo[]
   ): number {
     let pairs = 0;
 
     for (let i = 0; i < methods.length; i++) {
       if (!methods[i].isConstructor) {
         const methodA = methods[i];
-        const fieldsA = extractcomponentsfromcode.getFieldsUsedInMethod(
-          rootNode,
-          methodA
-        );
+        const fieldsA = methods[i].fieldsUsed;
 
         let key = true;
         for (let j = 0; j < methods.length; j++) {
-          if (!methods[j].isConstructor && methodA.name !== methods[j].name) {
-            const methodB = methods[j];
-            const fieldsB = extractcomponentsfromcode.getFieldsUsedInMethod(
-              rootNode,
-              methodB
-            );
+          if (!methods[j].isConstructor && methodA.name !== methods[j].name) 
+        {
+            const fieldsB = methods[j].fieldsUsed;
 
             // Check for any shared field
             for (const field of fieldsA) {

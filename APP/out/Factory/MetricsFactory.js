@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
 // ..
 const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
-// import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
+const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
@@ -16,19 +16,21 @@ const JavaNProtM_1 = require("../Metrics/Java/JavaNProtM");
 const JavaWMC_1 = require("../Metrics/Java/JavaWMC");
 const JavaWOC_1 = require("../Metrics/Java/JavaWOC");
 const JavaDIT_1 = require("../Metrics/Java/JavaDIT");
-// import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
-const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
-const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
-const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
-const JavaLAA_1 = require("../Metrics/Java/JavaLAA");
 const JavaNrFE_1 = require("../Metrics/Java/JavaNrFE");
+const JavaLAA_1 = require("../Metrics/Java/JavaLAA");
+const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
+// import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
+// import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
+// import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
+// import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
+// import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -69,23 +71,23 @@ class MetricsFactory {
             case `DAC`:
                 return new JavaDAC_1.JavaDataAbstractionCoupling();
             case "NOA":
-                return new JavaNOA_1.JavaNumberOfAttributesMetric();
+                return new JavaNOA_1.JavaNumberOfAttributes();
             case "NOM":
-                return new JavaNOM_1.JavaNumberOfMethodsMetric();
+                return new JavaNOM_1.JavaNumberOfMethods();
             case "NOAM":
                 return new JavaNOAM_1.JavaNumberOfAccessorMethods();
             case "NOPA":
-                return new JavaNOPA_1.JavaNumberOfPublicAttributesM();
+                return new JavaNOPA_1.JavaNumberOfPublicAttributes();
             case "NAbsm":
                 return new JavaNAbsm_1.JavaNumberOfAbstractClassesM();
             case "NProtM":
-                return new JavaNProtM_1.JavaNumberOfProtectedMethodsMetric();
+                return new JavaNProtM_1.JavaNumberOfProtectedMethods();
             // case "CognitiveComplexity":
             //   return new JavaCognitiveComplexityMetric();
             case "NDU":
             // return new NDUCalculation();
             case "NAS":
-                return new JavaNAS_1.JavaNumberOfAddedServices();
+            // return new JavaNumberOfAddedServices();
             case "BUR":
             // return new BURCalculation();
             // case "NOD":
@@ -95,7 +97,7 @@ class MetricsFactory {
             case "TCC":
                 return new JavaTCC_1.TCCCalculation();
             case "DIT":
-                return new JavaDIT_1.DepthOfInheritanceTree();
+                return new JavaDIT_1.JavaDepthOfInheritanceTree();
             //       case "FANOUT":
             //         const javaCode = `
             // public class Dog extends Animal {

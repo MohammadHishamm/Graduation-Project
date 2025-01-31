@@ -2,18 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaWeightOfAClass = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const filteredFields = extractcomponentsfromcode.filterPublicNonEncapsulatedFields(Fields, methods);
-        const WOC = this.calculateWeight(methods, filteredFields);
+    //TODO FECFC , FileParsedComponents
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = allClasses.concat(classGroup.classes);
+                allMethods = allMethods.concat(classGroup.methods);
+                allFields = allFields.concat(classGroup.fields);
+            });
+        }
+        const WOC = this.calculateWeight(allMethods, allFields);
         return WOC;
     }
-    // Calculate the weight of the class
     calculateWeight(methods, fields) {
         let nom = 0; // Numerator: public methods (non-constructor and non-accessor) + public attributes
         let den = 0; // Denominator: public methods that are not accessors
@@ -26,7 +32,7 @@ class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
             }
         });
         fields.forEach((field) => {
-            if (field.modifiers.includes("public")) {
+            if (field.modifiers.includes("public") && !field.isEncapsulated) {
                 ++nom;
                 ++den;
             }

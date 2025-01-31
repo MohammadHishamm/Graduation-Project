@@ -1,40 +1,43 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
+import { FolderExtractComponentsFromCode } from '../../Extractors/FolderExtractComponentsFromCode';
+import { ClassInfo } from '../../Interface/ClassInfo';
+import { FieldInfo } from '../../Interface/FieldInfo';
+import { MethodInfo } from '../../Interface/MethodInfo';
 
-export class JavaNumberOfProtectedMethodsMetric extends MetricCalculator {
+export class JavaNumberOfProtectedMethods extends MetricCalculator {
+  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  { 
+    let allClasses: ClassInfo[] = [];
+    let allMethods: MethodInfo[] = [];
+    let allFields: FieldInfo[] = [];
 
-    
-    calculate(node: any): number {
-        let numberOfProtectedMethods = 0;
+    const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
 
-        const traverse = (currentNode: any) => {
-            // Check if the current node represents a class declaration
-            if (currentNode.type === 'class_declaration') {
-                // Traverse the class body to count method declarations
-                const classBody = currentNode.children.find((child: any) => child.type === 'class_body');
-                if (classBody && classBody.children) {
-                    for (const child of classBody.children) {
-                        // Check for method declarations
-                        if (child.type === 'method_declaration' ) {
-                            // Check for the "protected" modifier in the method
-                            const modifiers = child.children.find((subChild: any) => subChild.type === 'modifiers');
-                            if (modifiers && modifiers.children.some((modifier: any) => modifier.type === 'protected')) {
-                                numberOfProtectedMethods++;
-                            }
-                        }
-                    }
-                }
-            }
+    if (fileParsedComponents) 
+      {
+        const classGroups = fileParsedComponents.classes;
+        classGroups.forEach((classGroup) => 
+        {
+          allClasses = allClasses.concat(classGroup.classes);
+          allMethods = allMethods.concat(classGroup.methods);
+          allFields = allFields.concat(classGroup.fields);
+        });
+      }
+      
+    const NProtM = this.claculateNumberOfProtectedMethods(allMethods);
 
-            // Traverse through child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
-                }
-            }
-        };
+    return NProtM;
+  }
 
-        traverse(node);
-        return numberOfProtectedMethods;
+  private claculateNumberOfProtectedMethods(Methods: MethodInfo[]): number {
+    let NProtM = 0; // Initialize DAC counter
+
+    for (const Method of Methods) {
+      if (Method.modifiers.includes("protected")) {
+        NProtM++;
+      }
     }
+
+    return NProtM; // Return the final count
+  }
 }

@@ -2,15 +2,22 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaAccessToForeignData = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 const FolderExtractComponentsFromCode_1 = require("../../Extractors/FolderExtractComponentsFromCode");
 class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
-    calculate(node, sourceCode, FECFC) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const ATFD = this.calculateAccessToForeignData(node, Classes, methods, Fields, FECFC);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
+        const ATFD = this.calculateAccessToForeignData(node, allClasses, allMethods, allFields, FECFC);
         console.log("[ATFD] Final Metric Value:", ATFD);
         return ATFD;
     }
@@ -199,7 +206,6 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
                 if (matchField || matchMethod) {
                     return {
                         name: classInfo.name,
-                        extendedclass: "",
                         isAbstract: false,
                         isInterface: false,
                         startPosition: { row: 0, column: 0 },

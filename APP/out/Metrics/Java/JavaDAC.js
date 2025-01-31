@@ -2,13 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaDataAbstractionCoupling = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaDataAbstractionCoupling extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const DAC = this.findDataAbstractionCoupling(Fields);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
+        const DAC = this.findDataAbstractionCoupling(allFields);
         return DAC;
     }
     findDataAbstractionCoupling(Fields) {

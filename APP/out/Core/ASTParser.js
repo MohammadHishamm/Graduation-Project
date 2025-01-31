@@ -9,9 +9,13 @@ class ASTParser {
     parser;
     constructor() {
         this.parser = new tree_sitter_1.default();
+        this.selectLanguage(); // Ensure the language is set in subclasses
     }
     parse(sourceCode) {
-        return this.parser.parse(sourceCode).rootNode; // Parse Python source code
+        if (!this.parser.getLanguage()) {
+            throw new Error("Language must be set before parsing.");
+        }
+        return this.parser.parse(sourceCode).rootNode;
     }
 }
 exports.ASTParser = ASTParser;

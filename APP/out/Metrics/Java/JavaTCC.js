@@ -2,28 +2,34 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TCCCalculation = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class TCCCalculation extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
-        const extractcomponentsfromcode = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const Classes = extractcomponentsfromcode.extractClasses(node);
-        const methods = extractcomponentsfromcode.extractMethods(node, Classes);
-        const Fields = extractcomponentsfromcode.extractFields(node, Classes);
-        const TCC = this.calculateTCC(node, methods, Fields, extractcomponentsfromcode);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
+        const TCC = this.calculateTCC(allMethods, allFields);
         return TCC;
     }
     // Simulate field usage extraction for a method
-    calculateTCC(rootNode, methods, fields, extractcomponentsfromcode) {
+    calculateTCC(methods, fields) {
         let pairs = 0;
         for (let i = 0; i < methods.length; i++) {
             if (!methods[i].isConstructor) {
                 const methodA = methods[i];
-                const fieldsA = extractcomponentsfromcode.getFieldsUsedInMethod(rootNode, methodA);
+                const fieldsA = methods[i].fieldsUsed;
                 let key = true;
                 for (let j = 0; j < methods.length; j++) {
                     if (!methods[j].isConstructor && methodA.name !== methods[j].name) {
-                        const methodB = methods[j];
-                        const fieldsB = extractcomponentsfromcode.getFieldsUsedInMethod(rootNode, methodB);
+                        const fieldsB = methods[j].fieldsUsed;
                         // Check for any shared field
                         for (const field of fieldsA) {
                             if (fieldsB.includes(field) && key) {

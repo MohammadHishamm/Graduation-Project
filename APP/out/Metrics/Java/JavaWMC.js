@@ -3,45 +3,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaWeightedMethodCount = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class JavaWeightedMethodCount extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = allClasses.concat(classGroup.classes);
+                allMethods = allMethods.concat(classGroup.methods);
+                allFields = allFields.concat(classGroup.fields);
+            });
+        }
+        return this.calculateWeightedMethodCount(allMethods);
+    }
+    calculateWeightedMethodCount(methods) {
         let complexity = 0;
-        const traverse = (currentNode) => {
-            // console.log(`${currentNode.type}`);            
-            // Increment for each control flow statement
-            if ([
-                'if_statement',
-                'for_statement',
-                'while_statement',
-                'do_statement',
-                'catch_clause',
-                'case',
-                'throw_statement',
-                'break_statement',
-                'continue_statement'
-            ].includes(currentNode.type)) {
-                complexity++;
-            }
-            // Check guard conditions for boolean operators (&&, ||)
-            if (currentNode.type === 'condition') {
-                const conditionText = currentNode.text || ''; // Assume 'text' contains the source code of the condition
-                const booleanOperators = (conditionText.match(/&&|\|\|/g) || []).length;
-                complexity += booleanOperators;
-            }
-            if (currentNode.type === 'method_declaration' || currentNode.type === 'constructor_declaration') {
-                complexity++;
-            }
-            // Increment for ternary conditional expressions (?:)
-            if (currentNode.type === 'ternary_expression') {
-                complexity++;
-            }
-            // Recursively traverse child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
+        methods.forEach((method) => {
+            method.methodBody.forEach((statement) => {
+                if (statement.includes("if_statement") ||
+                    statement.includes("while_statement") ||
+                    statement.includes("do_statement") ||
+                    statement.includes("catch_clause") ||
+                    statement.includes("case") ||
+                    statement.includes("throw_statement") ||
+                    statement.includes("break_statement") ||
+                    statement.includes("continue_statement") ||
+                    statement.includes("for_statement") ||
+                    statement.includes("condition") ||
+                    statement.includes("ternary_expression") ||
+                    method) {
+                    complexity++;
                 }
-            }
-        };
-        traverse(node);
+            });
+        });
         return complexity;
     }
 }

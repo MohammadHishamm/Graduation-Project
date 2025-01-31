@@ -2,20 +2,20 @@ import { MetricCalculator } from "../Core/MetricCalculator";
 
 // ..
 import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
-// import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
+import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
+import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
 import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 import { JavaLOCMetric } from "../Metrics/Java/JavaLOCC";
 import { JavaNumberOfAbstractClassesM } from "../Metrics/Java/JavaNAbsm";
 // import { NDUCalculation } from "../Metrics/Java/JavaNDU";
-import { JavaNumberOfAttributesMetric } from "../Metrics/Java/JavaNOA";
+import { JavaNumberOfAttributes } from "../Metrics/Java/JavaNOA";
 import { JavaNumberOfAccessorMethods } from "../Metrics/Java/JavaNOAM";
-import { JavaNumberOfMethodsMetric } from "../Metrics/Java/JavaNOM";
-import { JavaNumberOfPublicAttributesM } from "../Metrics/Java/JavaNOPA";
-import { JavaNumberOfProtectedMethodsMetric } from "../Metrics/Java/JavaNProtM";
+import { JavaNumberOfMethods } from "../Metrics/Java/JavaNOM";
+import { JavaNumberOfPublicAttributes } from "../Metrics/Java/JavaNOPA";
+import { JavaNumberOfProtectedMethods } from "../Metrics/Java/JavaNProtM";
 import { JavaWeightedMethodCount } from "../Metrics/Java/JavaWMC";
 import { JavaWeightOfAClass } from "../Metrics/Java/JavaWOC";
-import { DepthOfInheritanceTree } from "../Metrics/Java/JavaDIT";
-// import { ExtractComponentsFromCode } from '../Metrics/Java/JavaWOC';
+import { JavaDepthOfInheritanceTree } from "../Metrics/Java/JavaDIT";
 import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
 import { TCCCalculation } from "../Metrics/Java/JavaTCC";
 
@@ -24,11 +24,15 @@ import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
 import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
-import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
-import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
-import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
 import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
+import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
+import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
+// import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
+// import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
+// import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
+// import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
+// import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
 //import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
 // import { BURCalculation } from "../Metrics/Java/JavaBUR";
 // import { NODCalculation } from "../Metrics/Java/JavaNOD";
@@ -74,23 +78,23 @@ export class MetricsFactory {
       case `DAC`:
         return new JavaDataAbstractionCoupling();
       case "NOA":
-        return new JavaNumberOfAttributesMetric();
+        return new JavaNumberOfAttributes();
       case "NOM":
-        return new JavaNumberOfMethodsMetric();
+        return new JavaNumberOfMethods();
       case "NOAM":
         return new JavaNumberOfAccessorMethods();
       case "NOPA":
-        return new JavaNumberOfPublicAttributesM();
+        return new JavaNumberOfPublicAttributes();
       case "NAbsm":
         return new JavaNumberOfAbstractClassesM();
       case "NProtM":
-        return new JavaNumberOfProtectedMethodsMetric();
+        return new JavaNumberOfProtectedMethods();
       // case "CognitiveComplexity":
       //   return new JavaCognitiveComplexityMetric();
       case "NDU":
       // return new NDUCalculation();
       case "NAS":
-        return new JavaNumberOfAddedServices();
+        // return new JavaNumberOfAddedServices();
       case "BUR":
       // return new BURCalculation();
       // case "NOD":
@@ -100,7 +104,7 @@ export class MetricsFactory {
       case "TCC":
         return new TCCCalculation();
       case "DIT":
-        return new DepthOfInheritanceTree();
+        return new JavaDepthOfInheritanceTree();
       //       case "FANOUT":
       //         const javaCode = `
 

@@ -2,16 +2,22 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaCouplingBetweenObjects = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
-const ExtractComponentsFromCode_1 = require("../../Extractors/ExtractComponentsFromCode");
 class JavaCouplingBetweenObjects extends MetricCalculator_1.MetricCalculator {
-    calculate(node) {
-        const extractor = new ExtractComponentsFromCode_1.ExtractComponentsFromCode();
-        const extractedClasses = extractor.extractClasses(node);
-        const Classes = extractor.extractClasses(node);
-        const methods = extractor.extractMethods(node, Classes);
-        const Fields = extractor.extractFields(node, Classes);
+    calculate(node, sourceCode, FECFC, Filename) {
+        let allClasses = [];
+        let allMethods = [];
+        let allFields = [];
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = [...allClasses, ...classGroup.classes];
+                allMethods = [...allMethods, ...classGroup.methods];
+                allFields = [...allFields, ...classGroup.fields];
+            });
+        }
         let totalCBO = 0;
-        totalCBO += this.parameter_TypesCount(methods, node) + this.accessTypesCount(Fields) + this.callTypesCount(methods, node);
+        totalCBO += this.parameter_TypesCount(allMethods, node) + this.accessTypesCount(allFields) + this.callTypesCount(allMethods, node);
         return totalCBO;
     }
     parameter_TypesCount(methods, node) {
