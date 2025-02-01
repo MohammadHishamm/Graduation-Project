@@ -69,10 +69,10 @@ export class MetricsFactory {
         return new JavaAccessToForeignData();
       case `FDP`:
         return new JavaAccessofImportData();
-      case `LAA`:
-        return new JavaLocalityofAttributeAccess();
-      case `NrFE`:
-        return new JavaNumberofFeatureEnvyMethods();
+      //  case `LAA`:
+      // return new JavaLocalityofAttributeAccess();
+      // case `NrFE`:
+      // return new JavaNumberofFeatureEnvyMethods();
       case `CBO`:
         return new JavaCouplingBetweenObjects();
       case `DAC`:

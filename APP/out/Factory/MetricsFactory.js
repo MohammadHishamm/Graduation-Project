@@ -24,8 +24,6 @@ const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
-const JavaNrFE_1 = require("../Metrics/Java/JavaNrFE");
-const JavaLAA_1 = require("../Metrics/Java/JavaLAA");
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
 // import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 // import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
@@ -63,10 +61,10 @@ class MetricsFactory {
                 return new JavaATFD_1.JavaAccessToForeignData();
             case `FDP`:
                 return new JavaFDP_1.JavaAccessofImportData();
-            case `LAA`:
-                return new JavaLAA_1.JavaLocalityofAttributeAccess();
-            case `NrFE`:
-                return new JavaNrFE_1.JavaNumberofFeatureEnvyMethods();
+            //  case `LAA`:
+            // return new JavaLocalityofAttributeAccess();
+            // case `NrFE`:
+            // return new JavaNumberofFeatureEnvyMethods();
             case `CBO`:
                 return new JavaCBO_1.JavaCouplingBetweenObjects();
             case `DAC`:

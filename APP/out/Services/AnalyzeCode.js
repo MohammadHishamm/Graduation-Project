@@ -59,8 +59,8 @@ async function analyzeCode(document, sourceCode) {
             "AMW",
             "ATFD",
             "FDP",
-            "LAA",
-            "NrFE",
+            // "LAA",
+            // "NrFE",
             "CBO",
             "DAC",
             "WMC",
@@ -78,7 +78,7 @@ async function analyzeCode(document, sourceCode) {
             "NOD",
             "NODD",
             "TCC",
-            "DIT"
+            "DIT",
         ];
         initialize_1.FECFcode.parseAllJavaFiles();
         try {
@@ -115,7 +115,9 @@ async function AnalyzeSelctedCode(document, sourceCode) {
         const parser = document.languageId === "java" ? new initialize_1.javaParser() : new initialize_1.pythonParser();
         parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
-        const metricsToCalculate = vscode.workspace.getConfiguration("codepure").get("selectedMetrics", []);
+        const metricsToCalculate = vscode.workspace
+            .getConfiguration("codepure")
+            .get("selectedMetrics", []);
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
             await (0, utils_1.pause)(500); // Simulate processing delay
@@ -140,7 +142,7 @@ async function calculateMetricsWithProgress(document, rootNode, sourceCode, lang
             // Update progress
             progress.report({
                 message: `Calculating ${metricName}...`,
-                increment: (70 / metrics.length), // Distribute remaining progress evenly
+                increment: 70 / metrics.length, // Distribute remaining progress evenly
             });
             await (0, utils_1.pause)(300); // Simulate delay for each metric
         }
