@@ -29,32 +29,10 @@ export async function analyzeCode(document: vscode.TextDocument, sourceCode: str
 
       const metricsToCalculate = [
         "LOC",
-        "AMW",
-        "ATFD",
-        "FDP",
-        "LAA",
-        "NrFE",
-        "CBO",
-        "DAC",
-        "WMC",
-        "WOC",
-        "NOA",
-        "NOM",
-        "NOAM",
-        "NOPA",
-        "NAbsm",
-        "NProtM",
-        "FANOUT",
-        "NDU",
-        "NAS",
-        "BUR",
-        "NOD",
-        "NODD",
-        "TCC",
-        "DIT"
+
       ]; 
 
-      FECFcode.parseAllJavaFiles();
+     
 
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
@@ -62,6 +40,10 @@ export async function analyzeCode(document: vscode.TextDocument, sourceCode: str
 
         progress.report({ message: "Parsing source code...", increment: 20 });
         await pause(500);
+
+        progress.report({ message: "Extracting all Java files...", increment: 30 });
+        await FECFcode.startbolbol(rootNode , document.uri); // Ensure it completes before proceeding
+
 
         const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
 

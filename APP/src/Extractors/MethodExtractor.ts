@@ -39,7 +39,8 @@ export class MethodExtractor {
         return modifiers;
     }
 
-    private extractStatementsRecursively(node: Parser.SyntaxNode, bodyStatements: string[]) {
+    private extractStatementsRecursively(node: Parser.SyntaxNode, bodyStatements: string[]) 
+    {
 
         if (node.type === "if_statement") {
             bodyStatements.push(node.type);

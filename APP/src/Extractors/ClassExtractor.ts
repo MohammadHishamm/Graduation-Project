@@ -8,8 +8,10 @@ export class ClassExtractor
   public extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] 
   {
     const classNodes = rootNode.descendantsOfType("class_declaration");
+    
     const { extendedClass, implementedInterfaces } = this.extractInheritanceInfo(classNodes);
     const classInfos = this.extractClassInfo(classNodes, extendedClass, implementedInterfaces);
+    
     return classInfos;
   }
 
