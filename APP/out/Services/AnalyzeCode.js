@@ -56,32 +56,6 @@ async function analyzeCode(document, sourceCode) {
         const rootNode = parser.parse(sourceCode);
         const metricsToCalculate = [
             "LOC",
-<<<<<<< HEAD
-=======
-            "AMW",
-            "ATFD",
-            "FDP",
-            // "LAA",
-            // "NrFE",
-            "CBO",
-            "DAC",
-            "WMC",
-            "WOC",
-            "NOA",
-            "NOM",
-            "NOAM",
-            "NOPA",
-            "NAbsm",
-            "NProtM",
-            "FANOUT",
-            "NDU",
-            "NAS",
-            "BUR",
-            "NOD",
-            "NODD",
-            "TCC",
-            "DIT",
->>>>>>> dec1a659c8cab94975ba65b06953f51507baf08b
         ];
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
