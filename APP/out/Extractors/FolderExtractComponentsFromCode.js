@@ -84,9 +84,9 @@ class FolderExtractComponentsFromCode {
                 // Get the directory of the current file using fileUri
                 const currentFileDirectory = path.dirname(fileUri.fsPath); // Use fsPath from fileUri
                 // Find files in the same directory
-                const filesInSameFolder = javaFiles.filter(file => path.dirname(file.fsPath) === currentFileDirectory);
+                const filesInSameFolder = javaFiles.filter((file) => path.dirname(file.fsPath) === currentFileDirectory);
                 // Check if any of the files in the same folder match the extended class name
-                const matchingFile = filesInSameFolder.find(file => path.basename(file.fsPath, ".java") === extendedClass);
+                const matchingFile = filesInSameFolder.find((file) => path.basename(file.fsPath, ".java") === extendedClass);
                 if (matchingFile) {
                     // If a matching file is found, process it
                     const finalFilePath = matchingFile.fsPath;
@@ -105,8 +105,11 @@ class FolderExtractComponentsFromCode {
     IsRelationFound(rootNode) {
         let extendedClasses = "";
         const traverse = (currentNode) => {
-            if (currentNode.type === "superclass" || currentNode.type === "super_interfaces") {
-                extendedClasses = currentNode.text.trim().replace(/^(extends|implements)\s*/, "");
+            if (currentNode.type === "superclass" ||
+                currentNode.type === "super_interfaces") {
+                extendedClasses = currentNode.text
+                    .trim()
+                    .replace(/^(extends|implements)\s*/, "");
             }
             for (const child of currentNode.children) {
                 traverse(child);
@@ -206,7 +209,8 @@ class FolderExtractComponentsFromCode {
                 .join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json")
                 .replace(/out[\\\/]?/, "");
             // Remove duplicates based on file names
-            const uniqueParsedComponents = parsedComponents.filter((component, index, self) => index === self.findIndex((c) => c.classes.some((classGroup) => classGroup.fileName === component.classes[0].fileName)));
+            const uniqueParsedComponents = parsedComponents.filter((component, index, self) => index ===
+                self.findIndex((c) => c.classes.some((classGroup) => classGroup.fileName === component.classes[0].fileName)));
             const newContent = JSON.stringify(uniqueParsedComponents, null, 2);
             if (newContent) {
                 fs.writeFileSync(filePath, newContent);
@@ -247,7 +251,9 @@ class FolderExtractComponentsFromCode {
         // Clean up the import path and ensure it's in a consistent format
         const filePath = importPath.replace("import", "").replace(";", "").trim();
         // Get everything after the first dot (.)
-        const filePathAfterFirstDot = filePath.includes(".") ? filePath.substring(filePath.indexOf(".") + 1) : filePath;
+        const filePathAfterFirstDot = filePath.includes(".")
+            ? filePath.substring(filePath.indexOf(".") + 1)
+            : filePath;
         // Convert to file path format
         const formattedFilePath = filePathAfterFirstDot.split(".").join(path.sep);
         console.log(formattedFilePath);
@@ -259,10 +265,10 @@ class FolderExtractComponentsFromCode {
         // Get the root path of the project (Assume the root folder is the directory of the first Java file)
         const projectRoot = path.dirname(javaFiles[0].fsPath);
         // Convert Java file paths to relative paths
-        const relativeJavaFiles = javaFiles.map(javaFile => path.relative(projectRoot, javaFile.fsPath));
+        const relativeJavaFiles = javaFiles.map((javaFile) => path.relative(projectRoot, javaFile.fsPath));
         // Normalize paths to always use forward slashes for comparison
         const normalizedFilePath = formattedFilePath.replace(/\\/g, "/") + ".java"; // Ensure it ends with .java
-        const matchingFile = relativeJavaFiles.find(file => file.replace(/\\/g, "/") === normalizedFilePath);
+        const matchingFile = relativeJavaFiles.find((file) => file.replace(/\\/g, "/") === normalizedFilePath);
         // Determine final file path
         const finalFilePath = matchingFile
             ? path.join(projectRoot, matchingFile)

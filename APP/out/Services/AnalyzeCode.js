@@ -56,14 +56,36 @@ async function analyzeCode(document, sourceCode) {
         const rootNode = parser.parse(sourceCode);
         const metricsToCalculate = [
             "LOC",
+            "AMW",
+            "ATFD",
+            "FDP",
+            // "LAA",
+            // "NrFE",
+            "CBO",
+            "DAC",
+            "WMC",
+            "WOC",
+            "NOA",
+            "NOM",
+            "NOAM",
+            "NOPA",
+            "NAbsm",
+            "NProtM",
+            "FANOUT",
+            "NDU",
+            "NAS",
+            "BUR",
+            "NOD",
+            "NODD",
+            "TCC",
+            "DIT",
         ];
+        initialize_1.FECFcode.parseAllJavaFiles();
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
             await (0, utils_1.pause)(500); // Simulate processing delay
             progress.report({ message: "Parsing source code...", increment: 20 });
             await (0, utils_1.pause)(500);
-            progress.report({ message: "Extracting all Java files...", increment: 30 });
-            await initialize_1.FECFcode.startbolbol(rootNode, document.uri); // Ensure it completes before proceeding
             const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
             if (results) {
                 vscode.window.showInformationMessage("Analysis is Finished.");

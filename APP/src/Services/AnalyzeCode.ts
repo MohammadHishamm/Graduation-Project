@@ -39,10 +39,6 @@ export async function analyzeCode(
 
       const metricsToCalculate = [
         "LOC",
-<<<<<<< HEAD
-
-      ]; 
-=======
         "AMW",
         "ATFD",
         "FDP",
@@ -67,9 +63,8 @@ export async function analyzeCode(
         "TCC",
         "DIT",
       ];
->>>>>>> dec1a659c8cab94975ba65b06953f51507baf08b
 
-     
+      FECFcode.parseAllJavaFiles();
 
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
@@ -78,13 +73,6 @@ export async function analyzeCode(
         progress.report({ message: "Parsing source code...", increment: 20 });
         await pause(500);
 
-<<<<<<< HEAD
-        progress.report({ message: "Extracting all Java files...", increment: 30 });
-        await FECFcode.startbolbol(rootNode , document.uri); // Ensure it completes before proceeding
-
-
-        const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
-=======
         const results = await calculateMetricsWithProgress(
           document,
           rootNode,
@@ -93,7 +81,6 @@ export async function analyzeCode(
           metricsToCalculate,
           progress
         );
->>>>>>> dec1a659c8cab94975ba65b06953f51507baf08b
 
         if (results) {
           vscode.window.showInformationMessage("Analysis is Finished.");
@@ -176,7 +163,6 @@ async function calculateMetricsWithProgress(
   progress: vscode.Progress<{ message: string; increment: number }>
 ): Promise<string> {
   const results: string[] = [];
-
   for (const [index, metricName] of metrics.entries()) {
     const metricCalculator = MetricsFactory.CreateMetric(
       metricName,
@@ -190,7 +176,6 @@ async function calculateMetricsWithProgress(
         document.fileName
       );
       results.push(`${metricName}: ${value}`);
-
       // Update progress
       progress.report({
         message: `Calculating ${metricName}...`,

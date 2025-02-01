@@ -26,35 +26,34 @@ export class FolderExtractComponentsFromCode {
       this.Files.push(fileUri.path);
     }
 
-
-
-
-      // Extract components and parse Java files
-      await this.ExtractComponents(rootNode, fileUri);
-      await this.parseAllJavaFiles();  // Make sure to await this if it's an async function
-    
+    // Extract components and parse Java files
+    await this.ExtractComponents(rootNode, fileUri);
+    await this.parseAllJavaFiles(); // Make sure to await this if it's an async function
   }
 
-  public async ExtractComponents(rootNode: Parser.SyntaxNode, fileUri: vscode.Uri) {
+  public async ExtractComponents(
+    rootNode: Parser.SyntaxNode,
+    fileUri: vscode.Uri
+  ) {
     const extendedClass = this.IsRelationFound(rootNode);
-
 
     if (extendedClass) {
       const importPaths = this.ExtractImportsAndPackage(rootNode);
 
       // If import paths are found
       if (importPaths.length > 0) {
-        const filesToExtract = this.GetFilesToExtract(extendedClass, importPaths);
+        const filesToExtract = this.GetFilesToExtract(
+          extendedClass,
+          importPaths
+        );
 
         if (filesToExtract && filesToExtract.length > 0) {
-
           const tree = await this.convertImportToFilePath(filesToExtract);
           const treeRootNode = tree.rootNode;
 
           if (treeRootNode) {
             await this.ExtractComponents(treeRootNode, fileUri); // Pass the fileUri here
           }
-
         }
       } else {
         // If no imports are found, check for extended class name matching with files in the same folder
@@ -64,14 +63,16 @@ export class FolderExtractComponentsFromCode {
         const currentFileDirectory = path.dirname(fileUri.fsPath); // Use fsPath from fileUri
 
         // Find files in the same directory
-        const filesInSameFolder = javaFiles.filter(file => path.dirname(file.fsPath) === currentFileDirectory);
+        const filesInSameFolder = javaFiles.filter(
+          (file) => path.dirname(file.fsPath) === currentFileDirectory
+        );
 
         // Check if any of the files in the same folder match the extended class name
-        const matchingFile = filesInSameFolder.find(file => path.basename(file.fsPath, ".java") === extendedClass);
-
+        const matchingFile = filesInSameFolder.find(
+          (file) => path.basename(file.fsPath, ".java") === extendedClass
+        );
 
         if (matchingFile) {
-
           // If a matching file is found, process it
           const finalFilePath = matchingFile.fsPath;
 
@@ -81,26 +82,25 @@ export class FolderExtractComponentsFromCode {
           const tree = await this.convertextendedToFilePath(finalFilePath);
           const treeRootNode = tree.rootNode;
 
-
           if (treeRootNode) {
             await this.ExtractComponents(treeRootNode, fileUri); // Recursively process
           }
         }
       }
     }
-
   }
-
 
   public IsRelationFound(rootNode: Parser.SyntaxNode): string | null {
     let extendedClasses = "";
 
     const traverse = (currentNode: Parser.SyntaxNode) => {
-
-
-      if (currentNode.type === "superclass" || currentNode.type === "super_interfaces") {
-        extendedClasses = currentNode.text.trim().replace(/^(extends|implements)\s*/, "");
-
+      if (
+        currentNode.type === "superclass" ||
+        currentNode.type === "super_interfaces"
+      ) {
+        extendedClasses = currentNode.text
+          .trim()
+          .replace(/^(extends|implements)\s*/, "");
       }
       for (const child of currentNode.children) {
         traverse(child);
@@ -112,13 +112,11 @@ export class FolderExtractComponentsFromCode {
     return extendedClasses; // Return comma-separated string
   }
 
-
   // Extract all the imports from the current file then sends it to the files that need to be extracted
   public ExtractImportsAndPackage(rootNode: Parser.SyntaxNode): string[] {
     const importPaths: string[] = [];
 
     const traverse = (currentNode: Parser.SyntaxNode) => {
-
       if (currentNode.type === "import_declaration") {
         importPaths.push(currentNode.text);
       }
@@ -137,7 +135,10 @@ export class FolderExtractComponentsFromCode {
     return importPath.replace(";", "").split(".").pop() || "";
   }
 
-  public GetFilesToExtract(extendedClass: string, importPaths: string[]): string {
+  public GetFilesToExtract(
+    extendedClass: string,
+    importPaths: string[]
+  ): string {
     let imports = "";
     importPaths.forEach((importPath) => {
       const ClassNameFromImport = this.ExtractClassNameFromImport(importPath);
@@ -147,32 +148,29 @@ export class FolderExtractComponentsFromCode {
       }
     });
 
-
     return imports;
   }
-
-
 
   public async parseAllJavaFiles() {
     if (!this.Files || this.Files.length === 0) {
       console.log("No files found in this.Files");
       return;
     }
-  
+
     const existingComponents = this.getParsedComponentsFromFile();
     const allParsedComponents: FileParsedComponents[] = [...existingComponents];
-  
+
     console.log("\nCache and file service started...");
     console.log(this.Files);
-    
+
     for (const filePath of this.Files) {
       const fileUri = vscode.Uri.file(filePath);
       const fileContent = await this.fetchFileContent(fileUri);
       const fileHash = FileCacheManager.computeHash(fileContent);
-  
+
       // Check cache to see if the file has been processed before
       const cachedComponents = this.cacheManager.get(filePath, fileHash);
-  
+
       if (cachedComponents) {
         console.log(`Cache hit: ${filePath}`);
       } else {
@@ -180,13 +178,16 @@ export class FolderExtractComponentsFromCode {
         if (parsedComponents) {
           // Check if the file is already in the parsed components list
           const existingIndex = allParsedComponents.findIndex((component) =>
-            component.classes.some((classGroup) => classGroup.fileName === filePath));
-  
+            component.classes.some(
+              (classGroup) => classGroup.fileName === filePath
+            )
+          );
+
           if (existingIndex === -1) {
             // Only add new components if not already in the list
             allParsedComponents.push(parsedComponents);
             this.cacheManager.set(filePath, fileHash, parsedComponents);
-  
+
             console.log("Changes detected. New Components saved.");
             console.log(`Cache updated: ${filePath}`);
           } else {
@@ -197,18 +198,22 @@ export class FolderExtractComponentsFromCode {
         }
       }
     }
-  
+
     // Save the combined parsed components back to the file
     this.Files = [];
     this.saveParsedComponents(allParsedComponents);
     console.log("Cache and file service Stopped\n");
   }
-  
-  
 
   private async clearFileContent(): Promise<boolean> {
     const filePath = path
-      .join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json")
+      .join(
+        __dirname,
+        "..",
+        "src",
+        "Results",
+        "FolderExtractComponentsFromCode.json"
+      )
       .replace(/out[\\\/]?/, "");
 
     try {
@@ -221,8 +226,6 @@ export class FolderExtractComponentsFromCode {
     }
   }
 
-
-
   private saveParsedComponents(parsedComponents: FileParsedComponents[]) {
     try {
       const filePath = path
@@ -234,12 +237,19 @@ export class FolderExtractComponentsFromCode {
           "FolderExtractComponentsFromCode.json"
         )
         .replace(/out[\\\/]?/, "");
-  
+
       // Remove duplicates based on file names
-      const uniqueParsedComponents = parsedComponents.filter((component, index, self) =>
-        index === self.findIndex((c) => c.classes.some((classGroup) => classGroup.fileName === component.classes[0].fileName))
+      const uniqueParsedComponents = parsedComponents.filter(
+        (component, index, self) =>
+          index ===
+          self.findIndex((c) =>
+            c.classes.some(
+              (classGroup) =>
+                classGroup.fileName === component.classes[0].fileName
+            )
+          )
       );
-  
+
       const newContent = JSON.stringify(uniqueParsedComponents, null, 2);
       if (newContent) {
         fs.writeFileSync(filePath, newContent);
@@ -250,9 +260,10 @@ export class FolderExtractComponentsFromCode {
       console.error("Failed to save parsedComponents to file:", err);
     }
   }
-  
 
-  public getParsedComponentsFromFile(fileName?: string): FileParsedComponents[] {
+  public getParsedComponentsFromFile(
+    fileName?: string
+  ): FileParsedComponents[] {
     try {
       const filePath = path.join(
         __dirname,
@@ -285,25 +296,23 @@ export class FolderExtractComponentsFromCode {
     }
   }
 
-
-
-
-  public async convertImportToFilePath(importPath: string): Promise<Parser.Tree> {
+  public async convertImportToFilePath(
+    importPath: string
+  ): Promise<Parser.Tree> {
     // Clean up the import path and ensure it's in a consistent format
     const filePath = importPath.replace("import", "").replace(";", "").trim();
 
     // Get everything after the first dot (.)
-    const filePathAfterFirstDot = filePath.includes(".") ? filePath.substring(filePath.indexOf(".") + 1) : filePath;
+    const filePathAfterFirstDot = filePath.includes(".")
+      ? filePath.substring(filePath.indexOf(".") + 1)
+      : filePath;
 
     // Convert to file path format
     const formattedFilePath = filePathAfterFirstDot.split(".").join(path.sep);
 
-
     console.log(formattedFilePath);
     // Search for Java files in the workspace
     const javaFiles = await vscode.workspace.findFiles("**/*.java");
-
-
 
     if (javaFiles.length === 0) {
       throw new Error("No Java files found in the workspace.");
@@ -313,19 +322,20 @@ export class FolderExtractComponentsFromCode {
     const projectRoot = path.dirname(javaFiles[0].fsPath);
 
     // Convert Java file paths to relative paths
-    const relativeJavaFiles = javaFiles.map(javaFile => path.relative(projectRoot, javaFile.fsPath));
-
+    const relativeJavaFiles = javaFiles.map((javaFile) =>
+      path.relative(projectRoot, javaFile.fsPath)
+    );
 
     // Normalize paths to always use forward slashes for comparison
     const normalizedFilePath = formattedFilePath.replace(/\\/g, "/") + ".java"; // Ensure it ends with .java
-    const matchingFile = relativeJavaFiles.find(file => file.replace(/\\/g, "/") === normalizedFilePath);
-
+    const matchingFile = relativeJavaFiles.find(
+      (file) => file.replace(/\\/g, "/") === normalizedFilePath
+    );
 
     // Determine final file path
     const finalFilePath = matchingFile
       ? path.join(projectRoot, matchingFile)
       : path.join(projectRoot, formattedFilePath + ".java");
-
 
     // Check if the file exists before reading
     if (!fs.existsSync(finalFilePath)) {
@@ -350,13 +360,13 @@ export class FolderExtractComponentsFromCode {
     }
   }
 
-
-  public async convertextendedToFilePath(finalFilePath: string): Promise<Parser.Tree> {
+  public async convertextendedToFilePath(
+    finalFilePath: string
+  ): Promise<Parser.Tree> {
     const uri = vscode.Uri.file(finalFilePath);
 
-
     // Parse the file
-    const parsedComponents = await this.parseFiletest(uri);  // Await the result
+    const parsedComponents = await this.parseFiletest(uri); // Await the result
 
     // if (parsedComponents) {
     //   allParsedComponents.push(parsedComponents);
@@ -366,11 +376,7 @@ export class FolderExtractComponentsFromCode {
     return parsedComponents;
   }
 
-
-  public async parseFiletest(
-    fileUri: vscode.Uri
-  ): Promise<Parser.Tree> {
-
+  public async parseFiletest(fileUri: vscode.Uri): Promise<Parser.Tree> {
     const fileContent = await this.fetchFileContent(fileUri);
 
     const tree = this.parseCode(fileContent);
@@ -378,12 +384,15 @@ export class FolderExtractComponentsFromCode {
     return tree;
   }
 
-  public getParsedComponentsByFileName(fileName: string): FileParsedComponents | null {
+  public getParsedComponentsByFileName(
+    fileName: string
+  ): FileParsedComponents | null {
     try {
       const parsedComponents = this.getParsedComponentsFromFile();
 
       const matchingComponent = parsedComponents.find((component) =>
-        component.classes.some((classGroup) => classGroup.fileName === fileName));
+        component.classes.some((classGroup) => classGroup.fileName === fileName)
+      );
 
       if (!matchingComponent) {
         console.warn(`No data found for file name: ${fileName}`);
@@ -392,11 +401,13 @@ export class FolderExtractComponentsFromCode {
 
       return matchingComponent;
     } catch (err) {
-      console.error(`Failed to get parsed components for file: ${fileName}`, err);
+      console.error(
+        `Failed to get parsed components for file: ${fileName}`,
+        err
+      );
       return null;
     }
   }
-
 
   public async parseFile(
     fileUri: vscode.Uri
@@ -428,7 +439,6 @@ export class FolderExtractComponentsFromCode {
     };
   }
 
-
   private async fetchFileContent(fileUri: vscode.Uri): Promise<string> {
     const fileContent = await vscode.workspace.fs.readFile(fileUri);
     return Buffer.from(fileContent).toString("utf8");
@@ -437,6 +447,4 @@ export class FolderExtractComponentsFromCode {
   public parseCode(sourceCode: string): Parser.Tree {
     return this.parser.parse(sourceCode);
   }
-
-
 }
