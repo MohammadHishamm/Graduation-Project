@@ -41,19 +41,15 @@ export class FolderExtractComponentsFromCode {
       const importPaths = this.ExtractImportsAndPackage(rootNode);
 
       // If import paths are found
-      if (importPaths.length > 0) {
-        const filesToExtract = this.GetFilesToExtract(
-          extendedClass,
-          importPaths
-        );
 
-        if (filesToExtract && filesToExtract.length > 0) {
-          const tree = await this.convertImportToFilePath(filesToExtract);
-          const treeRootNode = tree.rootNode;
+      const filesToExtract = this.GetFilesToExtract(extendedClass, importPaths);
 
-          if (treeRootNode) {
-            await this.ExtractComponents(treeRootNode, fileUri); // Pass the fileUri here
-          }
+      if (importPaths.length > 0 && filesToExtract.length > 0) {
+        const tree = await this.convertImportToFilePath(filesToExtract);
+        const treeRootNode = tree.rootNode;
+
+        if (treeRootNode) {
+          await this.ExtractComponents(treeRootNode, fileUri); // Pass the fileUri here
         }
       } else {
         // If no imports are found, check for extended class name matching with files in the same folder
@@ -72,12 +68,15 @@ export class FolderExtractComponentsFromCode {
           (file) => path.basename(file.fsPath, ".java") === extendedClass
         );
 
+        console.log("matchingfile", matchingFile);
+
         if (matchingFile) {
           // If a matching file is found, process it
           const finalFilePath = matchingFile.fsPath;
 
           if (!this.Files.includes(finalFilePath)) {
             this.Files.push(finalFilePath);
+            console.log("files", this.Files);
           }
           const tree = await this.convertextendedToFilePath(finalFilePath);
           const treeRootNode = tree.rootNode;
@@ -152,78 +151,103 @@ export class FolderExtractComponentsFromCode {
   }
 
   public async parseAllJavaFiles() {
+    console.log("parseAllJavaFiles", this.Files);
     if (!this.Files || this.Files.length === 0) {
       console.log("No files found in this.Files");
       return;
     }
 
     const existingComponents = this.getParsedComponentsFromFile();
-    const allParsedComponents: FileParsedComponents[] = [...existingComponents];
+    let allParsedComponents: FileParsedComponents[] = [];
 
     console.log("\nCache and file service started...");
-    console.log(this.Files);
+    console.log("Processing files:", this.Files);
 
     for (const filePath of this.Files) {
       const fileUri = vscode.Uri.file(filePath);
       const fileContent = await this.fetchFileContent(fileUri);
       const fileHash = FileCacheManager.computeHash(fileContent);
 
-      // Check cache to see if the file has been processed before
-      const cachedComponents = this.cacheManager.get(filePath, fileHash);
+      // Always parse the file to get the latest components
+      const newParsedComponents = await this.parseFile(fileUri);
 
-      if (cachedComponents) {
-        console.log(`Cache hit: ${filePath}`);
-      } else {
-        const parsedComponents = await this.parseFile(fileUri);
-        if (parsedComponents) {
-          // Check if the file is already in the parsed components list
-          const existingIndex = allParsedComponents.findIndex((component) =>
-            component.classes.some(
-              (classGroup) => classGroup.fileName === filePath
-            )
+      if (newParsedComponents) {
+        // Check if we already have components for this file
+        const existingComponent = existingComponents.find((component) =>
+          component.classes.some(
+            (classGroup) => classGroup.fileName === filePath
+          )
+        );
+
+        if (existingComponent) {
+          // Compare the new components with existing ones
+          const hasChanges = this.hasComponentsChanged(
+            existingComponent,
+            newParsedComponents
           );
 
-          if (existingIndex === -1) {
-            // Only add new components if not already in the list
-            allParsedComponents.push(parsedComponents);
-            this.cacheManager.set(filePath, fileHash, parsedComponents);
-
-            console.log("Changes detected. New Components saved.");
-            console.log(`Cache updated: ${filePath}`);
+          if (hasChanges) {
+            console.log(`Changes detected in file: ${filePath}`);
+            // Update cache with new components
+            this.cacheManager.set(filePath, fileHash, newParsedComponents);
+            allParsedComponents.push(newParsedComponents);
           } else {
-            console.log(`Skipping duplicate file: ${filePath}`);
+            console.log(`No changes detected in file: ${filePath}`);
+            allParsedComponents.push(existingComponent);
           }
         } else {
-          console.error(`Error parsing file: ${filePath}`);
+          console.log(`New file detected: ${filePath}`);
+          // Add new components and update cache
+          this.cacheManager.set(filePath, fileHash, newParsedComponents);
+          allParsedComponents.push(newParsedComponents);
         }
+      } else {
+        console.error(`Error processing file: ${filePath}`);
       }
     }
 
-    // Save the combined parsed components back to the file
-    this.Files = [];
+    // Handle files that are in existing components but not in current Files
+    const additionalComponents = existingComponents.filter((component) =>
+      component.classes.some(
+        (classGroup) => !this.Files.includes(classGroup.fileName)
+      )
+    );
+    allParsedComponents = [...allParsedComponents, ...additionalComponents];
+
     this.saveParsedComponents(allParsedComponents);
     console.log("Cache and file service Stopped\n");
   }
 
-  private async clearFileContent(): Promise<boolean> {
-    const filePath = path
-      .join(
-        __dirname,
-        "..",
-        "src",
-        "Results",
-        "FolderExtractComponentsFromCode.json"
-      )
-      .replace(/out[\\\/]?/, "");
+  private hasComponentsChanged(
+    existing: FileParsedComponents,
+    new_: FileParsedComponents
+  ): boolean {
+    // Convert to strings for deep comparison
+    const existingStr = JSON.stringify(this.normalizeComponent(existing));
+    const newStr = JSON.stringify(this.normalizeComponent(new_));
+    return existingStr !== newStr;
+  }
 
-    try {
-      fs.writeFileSync(filePath, ""); // Overwrites the file with an empty string
-      console.log(`Cleared content of file: ${filePath}`);
-      return true; // Return true if successful
-    } catch (err) {
-      console.error(`Failed to clear file content: ${filePath}`, err);
-      return false; // Return false if an error occurs
-    }
+  private normalizeComponent(component: FileParsedComponents): any {
+    // Create a copy to avoid modifying the original
+    const normalized = JSON.parse(JSON.stringify(component));
+
+    // Normalize the component by removing position information
+    // which might change even when the actual content hasn't
+    const removePositions = (obj: any) => {
+      for (const key in obj) {
+        if (typeof obj[key] === "object" && obj[key] !== null) {
+          if (key === "startPosition" || key === "endPosition") {
+            delete obj[key];
+          } else {
+            removePositions(obj[key]);
+          }
+        }
+      }
+      return obj;
+    };
+
+    return removePositions(normalized);
   }
 
   private saveParsedComponents(parsedComponents: FileParsedComponents[]) {
@@ -237,6 +261,12 @@ export class FolderExtractComponentsFromCode {
           "FolderExtractComponentsFromCode.json"
         )
         .replace(/out[\\\/]?/, "");
+
+      // Ensure the directory exists
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
 
       // Remove duplicates based on file names
       const uniqueParsedComponents = parsedComponents.filter(
@@ -252,15 +282,21 @@ export class FolderExtractComponentsFromCode {
 
       const newContent = JSON.stringify(uniqueParsedComponents, null, 2);
       if (newContent) {
-        fs.writeFileSync(filePath, newContent);
+        // Write to a temporary file first
+        const tempPath = `${filePath}.tmp`;
+        fs.writeFileSync(tempPath, newContent);
+
+        // Rename temp file to target file (atomic operation)
+        fs.renameSync(tempPath, filePath);
+
+        console.log("Successfully saved parsed components to file");
       } else {
-        console.log("No parsedComponents.");
+        console.log("No parsedComponents to save.");
       }
     } catch (err) {
       console.error("Failed to save parsedComponents to file:", err);
     }
   }
-
   public getParsedComponentsFromFile(
     fileName?: string
   ): FileParsedComponents[] {
