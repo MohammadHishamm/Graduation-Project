@@ -80,7 +80,7 @@ async function analyzeCode(document, sourceCode) {
             "TCC",
             "DIT",
         ];
-        initialize_1.FECFcode.parseAllJavaFiles();
+        initialize_1.FECFcode.startbolbol(rootNode, document.uri);
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
             await (0, utils_1.pause)(500); // Simulate processing delay

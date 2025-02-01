@@ -64,7 +64,7 @@ export async function analyzeCode(
         "DIT",
       ];
 
-      FECFcode.parseAllJavaFiles();
+      FECFcode.startbolbol(rootNode, document.uri);
 
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
