@@ -56,6 +56,32 @@ async function analyzeCode(document, sourceCode) {
         const rootNode = parser.parse(sourceCode);
         const metricsToCalculate = [
             "LOC",
+<<<<<<< HEAD
+=======
+            "AMW",
+            "ATFD",
+            "FDP",
+            // "LAA",
+            // "NrFE",
+            "CBO",
+            "DAC",
+            "WMC",
+            "WOC",
+            "NOA",
+            "NOM",
+            "NOAM",
+            "NOPA",
+            "NAbsm",
+            "NProtM",
+            "FANOUT",
+            "NDU",
+            "NAS",
+            "BUR",
+            "NOD",
+            "NODD",
+            "TCC",
+            "DIT",
+>>>>>>> dec1a659c8cab94975ba65b06953f51507baf08b
         ];
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
@@ -93,7 +119,9 @@ async function AnalyzeSelctedCode(document, sourceCode) {
         const parser = document.languageId === "java" ? new initialize_1.javaParser() : new initialize_1.pythonParser();
         parser.selectLanguage();
         const rootNode = parser.parse(sourceCode);
-        const metricsToCalculate = vscode.workspace.getConfiguration("codepure").get("selectedMetrics", []);
+        const metricsToCalculate = vscode.workspace
+            .getConfiguration("codepure")
+            .get("selectedMetrics", []);
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
             await (0, utils_1.pause)(500); // Simulate processing delay
@@ -118,7 +146,7 @@ async function calculateMetricsWithProgress(document, rootNode, sourceCode, lang
             // Update progress
             progress.report({
                 message: `Calculating ${metricName}...`,
-                increment: (70 / metrics.length), // Distribute remaining progress evenly
+                increment: 70 / metrics.length, // Distribute remaining progress evenly
             });
             await (0, utils_1.pause)(300); // Simulate delay for each metric
         }

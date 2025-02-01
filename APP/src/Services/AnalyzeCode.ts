@@ -1,15 +1,24 @@
 import * as vscode from "vscode";
 import { MetricsFactory } from "../Factory/MetricsFactory";
-import { metricsSaver, servermetricsmanager , FECFcode , pythonParser ,javaParser } from "../initialize";
+import {
+  metricsSaver,
+  servermetricsmanager,
+  FECFcode,
+  pythonParser,
+  javaParser,
+} from "../initialize";
 import { pause } from "../utils";
-
 
 let isAnalyzing = false;
 
-
-export async function analyzeCode(document: vscode.TextDocument, sourceCode: string): Promise<string> {
+export async function analyzeCode(
+  document: vscode.TextDocument,
+  sourceCode: string
+): Promise<string> {
   if (isAnalyzing) {
-    vscode.window.showInformationMessage("Analysis is already running. Please wait...");
+    vscode.window.showInformationMessage(
+      "Analysis is already running. Please wait..."
+    );
     return "Analysis in progress";
   }
 
@@ -22,41 +31,78 @@ export async function analyzeCode(document: vscode.TextDocument, sourceCode: str
       cancellable: false,
     },
     async (progress) => {
-      const parser = document.languageId === "java" ? new javaParser() : new pythonParser();
+      const parser =
+        document.languageId === "java" ? new javaParser() : new pythonParser();
       parser.selectLanguage();
 
       const rootNode = parser.parse(sourceCode);
 
       const metricsToCalculate = [
         "LOC",
+<<<<<<< HEAD
 
       ]; 
+=======
+        "AMW",
+        "ATFD",
+        "FDP",
+        // "LAA",
+        // "NrFE",
+        "CBO",
+        "DAC",
+        "WMC",
+        "WOC",
+        "NOA",
+        "NOM",
+        "NOAM",
+        "NOPA",
+        "NAbsm",
+        "NProtM",
+        "FANOUT",
+        "NDU",
+        "NAS",
+        "BUR",
+        "NOD",
+        "NODD",
+        "TCC",
+        "DIT",
+      ];
+>>>>>>> dec1a659c8cab94975ba65b06953f51507baf08b
 
      
 
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
-        await pause(500);  // Simulate processing delay
+        await pause(500); // Simulate processing delay
 
         progress.report({ message: "Parsing source code...", increment: 20 });
         await pause(500);
 
+<<<<<<< HEAD
         progress.report({ message: "Extracting all Java files...", increment: 30 });
         await FECFcode.startbolbol(rootNode , document.uri); // Ensure it completes before proceeding
 
 
         const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
+=======
+        const results = await calculateMetricsWithProgress(
+          document,
+          rootNode,
+          sourceCode,
+          document.languageId,
+          metricsToCalculate,
+          progress
+        );
+>>>>>>> dec1a659c8cab94975ba65b06953f51507baf08b
 
-        if(results)
-        {
+        if (results) {
           vscode.window.showInformationMessage("Analysis is Finished.");
           servermetricsmanager.sendMetricsFile();
+        } else {
+          vscode.window.showInformationMessage(
+            "Error Occured While Analyzing."
+          );
         }
-        else
-        {
-          vscode.window.showInformationMessage("Error Occured While Analyzing.");
-        }
-   
 
         return results;
       } finally {
@@ -66,11 +112,14 @@ export async function analyzeCode(document: vscode.TextDocument, sourceCode: str
   );
 }
 
-export async function AnalyzeSelctedCode(document: vscode.TextDocument, sourceCode: string): Promise<string> 
-{
-  if (isAnalyzing)
-  {
-    vscode.window.showInformationMessage("Analysis is already running. Please wait...");
+export async function AnalyzeSelctedCode(
+  document: vscode.TextDocument,
+  sourceCode: string
+): Promise<string> {
+  if (isAnalyzing) {
+    vscode.window.showInformationMessage(
+      "Analysis is already running. Please wait..."
+    );
     return "Analysis in progress";
   }
 
@@ -83,20 +132,30 @@ export async function AnalyzeSelctedCode(document: vscode.TextDocument, sourceCo
       cancellable: false,
     },
     async (progress) => {
-      const parser = document.languageId === "java" ? new javaParser() : new pythonParser();
+      const parser =
+        document.languageId === "java" ? new javaParser() : new pythonParser();
       parser.selectLanguage();
 
       const rootNode = parser.parse(sourceCode);
-      const metricsToCalculate = vscode.workspace.getConfiguration("codepure").get<string[]>("selectedMetrics", []);
+      const metricsToCalculate = vscode.workspace
+        .getConfiguration("codepure")
+        .get<string[]>("selectedMetrics", []);
 
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
-        await pause(500);  // Simulate processing delay
+        await pause(500); // Simulate processing delay
 
         progress.report({ message: "Parsing source code...", increment: 20 });
         await pause(500);
 
-        const results = await calculateMetricsWithProgress(document,rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
+        const results = await calculateMetricsWithProgress(
+          document,
+          rootNode,
+          sourceCode,
+          document.languageId,
+          metricsToCalculate,
+          progress
+        );
 
         servermetricsmanager.sendMetricsFile();
 
@@ -110,35 +169,44 @@ export async function AnalyzeSelctedCode(document: vscode.TextDocument, sourceCo
 
 async function calculateMetricsWithProgress(
   document: vscode.TextDocument,
-  rootNode: any, 
-  sourceCode: string, 
-  languageId: string, 
-  metrics: string[], 
+  rootNode: any,
+  sourceCode: string,
+  languageId: string,
+  metrics: string[],
   progress: vscode.Progress<{ message: string; increment: number }>
 ): Promise<string> {
   const results: string[] = [];
-  
+
   for (const [index, metricName] of metrics.entries()) {
-    const metricCalculator = MetricsFactory.CreateMetric(metricName, languageId);
+    const metricCalculator = MetricsFactory.CreateMetric(
+      metricName,
+      languageId
+    );
     if (metricCalculator) {
-      const value = metricCalculator.calculate(rootNode, sourceCode, FECFcode , document.fileName);
+      const value = metricCalculator.calculate(
+        rootNode,
+        sourceCode,
+        FECFcode,
+        document.fileName
+      );
       results.push(`${metricName}: ${value}`);
-      
+
       // Update progress
       progress.report({
         message: `Calculating ${metricName}...`,
-        increment: (70 / metrics.length),  // Distribute remaining progress evenly
+        increment: 70 / metrics.length, // Distribute remaining progress evenly
       });
       await pause(300); // Simulate delay for each metric
     }
   }
 
-  metricsSaver.saveMetrics(results.map((result) => {
-    const [name, value] = result.split(": ");
-    return { name, value: parseFloat(value) };
-  }),  document.fileName);
-
+  metricsSaver.saveMetrics(
+    results.map((result) => {
+      const [name, value] = result.split(": ");
+      return { name, value: parseFloat(value) };
+    }),
+    document.fileName
+  );
 
   return results.join("\n");
 }
-
