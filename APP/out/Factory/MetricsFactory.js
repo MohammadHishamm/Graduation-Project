@@ -19,7 +19,7 @@ const JavaDIT_1 = require("../Metrics/Java/JavaDIT");
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
-const PythonLOC_1 = require("../Metrics/Python/PythonLOC");
+// import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
@@ -122,7 +122,7 @@ class MetricsFactory {
     static createPythonMetric(metricName) {
         switch (metricName) {
             case "LOC":
-                return new PythonLOC_1.PythonLOCMetric();
+            // return new PythonLOCMetric();
             case "CC":
                 return new PythonCC_1.PythonCyclomaticComplexityMetric();
             case "NOA":

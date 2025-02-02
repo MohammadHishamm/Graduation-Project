@@ -20,7 +20,7 @@ import { JavaNumberOfAddedServices } from "../Metrics/Java/JavaNAS";
 import { TCCCalculation } from "../Metrics/Java/JavaTCC";
 
 import { PythonCyclomaticComplexityMetric } from "../Metrics/Python/PythonCC";
-import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
+// import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
 import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
@@ -140,7 +140,7 @@ export class MetricsFactory {
   ): MetricCalculator | null {
     switch (metricName) {
       case "LOC":
-        return new PythonLOCMetric();
+        // return new PythonLOCMetric();
       case "CC":
         return new PythonCyclomaticComplexityMetric();
       case "NOA":

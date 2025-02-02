@@ -4,7 +4,7 @@ exports.JavaNumberOfAddedServices = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
     // Return a Promise from calculate
-    calculate(node, sourceCode, FECFC, Filename) {
+    calculate(node, FECFC, Filename) {
         let allClasses = [];
         let allMethods = [];
         let allFields = [];

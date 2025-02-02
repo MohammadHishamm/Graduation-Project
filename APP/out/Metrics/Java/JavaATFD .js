@@ -4,7 +4,7 @@ exports.JavaAccessToForeignData = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 const FolderExtractComponentsFromCode_1 = require("../../Extractors/FolderExtractComponentsFromCode");
 class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
-    calculate(node, sourceCode, FECFC, Filename) {
+    calculate(node, FECFC, Filename) {
         let allClasses = [];
         let allMethods = [];
         let allFields = [];

@@ -22,11 +22,15 @@ export class MetricsSaver {
 
     // Ensure the 'results' folder exists
     const resultsDir = path.dirname(this.filePath);
+
+
+    // Check if the directory exists, if not, create it
     if (!fs.existsSync(resultsDir)) {
       fs.mkdirSync(resultsDir, { recursive: true });
       console.log(`'Results' folder created at: ${resultsDir}`);
+    } else {
+      console.log(`'Results' folder already exists at: ${resultsDir}`);
     }
-
     // Inject the MetricsNotifier to the class
     this.notifier = notifier;
   }

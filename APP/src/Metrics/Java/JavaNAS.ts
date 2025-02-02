@@ -10,7 +10,7 @@ import { FieldInfo } from "../../Interface/FieldInfo";
 
 export class JavaNumberOfAddedServices extends MetricCalculator {
   // Return a Promise from calculate
-  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
   { 
     let allClasses: ClassInfo[] = [];
     let allMethods: MethodInfo[] = [];

@@ -120,7 +120,7 @@ class MethodExtractor {
         const methodNodes = rootNode.descendantsOfType("method_declaration");
         return methodNodes.map((node) => {
             const modifiers = this.extractMethodModifiers(node);
-            const isOverridden = this.isOverriddenMethod(modifiers);
+            const isOverridden = this.isOverriddenMethod(node);
             const accessModifier = this.getAccessModifier(modifiers);
             const name = this.extractMethodName(node);
             const params = this.extractMethodParams(node);
@@ -154,8 +154,12 @@ class MethodExtractor {
         });
     }
     // Helper Methods (to be defined)
-    isOverriddenMethod(modifiers) {
-        return modifiers.includes("overrides");
+    isOverriddenMethod(node) {
+        const annotationNodes = node.descendantsOfType("marker_annotation");
+        if (annotationNodes.length > 0) {
+            return true;
+        }
+        return false;
     }
     getAccessModifier(modifiers) {
         const modifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));
@@ -215,18 +219,21 @@ class MethodExtractor {
     }
     getFieldsUsedInMethod(rootNode, MethodName) {
         const fieldsUsed = [];
-        const accessNodes = rootNode.descendantsOfType("identifier");
+        const accessNodes = rootNode.descendantsOfType("variable_declarator");
         accessNodes.forEach((accessNode) => {
             const fieldName = accessNode.text;
             if (fieldName && !fieldsUsed.includes(fieldName) && fieldName !== MethodName) {
-                fieldsUsed.push(fieldName); // Add unique field names accessed
+                const identifierNode = accessNode.children.find(subChild => subChild.type === "identifier");
+                if (identifierNode) {
+                    fieldsUsed.push(identifierNode.text); // Add unique field names accessed
+                }
             }
         });
         return fieldsUsed;
     }
     extractMethodAnnotations(node) {
         const annotations = [];
-        const annotationNodes = node.descendantsOfType("annotation");
+        const annotationNodes = node.descendantsOfType("marker_annotation");
         annotationNodes.forEach((annotation) => {
             annotations.push(annotation.text);
         });

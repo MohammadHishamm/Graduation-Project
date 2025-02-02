@@ -9,7 +9,7 @@ import { MethodInfo } from '../../Interface/MethodInfo';
 
 export class JavaNumberOfMethods extends MetricCalculator {
 
-  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
   { 
     let allClasses: ClassInfo[] = [];
     let allMethods: MethodInfo[] = [];

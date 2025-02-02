@@ -40,11 +40,11 @@ export async function analyzeCode(
       const metricsToCalculate = [
         "LOC",
         "AMW",
-        "ATFD",
-        "FDP",
+        // "ATFD",
+        // "FDP",
         // "LAA",
         // "NrFE",
-        "CBO",
+        // "CBO",
         "DAC",
         "WMC",
         "WOC",
@@ -54,17 +54,17 @@ export async function analyzeCode(
         "NOPA",
         "NAbsm",
         "NProtM",
-        "FANOUT",
-        "NDU",
+        // "FANOUT",
+        // "NDU",
         "NAS",
-        "BUR",
-        "NOD",
-        "NODD",
-        "TCC",
+        // "BUR",
+        // "NOD",
+        // "NODD",
+        // "TCC",
         "DIT",
       ];
 
-      FECFcode.startbolbol(rootNode, document.uri);
+
 
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
@@ -72,6 +72,10 @@ export async function analyzeCode(
 
         progress.report({ message: "Parsing source code...", increment: 20 });
         await pause(500);
+
+        progress.report({ message: "Extracting ExtractComponents From Code...", increment: 30 });
+        await pause(500);
+        await FECFcode.parseAllJavaFiles();
 
         const results = await calculateMetricsWithProgress(
           document,
@@ -171,7 +175,6 @@ async function calculateMetricsWithProgress(
     if (metricCalculator) {
       const value = metricCalculator.calculate(
         rootNode,
-        sourceCode,
         FECFcode,
         document.fileName
       );

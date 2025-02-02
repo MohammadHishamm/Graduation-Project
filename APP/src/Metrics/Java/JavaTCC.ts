@@ -6,7 +6,7 @@ import { ClassInfo } from "../../Interface/ClassInfo";
 import { MethodInfo } from "../../Interface/MethodInfo";
 import { FieldInfo } from "../../Interface/FieldInfo";
 export class TCCCalculation extends MetricCalculator {
- calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
   { 
     let allClasses: ClassInfo[] = [];
     let allMethods: MethodInfo[] = [];

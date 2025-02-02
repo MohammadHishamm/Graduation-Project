@@ -17,7 +17,7 @@ interface Reference {
 }
 
 export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
-    calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
     { 
       let allClasses: ClassInfo[] = [];
       let allMethods: MethodInfo[] = [];
@@ -49,7 +49,6 @@ export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
       AccessToForeignData,
       AccessofImportData,
       LocalityofAttributeAccess,
-      sourceCode,
       Filename
     );
 
@@ -64,7 +63,6 @@ export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
     AccessToForeignData: JavaAccessToForeignData,
     AccessofImportData: JavaAccessofImportData,
     LocalityofAttributeAccess: JavaLocalityofAttributeAccess,
-    sourceCode: string,
     Filename: string
   ): number {
     let featureEnvyCount = 0;
@@ -76,11 +74,10 @@ export class JavaNumberofFeatureEnvyMethods extends MetricCalculator {
       }
 
       // Calculate metrics for the current method
-      const ATFD = AccessToForeignData.calculate(rootNode, sourceCode, FECFC , Filename);
-      const FDP = AccessofImportData.calculate(rootNode, sourceCode, FECFC , Filename);
+      const ATFD = AccessToForeignData.calculate(rootNode, FECFC , Filename);
+      const FDP = AccessofImportData.calculate(rootNode, FECFC , Filename);
       const LAA = LocalityofAttributeAccess.calculate(
         rootNode,
-        sourceCode,
         FECFC ,
         Filename
       );

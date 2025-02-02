@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JavaNumberOfPublicAttributes = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class JavaNumberOfPublicAttributes extends MetricCalculator_1.MetricCalculator {
-    calculate(node, sourceCode, FECFC, Filename) {
+    calculate(node, FECFC, Filename) {
         let allClasses = [];
         let allMethods = [];
         let allFields = [];

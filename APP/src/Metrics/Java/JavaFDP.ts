@@ -13,12 +13,7 @@ interface Reference {
 }
 
 export class JavaAccessofImportData extends MetricCalculator {
-  calculate(
-    node: any,
-    sourceCode: string,
-    FECFC: FolderExtractComponentsFromCode ,
-    Filename: string
-  ): number {
+  calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number  {
     let allClasses: ClassInfo[] = [];
     let allMethods: MethodInfo[] = [];
     let allFields: FieldInfo[] = [];

@@ -57,11 +57,11 @@ async function analyzeCode(document, sourceCode) {
         const metricsToCalculate = [
             "LOC",
             "AMW",
-            "ATFD",
-            "FDP",
+            // "ATFD",
+            // "FDP",
             // "LAA",
             // "NrFE",
-            "CBO",
+            // "CBO",
             "DAC",
             "WMC",
             "WOC",
@@ -71,21 +71,23 @@ async function analyzeCode(document, sourceCode) {
             "NOPA",
             "NAbsm",
             "NProtM",
-            "FANOUT",
-            "NDU",
+            // "FANOUT",
+            // "NDU",
             "NAS",
-            "BUR",
-            "NOD",
-            "NODD",
-            "TCC",
+            // "BUR",
+            // "NOD",
+            // "NODD",
+            // "TCC",
             "DIT",
         ];
-        initialize_1.FECFcode.startbolbol(rootNode, document.uri);
         try {
             progress.report({ message: "Initializing parser...", increment: 10 });
             await (0, utils_1.pause)(500); // Simulate processing delay
             progress.report({ message: "Parsing source code...", increment: 20 });
             await (0, utils_1.pause)(500);
+            progress.report({ message: "Extracting ExtractComponents From Code...", increment: 30 });
+            await (0, utils_1.pause)(500);
+            await initialize_1.FECFcode.parseAllJavaFiles();
             const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
             if (results) {
                 vscode.window.showInformationMessage("Analysis is Finished.");
@@ -137,7 +139,7 @@ async function calculateMetricsWithProgress(document, rootNode, sourceCode, lang
     for (const [index, metricName] of metrics.entries()) {
         const metricCalculator = MetricsFactory_1.MetricsFactory.CreateMetric(metricName, languageId);
         if (metricCalculator) {
-            const value = metricCalculator.calculate(rootNode, sourceCode, initialize_1.FECFcode, document.fileName);
+            const value = metricCalculator.calculate(rootNode, initialize_1.FECFcode, document.fileName);
             results.push(`${metricName}: ${value}`);
             // Update progress
             progress.report({

@@ -140,7 +140,7 @@ export class MethodExtractor {
 
         return methodNodes.map((node) => {
             const modifiers = this.extractMethodModifiers(node);
-            const isOverridden = this.isOverriddenMethod(modifiers);
+            const isOverridden = this.isOverriddenMethod(node);
             const accessModifier = this.getAccessModifier(modifiers);
             const name = this.extractMethodName(node);
             const params = this.extractMethodParams(node);
@@ -176,8 +176,16 @@ export class MethodExtractor {
     }
 
     // Helper Methods (to be defined)
-    private isOverriddenMethod(modifiers: string[]): boolean {
-        return modifiers.includes("overrides");
+    private isOverriddenMethod( node: Parser.SyntaxNode): boolean {
+       
+        const annotationNodes = node.descendantsOfType("marker_annotation");
+
+        if(annotationNodes.length > 0)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private getAccessModifier(modifiers: string[]): string {
@@ -253,15 +261,24 @@ export class MethodExtractor {
         rootNode: Parser.SyntaxNode , 
         MethodName :string,
     ): string[] {
+
+
         const fieldsUsed: string[] = [];
 
 
 
-        const accessNodes = rootNode.descendantsOfType("identifier");
+        const accessNodes = rootNode.descendantsOfType("variable_declarator");
         accessNodes.forEach((accessNode) => {
             const fieldName = accessNode.text;
-            if (fieldName && !fieldsUsed.includes(fieldName) && fieldName !== MethodName) {
-                fieldsUsed.push(fieldName); // Add unique field names accessed
+            if (fieldName && !fieldsUsed.includes(fieldName) && fieldName !== MethodName) 
+            {
+                
+                const identifierNode = accessNode.children.find(subChild => subChild.type === "identifier");
+                if (identifierNode) {
+                    fieldsUsed.push(identifierNode.text); // Add unique field names accessed
+                }
+
+               
             }
         });
 
@@ -270,9 +287,10 @@ export class MethodExtractor {
         return fieldsUsed;
     }
 
-    private extractMethodAnnotations(node: Parser.SyntaxNode): string[] {
+    private extractMethodAnnotations(node: Parser.SyntaxNode): string[] 
+    {
         const annotations: string[] = [];
-        const annotationNodes = node.descendantsOfType("annotation");
+        const annotationNodes = node.descendantsOfType("marker_annotation");
         annotationNodes.forEach((annotation) => {
             annotations.push(annotation.text);
         });

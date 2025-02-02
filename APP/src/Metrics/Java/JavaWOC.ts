@@ -6,7 +6,7 @@ import { MethodInfo } from "../../Interface/MethodInfo";
 
 export class JavaWeightOfAClass extends MetricCalculator {
   //TODO FECFC , FileParsedComponents
-  calculate(node: any, sourceCode: string, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+  calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
   { 
     let allClasses: ClassInfo[] = [];
     let allMethods: MethodInfo[] = [];
@@ -24,6 +24,7 @@ export class JavaWeightOfAClass extends MetricCalculator {
           allFields = allFields.concat(classGroup.fields);
         });
       }
+
 
     const WOC = this.calculateWeight(allMethods, allFields);
 

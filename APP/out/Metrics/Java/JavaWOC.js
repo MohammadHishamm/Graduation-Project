@@ -4,7 +4,7 @@ exports.JavaWeightOfAClass = void 0;
 const MetricCalculator_1 = require("../../Core/MetricCalculator");
 class JavaWeightOfAClass extends MetricCalculator_1.MetricCalculator {
     //TODO FECFC , FileParsedComponents
-    calculate(node, sourceCode, FECFC, Filename) {
+    calculate(node, FECFC, Filename) {
         let allClasses = [];
         let allMethods = [];
         let allFields = [];

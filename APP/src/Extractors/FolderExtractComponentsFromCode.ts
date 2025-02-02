@@ -1,483 +1,195 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as vscode from "vscode";
-
 import Parser from "tree-sitter";
 import java from "tree-sitter-java";
+import * as vscode from "vscode";
 
 import { FileCacheManager } from "../Cache/FileCacheManager";
 import { FileParsedComponents } from "../Interface/FileParsedComponents";
 import { CompositeExtractor } from "./CompositeExtractor";
+
 export class FolderExtractComponentsFromCode {
   private parser: Parser;
   private cacheManager: FileCacheManager;
-  private Files: string[]; // Ensure it's always an array
 
   constructor() {
     this.parser = new Parser();
     this.parser.setLanguage(java);
     this.cacheManager = new FileCacheManager();
-    this.Files = []; // Initialize as an empty array
-  }
-
-  public async startbolbol(rootNode: Parser.SyntaxNode, fileUri: vscode.Uri) {
-    if (!this.Files.includes(fileUri.path)) {
-      // Save files
-      this.Files.push(fileUri.path);
-    }
-
-    // Extract components and parse Java files
-    await this.ExtractComponents(rootNode, fileUri);
-    await this.parseAllJavaFiles(); // Make sure to await this if it's an async function
-  }
-
-  public async ExtractComponents(
-    rootNode: Parser.SyntaxNode,
-    fileUri: vscode.Uri
-  ) {
-    const extendedClass = this.IsRelationFound(rootNode);
-
-    if (extendedClass) {
-      const importPaths = this.ExtractImportsAndPackage(rootNode);
-
-      // If import paths are found
-
-      const filesToExtract = this.GetFilesToExtract(extendedClass, importPaths);
-
-      if (importPaths.length > 0 && filesToExtract.length > 0) {
-        const tree = await this.convertImportToFilePath(filesToExtract);
-        const treeRootNode = tree.rootNode;
-
-        if (treeRootNode) {
-          await this.ExtractComponents(treeRootNode, fileUri); // Pass the fileUri here
-        }
-      } else {
-        // If no imports are found, check for extended class name matching with files in the same folder
-        const javaFiles = await vscode.workspace.findFiles("**/*.java");
-
-        // Get the directory of the current file using fileUri
-        const currentFileDirectory = path.dirname(fileUri.fsPath); // Use fsPath from fileUri
-
-        // Find files in the same directory
-        const filesInSameFolder = javaFiles.filter(
-          (file) => path.dirname(file.fsPath) === currentFileDirectory
-        );
-
-        // Check if any of the files in the same folder match the extended class name
-        const matchingFile = filesInSameFolder.find(
-          (file) => path.basename(file.fsPath, ".java") === extendedClass
-        );
-
-        console.log("matchingfile", matchingFile);
-
-        if (matchingFile) {
-          // If a matching file is found, process it
-          const finalFilePath = matchingFile.fsPath;
-
-          if (!this.Files.includes(finalFilePath)) {
-            this.Files.push(finalFilePath);
-            console.log("files", this.Files);
-          }
-          const tree = await this.convertextendedToFilePath(finalFilePath);
-          const treeRootNode = tree.rootNode;
-
-          if (treeRootNode) {
-            await this.ExtractComponents(treeRootNode, fileUri); // Recursively process
-          }
-        }
-      }
-    }
-  }
-
-  public IsRelationFound(rootNode: Parser.SyntaxNode): string | null {
-    let extendedClasses = "";
-
-    const traverse = (currentNode: Parser.SyntaxNode) => {
-      if (
-        currentNode.type === "superclass" ||
-        currentNode.type === "super_interfaces"
-      ) {
-        extendedClasses = currentNode.text
-          .trim()
-          .replace(/^(extends|implements)\s*/, "");
-      }
-      for (const child of currentNode.children) {
-        traverse(child);
-      }
-    };
-
-    traverse(rootNode);
-
-    return extendedClasses; // Return comma-separated string
-  }
-
-  // Extract all the imports from the current file then sends it to the files that need to be extracted
-  public ExtractImportsAndPackage(rootNode: Parser.SyntaxNode): string[] {
-    const importPaths: string[] = [];
-
-    const traverse = (currentNode: Parser.SyntaxNode) => {
-      if (currentNode.type === "import_declaration") {
-        importPaths.push(currentNode.text);
-      }
-
-      for (const child of currentNode.children) {
-        traverse(child);
-      }
-    };
-
-    traverse(rootNode);
-
-    return importPaths;
-  }
-
-  public ExtractClassNameFromImport(importPath: string): string {
-    return importPath.replace(";", "").split(".").pop() || "";
-  }
-
-  public GetFilesToExtract(
-    extendedClass: string,
-    importPaths: string[]
-  ): string {
-    let imports = "";
-    importPaths.forEach((importPath) => {
-      const ClassNameFromImport = this.ExtractClassNameFromImport(importPath);
-
-      if (ClassNameFromImport === extendedClass) {
-        imports = importPath;
-      }
-    });
-
-    return imports;
   }
 
   public async parseAllJavaFiles() {
-    console.log("parseAllJavaFiles", this.Files);
-    if (!this.Files || this.Files.length === 0) {
-      console.log("No files found in this.Files");
-      return;
-    }
-
+    const javaFiles = await vscode.workspace.findFiles("**/*.java");
     const existingComponents = this.getParsedComponentsFromFile();
-    let allParsedComponents: FileParsedComponents[] = [];
+    const allParsedComponents: FileParsedComponents[] = [...existingComponents];
 
-    console.log("\nCache and file service started...");
-    console.log("Processing files:", this.Files);
+    console.log("Cache and file service started...");
+    console.log("Existing Parsed Components:", existingComponents);
 
-    for (const filePath of this.Files) {
-      const fileUri = vscode.Uri.file(filePath);
+    for (const fileUri of javaFiles) {
+      const filePath = fileUri.fsPath;
       const fileContent = await this.fetchFileContent(fileUri);
       const fileHash = FileCacheManager.computeHash(fileContent);
 
-      // Always parse the file to get the latest components
-      const newParsedComponents = await this.parseFile(fileUri);
-
-      if (newParsedComponents) {
-        // Check if we already have components for this file
-        const existingComponent = existingComponents.find((component) =>
-          component.classes.some(
-            (classGroup) => classGroup.fileName === filePath
-          )
-        );
-
-        if (existingComponent) {
-          // Compare the new components with existing ones
-          const hasChanges = this.hasComponentsChanged(
-            existingComponent,
-            newParsedComponents
+      const cachedComponents = this.cacheManager.get(filePath, fileHash);
+      if (cachedComponents) {
+        console.log(`Cache hit: ${filePath}`);
+      } else {
+        const parsedComponents = await this.parseFile(fileUri);
+        if (parsedComponents) {
+          const existingIndex = allParsedComponents.findIndex((component) =>
+            component.classes.some((classGroup) => classGroup.fileName === filePath)
           );
 
-          if (hasChanges) {
-            console.log(`Changes detected in file: ${filePath}`);
-            // Update cache with new components
-            this.cacheManager.set(filePath, fileHash, newParsedComponents);
-            allParsedComponents.push(newParsedComponents);
+          if (existingIndex !== -1) {
+            allParsedComponents[existingIndex] = parsedComponents;
           } else {
-            console.log(`No changes detected in file: ${filePath}`);
-            allParsedComponents.push(existingComponent);
+            allParsedComponents.push(parsedComponents);
           }
+
+          this.cacheManager.set(filePath, fileHash, parsedComponents);
+          console.log(`Changes detected and cache updated: ${filePath}`);
         } else {
-          console.log(`New file detected: ${filePath}`);
-          // Add new components and update cache
-          this.cacheManager.set(filePath, fileHash, newParsedComponents);
-          allParsedComponents.push(newParsedComponents);
+          console.error(`Error parsing file: ${filePath}`);
         }
-      } else {
-        console.error(`Error processing file: ${filePath}`);
       }
     }
 
-    // Handle files that are in existing components but not in current Files
-    const additionalComponents = existingComponents.filter((component) =>
-      component.classes.some(
-        (classGroup) => !this.Files.includes(classGroup.fileName)
-      )
-    );
-    allParsedComponents = [...allParsedComponents, ...additionalComponents];
-
     this.saveParsedComponents(allParsedComponents);
-    console.log("Cache and file service Stopped\n");
-  }
-
-  private hasComponentsChanged(
-    existing: FileParsedComponents,
-    new_: FileParsedComponents
-  ): boolean {
-    // Convert to strings for deep comparison
-    const existingStr = JSON.stringify(this.normalizeComponent(existing));
-    const newStr = JSON.stringify(this.normalizeComponent(new_));
-    return existingStr !== newStr;
-  }
-
-  private normalizeComponent(component: FileParsedComponents): any {
-    // Create a copy to avoid modifying the original
-    const normalized = JSON.parse(JSON.stringify(component));
-
-    // Normalize the component by removing position information
-    // which might change even when the actual content hasn't
-    const removePositions = (obj: any) => {
-      for (const key in obj) {
-        if (typeof obj[key] === "object" && obj[key] !== null) {
-          if (key === "startPosition" || key === "endPosition") {
-            delete obj[key];
-          } else {
-            removePositions(obj[key]);
-          }
-        }
-      }
-      return obj;
-    };
-
-    return removePositions(normalized);
+    console.log("Cache and file service stopped.");
   }
 
   private saveParsedComponents(parsedComponents: FileParsedComponents[]) {
     try {
-      const filePath = path
-        .join(
-          __dirname,
-          "..",
-          "src",
-          "Results",
-          "FolderExtractComponentsFromCode.json"
-        )
-        .replace(/out[\\\/]?/, "");
+      parsedComponents.forEach((component) => {
+        const fileName = component.classes[0]?.fileName || 'UnknownFile';
+        const baseName = path.basename(fileName, path.extname(fileName));  // Get the base name (without extension)
 
-      // Ensure the directory exists
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
+        // Ensure the file is saved with a name matching the baseName for easy retrieval
+        const filePath = path.join(__dirname, "..", "src", "ExtractedFileComponents", `${baseName}.json`).replace(/out[\\\/]?/, "");
 
-      // Remove duplicates based on file names
-      const uniqueParsedComponents = parsedComponents.filter(
-        (component, index, self) =>
-          index ===
-          self.findIndex((c) =>
-            c.classes.some(
-              (classGroup) =>
-                classGroup.fileName === component.classes[0].fileName
-            )
-          )
-      );
+        const newContent = JSON.stringify(component, null, 2);
+        fs.writeFileSync(filePath, newContent);
 
-      const newContent = JSON.stringify(uniqueParsedComponents, null, 2);
-      if (newContent) {
-        // Write to a temporary file first
-        const tempPath = `${filePath}.tmp`;
-        fs.writeFileSync(tempPath, newContent);
-
-        // Rename temp file to target file (atomic operation)
-        fs.renameSync(tempPath, filePath);
-
-        console.log("Successfully saved parsed components to file");
-      } else {
-        console.log("No parsedComponents to save.");
-      }
+        console.log(`Saved parsed component for file: ${baseName}`);
+      });
     } catch (err) {
-      console.error("Failed to save parsedComponents to file:", err);
+      console.error("Failed to save parsed components to files:", err);
     }
   }
-  public getParsedComponentsFromFile(
-    fileName?: string
-  ): FileParsedComponents[] {
+
+  private deleteAllResultsFiles() {
     try {
-      const filePath = path.join(
-        __dirname,
-        "..",
-        "src",
-        "Results",
-        "FolderExtractComponentsFromCode.json"
-      );
-
-      const adjustedPath = filePath.replace(/out[\\\/]?/, "");
-
-      const fileContent = fs.readFileSync(adjustedPath, "utf8");
-
-      // Check if the file content is empty or only contains whitespace
-      if (!fileContent.trim()) {
-        console.warn("The file is empty or contains only whitespace.");
-        return [];
+      const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents");
+  
+      // Check if the Results directory exists
+      if (fs.existsSync(resultsDir)) {
+        // Get all files in the Results directory
+        const files = fs.readdirSync(resultsDir);
+  
+        // Loop through the files and delete each one
+        files.forEach((file) => {
+          const filePath = path.join(resultsDir, file);
+          if (fs.lstatSync(filePath).isFile()) {
+            fs.unlinkSync(filePath);  // Delete the file
+            console.log(`Deleted file: ${file}`);
+          }
+        });
+  
+        console.log("All files deleted from the Results folder.");
+      } else {
+        console.warn("Results folder does not exist.");
       }
+    } catch (err) {
+      console.error("Failed to delete files from the Results folder:", err);
+    }
+  }
 
-      // Try to parse the content, handle potential JSON parsing errors
-      try {
-        return JSON.parse(fileContent) as FileParsedComponents[];
-      } catch (parseError) {
-        console.error("Failed to parse JSON from file:", parseError);
-        return [];
-      }
+  public getParsedComponentsFromFile(): FileParsedComponents[] {
+    try {
+      const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json").replace(/out[\\\/]?/, "");
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      return fileContent.trim() ? JSON.parse(fileContent) : [];
     } catch (err) {
       console.error("Failed to read parsed components from file:", err);
       return [];
     }
   }
 
-  public async convertImportToFilePath(
-    importPath: string
-  ): Promise<Parser.Tree> {
-    // Clean up the import path and ensure it's in a consistent format
-    const filePath = importPath.replace("import", "").replace(";", "").trim();
 
-    // Get everything after the first dot (.)
-    const filePathAfterFirstDot = filePath.includes(".")
-      ? filePath.substring(filePath.indexOf(".") + 1)
-      : filePath;
-
-    // Convert to file path format
-    const formattedFilePath = filePathAfterFirstDot.split(".").join(path.sep);
-
-    console.log(formattedFilePath);
-    // Search for Java files in the workspace
-    const javaFiles = await vscode.workspace.findFiles("**/*.java");
-
-    if (javaFiles.length === 0) {
-      throw new Error("No Java files found in the workspace.");
-    }
-
-    // Get the root path of the project (Assume the root folder is the directory of the first Java file)
-    const projectRoot = path.dirname(javaFiles[0].fsPath);
-
-    // Convert Java file paths to relative paths
-    const relativeJavaFiles = javaFiles.map((javaFile) =>
-      path.relative(projectRoot, javaFile.fsPath)
-    );
-
-    // Normalize paths to always use forward slashes for comparison
-    const normalizedFilePath = formattedFilePath.replace(/\\/g, "/") + ".java"; // Ensure it ends with .java
-    const matchingFile = relativeJavaFiles.find(
-      (file) => file.replace(/\\/g, "/") === normalizedFilePath
-    );
-
-    // Determine final file path
-    const finalFilePath = matchingFile
-      ? path.join(projectRoot, matchingFile)
-      : path.join(projectRoot, formattedFilePath + ".java");
-
-    // Check if the file exists before reading
-    if (!fs.existsSync(finalFilePath)) {
-      console.error(`File does not exist at path: ${finalFilePath}`);
-      throw new Error(`Could not find file at path: ${finalFilePath}`);
-    }
-
+  public getParsedComponentsByFileName(fileName: string): FileParsedComponents | null {
     try {
-      const uri = vscode.Uri.file(finalFilePath);
-      const fileContent = await vscode.workspace.fs.readFile(uri);
-      const fileContentString = new TextDecoder().decode(fileContent);
+      let resultsDir = path.join(__dirname, "..", "ExtractedFileComponents");
+      resultsDir = resultsDir.replace('out', 'src');
+      const files = fs.readdirSync(resultsDir);  // Read all files in the Results folder
+      let parsedComponents;
 
-      if (!this.Files.includes(finalFilePath)) {
-        // Save files
-        this.Files.push(finalFilePath);
+      // Loop through the files, read their content, and parse it
+      for (const file of files) {
+        const filePath = path.join(resultsDir, file);
+
+        if (path.basename(fileName, path.extname(fileName)) === path.basename(filePath, path.extname(filePath))) {
+          const fileContent = fs.readFileSync(filePath, "utf8");
+          const parsedComponent: FileParsedComponents = JSON.parse(fileContent);
+          parsedComponents = parsedComponent;
+        }
+
+
       }
-      const parsedComponents = await this.parseFiletest(uri);
-      return parsedComponents;
-    } catch (error) {
-      console.error("Error reading file:", error);
-      throw new Error(`Could not read file: ${finalFilePath}`);
-    }
-  }
 
-  public async convertextendedToFilePath(
-    finalFilePath: string
-  ): Promise<Parser.Tree> {
-    const uri = vscode.Uri.file(finalFilePath);
+      const matchingComponent = parsedComponents;
 
-    // Parse the file
-    const parsedComponents = await this.parseFiletest(uri); // Await the result
-
-    // if (parsedComponents) {
-    //   allParsedComponents.push(parsedComponents);
-    //   this.saveParsedComponents(allParsedComponents);  // Save parsed data
-    // }
-
-    return parsedComponents;
-  }
-
-  public async parseFiletest(fileUri: vscode.Uri): Promise<Parser.Tree> {
-    const fileContent = await this.fetchFileContent(fileUri);
-
-    const tree = this.parseCode(fileContent);
-
-    return tree;
-  }
-
-  public getParsedComponentsByFileName(
-    fileName: string
-  ): FileParsedComponents | null {
-    try {
-      const parsedComponents = this.getParsedComponentsFromFile();
-
-      const matchingComponent = parsedComponents.find((component) =>
-        component.classes.some((classGroup) => classGroup.fileName === fileName)
-      );
 
       if (!matchingComponent) {
         console.warn(`No data found for file name: ${fileName}`);
         return null;
       }
 
-      return matchingComponent;
+      return matchingComponent;  // Return the matching component
     } catch (err) {
-      console.error(
-        `Failed to get parsed components for file: ${fileName}`,
-        err
-      );
+      console.error(`Failed to get parsed components for file: ${fileName}`, err);
       return null;
     }
   }
 
-  public async parseFile(
-    fileUri: vscode.Uri
-  ): Promise<FileParsedComponents | null> {
+
+
+  public async parseFile(fileUri: vscode.Uri): Promise<FileParsedComponents | null> {
     try {
       const fileContent = await this.fetchFileContent(fileUri);
-
       const tree = this.parseCode(fileContent);
-
       return this.extractFileComponents(tree, fileUri.fsPath);
     } catch (error) {
-      console.error("Error parsing file ${fileUri.fsPath}:, error");
+      console.error(`Error parsing file ${fileUri.fsPath}:`, error);
       return null;
     }
   }
 
-  public extractFileComponents(
-    tree: Parser.Tree,
-    fileName: string
-  ): FileParsedComponents {
-    const rootNode = tree.rootNode;
-
-    const compositeextractor = new CompositeExtractor();
-
-    const classgroup = compositeextractor.extractClassGroup(rootNode, fileName);
-
-    return {
-      classes: classgroup,
-    };
+  public extractFileComponents(tree: Parser.Tree, fileName: string): FileParsedComponents {
+    const compositeExtractor = new CompositeExtractor();
+    const classGroup = compositeExtractor.extractClassGroup(tree.rootNode, fileName);
+    return { classes: classGroup };
   }
 
+  // ✅ Buffered Reading Using Streams and Chunks
   private async fetchFileContent(fileUri: vscode.Uri): Promise<string> {
-    const fileContent = await vscode.workspace.fs.readFile(fileUri);
-    return Buffer.from(fileContent).toString("utf8");
+    return new Promise((resolve, reject) => {
+      const stream = fs.createReadStream(fileUri.fsPath, { encoding: "utf8", highWaterMark: 64 * 1024 }); // 64KB chunks
+      let fileContent = "";
+
+      stream.on("data", (chunk) => {
+        fileContent += chunk;
+      });
+
+      stream.on("end", () => {
+        resolve(fileContent);
+      });
+
+      stream.on("error", (err) => {
+        console.error(`Error reading file: ${fileUri.fsPath}`, err);
+        reject(err);
+      });
+    });
   }
 
   public parseCode(sourceCode: string): Parser.Tree {
