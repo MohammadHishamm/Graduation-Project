@@ -182,7 +182,7 @@ class FolderExtractComponentsFromCode {
         const classGroup = compositeExtractor.extractClassGroup(tree.rootNode, fileName);
         return { classes: classGroup };
     }
-    // ✅ Buffered Reading Using Streams and Chunks
+    //Buffered Reading Using Streams and Chunks
     async fetchFileContent(fileUri) {
         return new Promise((resolve, reject) => {
             const stream = fs.createReadStream(fileUri.fsPath, { encoding: "utf8", highWaterMark: 64 * 1024 }); // 64KB chunks

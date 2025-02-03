@@ -30,7 +30,6 @@ export class CompositeExtractor
       }
     }
 
-
     const classextractor = new ClassExtractor();
     const methodextractor = new MethodExtractor();
     const fieldextractor = new FieldExtractor();
