@@ -108,16 +108,6 @@ class MethodExtractor {
     extractMethodCalls(node) {
         const methodCalls = [];
         const bodyNode = node.childForFieldName("body");
-        const traverse = (currentNode) => {
-            console.log("sas", currentNode.type);
-            // Recursively traverse child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
-                }
-            }
-        };
-        traverse(node);
         if (bodyNode) {
             bodyNode.descendantsOfType("method_invocation").forEach((callNode) => {
                 const objectNode = callNode.childForFieldName("object");
