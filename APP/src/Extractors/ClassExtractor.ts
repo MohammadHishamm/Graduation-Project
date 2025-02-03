@@ -7,11 +7,26 @@ export class ClassExtractor
   // Main function to extract all classes
   public extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] 
   {
-    const classNodes = rootNode.descendantsOfType("class_declaration");
+
+
+
+    let classNodes = rootNode.descendantsOfType("class_declaration");
     
+    let classInfos:ClassInfo[] = [] ;
+   
+    if(classNodes.length === 0)
+    {
+      const interfaceNode =  rootNode.descendantsOfType("interface_declaration");
+
+      if(interfaceNode.length !== 0)
+      {
+        classNodes = interfaceNode;
+      }
+    }
+
     const { extendedClass, implementedInterfaces } = this.extractInheritanceInfo(classNodes);
-    const classInfos = this.extractClassInfo(classNodes, extendedClass, implementedInterfaces);
-    
+    classInfos = this.extractClassInfo(classNodes, extendedClass, implementedInterfaces);
+
     return classInfos;
   }
 
@@ -44,6 +59,7 @@ export class ClassExtractor
   ): ClassInfo[] {
     return classNodes.map((node) => {
       const modifiers = this.extractModifiers(node);
+      const AccessLevel = this.getAccessModifier(modifiers);
       const annotations = this.extractAnnotations(node);
       const isNested = this.isNestedClass(node);
       const genericParams = this.extractGenericParams(node);
@@ -53,10 +69,10 @@ export class ClassExtractor
       return {
         name: node.childForFieldName("name")?.text ?? "Unknown",
         implementedInterfaces,
-        isAbstract: modifiers.includes("abstract"),
-        isFinal: modifiers.includes("final"),
+        isAbstract: node.type === "abstract",  // Changed here,
+        isFinal: modifiers.some((mod) => mod === "final"),
         isInterface: node.type === "interface_declaration",
-        modifiers,
+        AccessLevel,
         annotations,
         startPosition: bodyNode?.startPosition ?? node.startPosition,
         endPosition: bodyNode?.endPosition ?? node.endPosition,
@@ -71,14 +87,20 @@ export class ClassExtractor
   // Function to extract modifiers from the class
   private extractModifiers(node: Parser.SyntaxNode): string[] {
     return node.children
-      .filter((child) => child.type === "modifier")
+      .filter((child) => child.type === "modifiers")
       .map((child) => child.text);
   }
+
+  
+  private getAccessModifier(modifiers: string[]): string {
+    const modifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));
+    return modifier ?? "public";
+}
 
   // Function to extract annotations from the class
   private extractAnnotations(node: Parser.SyntaxNode): string[] {
     return node.children
-      .filter((child) => child.type === "annotation")
+      .filter((child) => child.type === "marker_annotation")
       .map((child) => child.text);
   }
 

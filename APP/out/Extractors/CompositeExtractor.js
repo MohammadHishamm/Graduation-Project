@@ -6,12 +6,28 @@ const MethodExtractor_1 = require("./MethodExtractor");
 const FieldExtractor_1 = require("./FieldExtractor");
 class CompositeExtractor {
     extractClassGroup(rootNode, fileName) {
+        const traverse = (currentNode) => {
+            console.log(currentNode.type);
+            // Recursively traverse child nodes
+            if (currentNode.children) {
+                for (const child of currentNode.children) {
+                    traverse(child);
+                }
+            }
+        };
+        traverse(rootNode);
         // Extract class declarations
-        const classNodes = rootNode.descendantsOfType("class_declaration");
+        let classNodes = rootNode.descendantsOfType("class_declaration");
+        const interfaceNodes = rootNode.descendantsOfType("interface_declaration");
         // Handle cases where no classes are found
         if (classNodes.length === 0) {
-            console.warn(`No classes found in file: ${fileName}`);
-            return [];
+            if (interfaceNodes.length !== 0) {
+                classNodes = interfaceNodes;
+            }
+            else {
+                console.warn(`No Data found in file: ${fileName}`);
+                return [];
+            }
         }
         const classextractor = new ClassExtractor_1.ClassExtractor();
         const methodextractor = new MethodExtractor_1.MethodExtractor();

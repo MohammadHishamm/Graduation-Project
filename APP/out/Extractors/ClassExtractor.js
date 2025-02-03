@@ -4,9 +4,16 @@ exports.ClassExtractor = void 0;
 class ClassExtractor {
     // Main function to extract all classes
     extractClasses(rootNode) {
-        const classNodes = rootNode.descendantsOfType("class_declaration");
+        let classNodes = rootNode.descendantsOfType("class_declaration");
+        let classInfos = [];
+        if (classNodes.length === 0) {
+            const interfaceNode = rootNode.descendantsOfType("interface_declaration");
+            if (interfaceNode.length !== 0) {
+                classNodes = interfaceNode;
+            }
+        }
         const { extendedClass, implementedInterfaces } = this.extractInheritanceInfo(classNodes);
-        const classInfos = this.extractClassInfo(classNodes, extendedClass, implementedInterfaces);
+        classInfos = this.extractClassInfo(classNodes, extendedClass, implementedInterfaces);
         return classInfos;
     }
     // Function to extract inheritance information (extends and implements)
@@ -29,18 +36,20 @@ class ClassExtractor {
     extractClassInfo(classNodes, extendedClass, implementedInterfaces) {
         return classNodes.map((node) => {
             const modifiers = this.extractModifiers(node);
+            const AccessLevel = this.getAccessModifier(modifiers);
             const annotations = this.extractAnnotations(node);
             const isNested = this.isNestedClass(node);
             const genericParams = this.extractGenericParams(node);
             const hasConstructor = this.hasConstructor(node);
             const bodyNode = node.childForFieldName("body");
+            console.log("modifiers", node.descendantsOfType("abstract"));
             return {
                 name: node.childForFieldName("name")?.text ?? "Unknown",
                 implementedInterfaces,
-                isAbstract: modifiers.includes("abstract"),
-                isFinal: modifiers.includes("final"),
+                isAbstract: node.type === "abstract", // Changed here,
+                isFinal: modifiers.some((mod) => mod === "final"),
                 isInterface: node.type === "interface_declaration",
-                modifiers,
+                AccessLevel,
                 annotations,
                 startPosition: bodyNode?.startPosition ?? node.startPosition,
                 endPosition: bodyNode?.endPosition ?? node.endPosition,
@@ -54,13 +63,17 @@ class ClassExtractor {
     // Function to extract modifiers from the class
     extractModifiers(node) {
         return node.children
-            .filter((child) => child.type === "modifier")
+            .filter((child) => child.type === "modifiers")
             .map((child) => child.text);
+    }
+    getAccessModifier(modifiers) {
+        const modifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));
+        return modifier ?? "public";
     }
     // Function to extract annotations from the class
     extractAnnotations(node) {
         return node.children
-            .filter((child) => child.type === "annotation")
+            .filter((child) => child.type === "marker_annotation")
             .map((child) => child.text);
     }
     // Function to check if a class is nested
