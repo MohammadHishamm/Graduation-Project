@@ -61,6 +61,10 @@
       {
         "command": "codepure.openSettings",
         "title": "CodePure: Metrics Settings"
+      },
+      {
+        "command": "extension.clearHistory",
+        "title": "Clear History"
       }
     ],
     "keybindings": [

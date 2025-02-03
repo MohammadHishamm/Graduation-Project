@@ -42,7 +42,6 @@ class ClassExtractor {
             const genericParams = this.extractGenericParams(node);
             const hasConstructor = this.hasConstructor(node);
             const bodyNode = node.childForFieldName("body");
-            console.log("modifiers", node.descendantsOfType("abstract"));
             return {
                 name: node.childForFieldName("name")?.text ?? "Unknown",
                 implementedInterfaces,

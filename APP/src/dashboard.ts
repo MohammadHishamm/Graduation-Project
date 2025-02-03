@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Observer } from "./Core/MetricsObserver"; // Import Observer interface
-import { MetricsFileFormat } from "./Interface/MetricsFileFormat"; // Ensure you import your Metric classes
+import { Observer } from "./Core/MetricsObserver";
+import { MetricsFileFormat } from "./Interface/MetricsFileFormat";
 import { Metric } from "./Core/Metric";
 
 export class CustomTreeProvider
@@ -18,10 +18,12 @@ export class CustomTreeProvider
   private treeItems: TreeItem[] = [];
 
   constructor() {
-    this.loadMetricsData(); // Initial data load
+    this.loadMetricsData();
+
+    // Register the "clearHistory" command
+    vscode.commands.registerCommand("extension.clearHistory", this.clearHistory, this);
   }
 
-  // Load metrics data into the tree
   private loadMetricsData(metricsData: MetricsFileFormat[] = []): void {
     if (metricsData.length === 0) {
       let filePath = path.join(
@@ -46,10 +48,8 @@ export class CustomTreeProvider
       }
     }
 
-    // Create a root node for "ALL Files"
     const allFilesItem = new TreeItem("ALL Files", []);
 
-    // Map metricsData to TreeItems, ensuring the metrics array is passed correctly
     const fileItems = metricsData.map((item) => {
       const fileMetrics = item.metrics.map(
         (metric) => new Metric(metric.name, metric.value)
@@ -57,58 +57,83 @@ export class CustomTreeProvider
       return new TreeItem(item.folderName, fileMetrics);
     });
 
-    // Add the file items under the "ALL Files" root node
     allFilesItem.children = fileItems;
 
-    // Set the tree items to include the "ALL Files" root node
-    this.treeItems = [allFilesItem];
+    // Create Clear History icon and tooltip
+    const clearHistoryItem = new TreeItem(
+      "Clear History",
+      [],
+      vscode.TreeItemCollapsibleState.None
+    );
+    clearHistoryItem.command = {
+      command: "extension.clearHistory",
+      title: "Clear History",
+      tooltip: "Click to clear the metrics history",
+    };
 
-    // Notify listeners that the tree data has changed
+    // Set the icon for the Clear History item
+    clearHistoryItem.iconPath = path.join(__dirname.replace(/out[\\\/]?/, ''), 'src', 'Assets', 'clearhistory.png');
+    
+    // Add Clear History item as a child of ALL Files
+    allFilesItem.children?.push(clearHistoryItem);
+
+    this.treeItems = [allFilesItem];
     this._onDidChangeTreeData.fire();
   }
 
-  // Update method to handle the entire metrics data
   update(metricsData: MetricsFileFormat[]): void {
-    console.log(
-      `Observer notified: Metrics updated with ${metricsData.length} items.`
-    );
-    this.loadMetricsData(metricsData); // Reload tree data with updated metrics
+    console.log(`Observer notified: Metrics updated with ${metricsData.length} items.`);
+    this.loadMetricsData(metricsData);
   }
 
-  // Get the tree items (files with metrics)
   getTreeItem(element: TreeItem): vscode.TreeItem {
     return element;
   }
 
-  // Get the children (metrics for each file or list of files under ALL Files)
   getChildren(element?: TreeItem): Thenable<TreeItem[]> {
     if (!element) {
-      // Top level: return the "ALL Files" node
       return Promise.resolve(this.treeItems);
     }
-
-    // If the element is "ALL Files", return the file nodes
     if (element.label === "ALL Files") {
       return Promise.resolve(element.children || []);
     }
-
-    // If the element is a file, return the metrics for that file
     return Promise.resolve(
       element.metrics.map(
         (metric) => new TreeItem(`${metric.name}: ${metric.value}`, [])
       )
     );
   }
+
+  clearHistory(): void {
+    console.log("Clearing metrics history...");
+
+    let filePath = path.join(
+      __dirname,
+      "..",
+      "src",
+      "Results",
+      "MetricsCalculated.json"
+    );
+    filePath = filePath.replace(/out[\\\/]?/, "");
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify([]));
+      console.log("Metrics history cleared.");
+
+      this.treeItems = [];
+      this._onDidChangeTreeData.fire();
+    } catch (err) {
+      console.error("Error clearing metrics history file:", err);
+    }
+  }
 }
 
-// TreeItem class to represent each item in the tree (both files and metrics)
 class TreeItem extends vscode.TreeItem {
-  children?: TreeItem[]; // To store children nodes for "ALL Files"
+  children?: TreeItem[];
   constructor(
     public readonly label: string,
     public metrics: Metric[] = [],
-    collapsibleState: vscode.TreeItemCollapsibleState = vscode
-      .TreeItemCollapsibleState.Collapsed
+    collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.Collapsed
   ) {
     super(label, collapsibleState);
     this.tooltip = `${label}`;

@@ -6,16 +6,6 @@ const MethodExtractor_1 = require("./MethodExtractor");
 const FieldExtractor_1 = require("./FieldExtractor");
 class CompositeExtractor {
     extractClassGroup(rootNode, fileName) {
-        const traverse = (currentNode) => {
-            console.log(currentNode.type);
-            // Recursively traverse child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
-                }
-            }
-        };
-        traverse(rootNode);
         // Extract class declarations
         let classNodes = rootNode.descendantsOfType("class_declaration");
         const interfaceNodes = rootNode.descendantsOfType("interface_declaration");
