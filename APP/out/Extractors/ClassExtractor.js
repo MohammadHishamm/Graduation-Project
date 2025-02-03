@@ -36,6 +36,7 @@ class ClassExtractor {
     extractClassInfo(classNodes, extendedClass, implementedInterfaces) {
         return classNodes.map((node) => {
             const modifiers = this.extractModifiers(node);
+            const isAbstract = this.extractAbstract(node);
             const AccessLevel = this.getAccessModifier(modifiers);
             const annotations = this.extractAnnotations(node);
             const isNested = this.isNestedClass(node);
@@ -45,7 +46,7 @@ class ClassExtractor {
             return {
                 name: node.childForFieldName("name")?.text ?? "Unknown",
                 implementedInterfaces,
-                isAbstract: node.type === "abstract", // Changed here,
+                isAbstract: isAbstract, // Changed here,
                 isFinal: modifiers.some((mod) => mod === "final"),
                 isInterface: node.type === "interface_declaration",
                 AccessLevel,
@@ -59,11 +60,17 @@ class ClassExtractor {
             };
         });
     }
-    // Function to extract modifiers from the class
     extractModifiers(node) {
         return node.children
             .filter((child) => child.type === "modifiers")
             .map((child) => child.text);
+    }
+    extractAbstract(node) {
+        const modifiers = node.children.find((child) => child.type === 'modifiers');
+        if (modifiers && modifiers.children.some((modifier) => modifier.type === 'abstract')) {
+            return modifiers.children.some((modifier) => modifier.type === 'abstract');
+        }
+        return false;
     }
     getAccessModifier(modifiers) {
         const modifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));

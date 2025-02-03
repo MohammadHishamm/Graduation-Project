@@ -1,32 +1,39 @@
 import { MetricCalculator } from '../../Core/MetricCalculator';
-import { FileParsedComponents } from '../../Interface/FileParsedComponents';
 
-export class JavaNumberOfAbstractClassesM extends MetricCalculator {
+import { FolderExtractComponentsFromCode } from '../../Extractors/FolderExtractComponentsFromCode';
 
-    
-    calculate(node: any): number {
+import { ClassInfo } from '../../Interface/ClassInfo';
+import { MethodInfo } from '../../Interface/MethodInfo';
+import { FieldInfo } from '../../Interface/FieldInfo';
+
+
+export class JavaNumberOfAbstractClassesM extends MetricCalculator 
+{
+    calculate(node: any, FECFC: FolderExtractComponentsFromCode, Filename: string): number 
+    {
         let abstractClassCount = 0;
 
-        const traverse = (currentNode: any) => {
-            // Check if the current node is a class declaration
-            if (currentNode.type === 'class_declaration') {
-                // Check for the "abstract" modifier in the class declaration
-                const modifiers = currentNode.children.find((child: any) => child.type === 'modifiers');
-                if (modifiers && modifiers.children.some((modifier: any) => modifier.type === 'abstract')) {
-                    abstractClassCount++;
-                }
-            }
+        let allClasses: ClassInfo[] = [];
+        let allMethods: MethodInfo[] = [];
+        let allFields: FieldInfo[] = [];
 
-            // Continue traversing through child nodes
-            if (currentNode.children) {
-                for (const child of currentNode.children) {
-                    traverse(child);
-                }
-            }
-        };
+        const fileParsedComponents = FECFC.getParsedComponentsByFileName(Filename);
 
-        // Start traversal from the root node
-        traverse(node);
+        if (fileParsedComponents) {
+            const classGroups = fileParsedComponents.classes;
+            classGroups.forEach((classGroup) => {
+                allClasses = allClasses.concat(classGroup.classes);
+                allMethods = allMethods.concat(classGroup.methods);
+                allFields = allFields.concat(classGroup.fields);
+            });
+        }
+
+        allClasses.forEach((classes) => {
+            if (classes.isAbstract) {
+                abstractClassCount++;
+            }
+        });
+
         return abstractClassCount;
     }
 }

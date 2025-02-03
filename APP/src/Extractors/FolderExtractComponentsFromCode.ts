@@ -171,7 +171,7 @@ export class FolderExtractComponentsFromCode {
     return { classes: classGroup };
   }
 
-  // ✅ Buffered Reading Using Streams and Chunks
+  //Buffered Reading Using Streams and Chunks
   private async fetchFileContent(fileUri: vscode.Uri): Promise<string> {
     return new Promise((resolve, reject) => {
       const stream = fs.createReadStream(fileUri.fsPath, { encoding: "utf8", highWaterMark: 64 * 1024 }); // 64KB chunks
