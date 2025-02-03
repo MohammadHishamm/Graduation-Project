@@ -62,7 +62,7 @@ class MethodExtractor {
             bodyStatements.push(node.type);
         }
         else if (node.type === "condition" || node.type === "binary_expression") {
-            const conditionText = node.text || '';
+            const conditionText = node.text || "";
             const booleanOperators = (conditionText.match(/&&|\|\|/g) || []).length;
             if (booleanOperators > 0) {
                 bodyStatements.push("condition: " + conditionText);
@@ -94,7 +94,9 @@ class MethodExtractor {
         const localVars = [];
         const bodyNode = node.childForFieldName("body");
         if (bodyNode) {
-            bodyNode.descendantsOfType("variable_declarator").forEach((declarator) => {
+            bodyNode
+                .descendantsOfType("variable_declarator")
+                .forEach((declarator) => {
                 const varName = declarator.childForFieldName("name")?.text ?? "Unnamed";
                 const varType = declarator.childForFieldName("type")?.text ?? "Unknown";
                 localVars.push(`${varType} ${varName}`);
@@ -107,10 +109,15 @@ class MethodExtractor {
         const methodCalls = [];
         const bodyNode = node.childForFieldName("body");
         if (bodyNode) {
-            bodyNode.descendantsOfType("call_expression").forEach((callNode) => {
-                const calleeNode = callNode.childForFieldName("callee");
-                const methodName = calleeNode ? calleeNode.text : "Unknown";
-                methodCalls.push(methodName);
+            bodyNode.descendantsOfType("method_invocation").forEach((callNode) => {
+                const objectNode = callNode.childForFieldName("object");
+                const methodNode = callNode.childForFieldName("name");
+                if (objectNode && methodNode) {
+                    methodCalls.push(`${objectNode.text}.${methodNode.text}`);
+                }
+                else if (methodNode) {
+                    methodCalls.push(methodNode.text); // For static calls without object
+                }
             });
         }
         return methodCalls;
@@ -203,7 +210,7 @@ class MethodExtractor {
                                 }
                             }
                             else if (statement.type === "return_statement") {
-                                // get the return statment and gets its child which is field accesed so it is a get 
+                                // get the return statment and gets its child which is field accesed so it is a get
                                 const returnValue = statement.childrenForFieldName("FieldAccessNode");
                                 if (returnValue) {
                                     isAccessor = true;
@@ -222,8 +229,10 @@ class MethodExtractor {
         const accessNodes = rootNode.descendantsOfType("variable_declarator");
         accessNodes.forEach((accessNode) => {
             const fieldName = accessNode.text;
-            if (fieldName && !fieldsUsed.includes(fieldName) && fieldName !== MethodName) {
-                const identifierNode = accessNode.children.find(subChild => subChild.type === "identifier");
+            if (fieldName &&
+                !fieldsUsed.includes(fieldName) &&
+                fieldName !== MethodName) {
+                const identifierNode = accessNode.children.find((subChild) => subChild.type === "identifier");
                 if (identifierNode) {
                     fieldsUsed.push(identifierNode.text); // Add unique field names accessed
                 }

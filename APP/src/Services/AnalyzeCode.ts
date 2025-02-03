@@ -41,7 +41,7 @@ export async function analyzeCode(
         "LOC",
         "AMW",
         // "ATFD",
-        // "FDP",
+        "FDP",
         // "LAA",
         // "NrFE",
         // "CBO",
@@ -64,8 +64,6 @@ export async function analyzeCode(
         "DIT",
       ];
 
-
-
       try {
         progress.report({ message: "Initializing parser...", increment: 10 });
         await pause(500); // Simulate processing delay
@@ -73,7 +71,10 @@ export async function analyzeCode(
         progress.report({ message: "Parsing source code...", increment: 20 });
         await pause(500);
 
-        progress.report({ message: "Extracting ExtractComponents From Code...", increment: 30 });
+        progress.report({
+          message: "Extracting ExtractComponents From Code...",
+          increment: 30,
+        });
         await pause(500);
         await FECFcode.parseAllJavaFiles();
 

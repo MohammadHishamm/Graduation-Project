@@ -58,7 +58,7 @@ async function analyzeCode(document, sourceCode) {
             "LOC",
             "AMW",
             // "ATFD",
-            // "FDP",
+            "FDP",
             // "LAA",
             // "NrFE",
             // "CBO",
@@ -85,7 +85,10 @@ async function analyzeCode(document, sourceCode) {
             await (0, utils_1.pause)(500); // Simulate processing delay
             progress.report({ message: "Parsing source code...", increment: 20 });
             await (0, utils_1.pause)(500);
-            progress.report({ message: "Extracting ExtractComponents From Code...", increment: 30 });
+            progress.report({
+                message: "Extracting ExtractComponents From Code...",
+                increment: 30,
+            });
             await (0, utils_1.pause)(500);
             await initialize_1.FECFcode.parseAllJavaFiles();
             const results = await calculateMetricsWithProgress(document, rootNode, sourceCode, document.languageId, metricsToCalculate, progress);
