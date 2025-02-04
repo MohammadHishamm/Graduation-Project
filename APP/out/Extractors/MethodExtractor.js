@@ -27,9 +27,19 @@ class MethodExtractor {
     // Extract Access Modifiers like static, final, synchronized, etc.
     extractMethodModifiers(node) {
         const modifiers = [];
-        const modifierNodes = node.descendantsOfType("modifier");
-        modifierNodes.forEach((modifier) => {
-            modifiers.push(modifier.text);
+        const methodText = node.text;
+        const possibleModifiers = [
+            "public",
+            "private",
+            "protected",
+            "static",
+            "final",
+            "synchronized",
+        ];
+        possibleModifiers.forEach((mod) => {
+            if (methodText.split(/\s+/)[0] === mod) {
+                modifiers.push(mod);
+            }
         });
         return modifiers;
     }
@@ -173,8 +183,8 @@ class MethodExtractor {
         return false;
     }
     getAccessModifier(modifiers) {
-        const modifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));
-        return modifier ?? "public";
+        const accessModifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));
+        return accessModifier || "public";
     }
     extractMethodName(node) {
         const nameNode = node.childForFieldName("name");

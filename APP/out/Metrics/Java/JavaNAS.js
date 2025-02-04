@@ -21,54 +21,45 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
     }
     findNAS(classes, methods, FECFC) {
         let NAS = 0;
-        let isExtended;
-        let isinterface;
-        const fileParsedComponents = FECFC.getParsedComponentsFromFile();
-        // Loop through Classes to identify the extended class
-        for (const c of classes) {
-            isExtended = c.parent; // The class that extends another class
-            isinterface = c.isInterface; // is interface class
+        // Exit early if no classes or no parent class
+        const parentClass = classes[0]?.parent;
+        if (!parentClass) {
+            console.log("[NAS] No parent class found. NAS = 0");
+            return 0;
         }
-        if (isExtended) {
-            for (const method of methods) {
-                if (method.isOverridden) {
-                    let found = false;
-                    for (const fileComponents of fileParsedComponents) {
-                        for (const classGroup of fileComponents.classes) {
-                            if (isExtended === classGroup.name) {
-                                for (const classMethod of classGroup.methods) {
-                                    if (classMethod.name === method.name) {
-                                        found = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (!found) {
-                        NAS++;
-                    }
-                }
-                else {
-                    if (method.modifiers.includes("public") && // Only public methods
-                        !method.isConstructor && // Exclude constructors
-                        !method.isAccessor // Exclude getters and setters
-                    ) {
-                        NAS++;
-                    }
-                }
+        // Filter methods that are public, not constructors, and not accessors
+        const publicNonAccessorMethods = methods.filter((method) => {
+            const isPublic = method.modifiers.includes("public");
+            const isNotConstructor = !method.isConstructor;
+            const isNotAccessor = !method.isAccessor;
+            if (isPublic && isNotConstructor && isNotAccessor) {
+                console.log(`[NAS] Selected method: ${method.name}`);
+                return true;
             }
-        }
-        else {
-            for (const method of methods) {
-                if (method.modifiers.includes("public") && // Only public methods
-                    !method.isConstructor && // Exclude constructors
-                    !method.isAccessor // Exclude getters and setters
-                ) {
-                    NAS++;
-                }
+            else {
+                if (!isPublic)
+                    console.log(`[NAS] Skipped method (not public): ${method.name}`);
+                if (!isNotConstructor)
+                    console.log(`[NAS] Skipped method (constructor): ${method.name}`);
+                if (!isNotAccessor)
+                    console.log(`[NAS] Skipped method (accessor): ${method.name}`);
+                return false;
             }
-        }
-        return NAS;
+        });
+        // Filter overridden methods
+        const overriddenMethods = methods.filter((method) => {
+            if (method.isOverridden) {
+                console.log(`[NAS] Overridden method: ${method.name}`);
+                return true;
+            }
+            return false;
+        });
+        // Calculate NAS as count of public methods minus overridden methods
+        NAS = publicNonAccessorMethods.length - overriddenMethods.length;
+        console.log(`[NAS] Public Non-Accessor Methods: ${publicNonAccessorMethods.length}`);
+        console.log(`[NAS] Overridden Methods: ${overriddenMethods.length}`);
+        console.log(`[NAS] Final NAS: ${Math.max(NAS, 0)}`);
+        return Math.max(NAS, 0); // Ensure NAS is not negative
     }
 }
 exports.JavaNumberOfAddedServices = JavaNumberOfAddedServices;

@@ -31,10 +31,22 @@ export class MethodExtractor {
   // Extract Access Modifiers like static, final, synchronized, etc.
   private extractMethodModifiers(node: Parser.SyntaxNode): string[] {
     const modifiers: string[] = [];
-    const modifierNodes = node.descendantsOfType("modifier");
-    modifierNodes.forEach((modifier) => {
-      modifiers.push(modifier.text);
+    const methodText = node.text;
+    const possibleModifiers = [
+      "public",
+      "private",
+      "protected",
+      "static",
+      "final",
+      "synchronized",
+    ];
+
+    possibleModifiers.forEach((mod) => {
+      if (methodText.split(/\s+/)[0] === mod) {
+        modifiers.push(mod);
+      }
     });
+
     return modifiers;
   }
 
@@ -189,10 +201,11 @@ export class MethodExtractor {
   }
 
   private getAccessModifier(modifiers: string[]): string {
-    const modifier = modifiers.find((mod) =>
+    const accessModifier = modifiers.find((mod) =>
       ["public", "private", "protected"].includes(mod)
     );
-    return modifier ?? "public";
+
+    return accessModifier || "public";
   }
 
   private extractMethodName(node: Parser.SyntaxNode): string {
