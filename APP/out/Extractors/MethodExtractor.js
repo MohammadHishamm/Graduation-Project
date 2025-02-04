@@ -98,8 +98,12 @@ class MethodExtractor {
                 .descendantsOfType("variable_declarator")
                 .forEach((declarator) => {
                 const varName = declarator.childForFieldName("name")?.text ?? "Unnamed";
-                const varType = declarator.childForFieldName("type")?.text ?? "Unknown";
-                localVars.push(`${varType} ${varName}`);
+                // Try to find the type in the parent node (e.g., variable_declaration)
+                const parent = declarator.parent;
+                const varType = parent?.childForFieldName("type")?.text;
+                parent?.child(0)?.text; // Sometimes the type is the first child
+                ("Unknown");
+                localVars.push(`${varType}`);
             });
         }
         return localVars;

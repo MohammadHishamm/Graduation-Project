@@ -54,49 +54,50 @@ class JavaAccessofImportData extends MetricCalculator_1.MetricCalculator {
             "Long",
             "Void",
         ]);
-        // System and standard library packages to exclude
-        const systemPackages = new Set([
-            "System",
-            "Math",
-            "Arrays",
-            "Collections",
-            "List",
-            "Map",
-            "Set",
-            "out",
-            "print",
-            "println",
-            "console",
-            "Integer",
-            "Double",
-            "Boolean",
-            "String",
-        ]);
         // Helper: Check if a type is foreign
         const isForeignClass = (type) => {
             const baseType = type.split("<")[0].trim();
-            return (!primitiveTypes.has(baseType) &&
-                baseType !== currentClassName &&
-                !systemPackages.has(baseType));
+            return !primitiveTypes.has(baseType) && baseType !== currentClassName;
         };
-        // Process methods to find usage of foreign class method calls
+        // Map field names to their types (if foreign)
+        const fieldTypes = new Map();
+        fields.forEach((field) => {
+            if (isForeignClass(field.type)) {
+                fieldTypes.set(field.name, field.type);
+                console.log(`[FDP] Found field of foreign type: ${field.name} (${field.type})`);
+            }
+        });
+        // Process methods to find usage of foreign class fields, methods, and local variables
         methods.forEach((method) => {
-            method.methodCalls.forEach((methodCall) => {
-                // Only process method calls with a dot
-                if (!methodCall.includes("."))
-                    return;
-                // Split the method call and take the first part
-                const objectName = methodCall.split(".")[0];
-                // Skip primitive or current class names or system packages
-                if (primitiveTypes.has(objectName) ||
-                    objectName === currentClassName ||
-                    systemPackages.has(objectName)) {
-                    return;
+            // Check fields used
+            method.fieldsUsed.forEach((fieldName) => {
+                for (const [name, type] of fieldTypes) {
+                    if (fieldName.startsWith(name)) {
+                        foreignClassesAccessed.add(type);
+                        console.log(`[FDP] Found usage of foreign class ${type} through field ${name}`);
+                    }
                 }
-                // If the object name is not a primitive and not the current class
-                if (isForeignClass(objectName)) {
-                    foreignClassesAccessed.add(objectName);
-                    console.log(`[FDP] Found usage of foreign class through method call: ${methodCall}`);
+            });
+            // Check local variables
+            method.localVariables.forEach((localVar) => {
+                // Skip 'Unknown' placeholders or primitive placeholders
+                if (localVar === "Unknown" || primitiveTypes.has(localVar))
+                    return;
+                // If local variable is a valid foreign type
+                if (isForeignClass(localVar)) {
+                    foreignClassesAccessed.add(localVar);
+                    console.log(`[FDP] Found local variable of foreign type: ${localVar}`);
+                }
+            });
+            // Check method calls
+            method.methodCalls.forEach((methodCall) => {
+                // Extract the object part of the call (e.g., 'providerA' from 'providerA.getDataA')
+                const objectName = methodCall.split(".")[0];
+                // If the object matches a foreign field, it's a foreign method call
+                if (fieldTypes.has(objectName)) {
+                    const foreignType = fieldTypes.get(objectName);
+                    foreignClassesAccessed.add(foreignType);
+                    console.log(`[FDP] Found usage of foreign class ${foreignType} through method call ${methodCall}`);
                 }
             });
         });
