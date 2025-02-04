@@ -1,8 +1,7 @@
 import * as vscode from "vscode";
-import { initializeExtension , customTreeProvider} from "./initialize";
+import { initializeExtension, customTreeProvider } from "./initialize";
 import { registerCommands } from "./commands";
 import { handleEvents } from "./events";
-
 
 export async function activate(context: vscode.ExtensionContext) {
   console.time("Extension Execution Time");
@@ -17,7 +16,10 @@ export async function activate(context: vscode.ExtensionContext) {
   handleEvents(context);
 
   // Register Tree View
-  vscode.window.registerTreeDataProvider("codepureTreeView", customTreeProvider);
+  vscode.window.registerTreeDataProvider(
+    "codepureTreeView",
+    customTreeProvider
+  );
 
   console.timeEnd("Extension Execution Time");
 }

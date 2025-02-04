@@ -21,14 +21,17 @@ class ClassExtractor {
         let extendedClass;
         let implementedInterfaces = [];
         classNodes.forEach((node) => {
-            const extendsNode = node.childForFieldName("superclass");
-            const implementsNode = node.childForFieldName("interfaces");
-            if (extendsNode) {
-                extendedClass = extendsNode.text.trim().replace(/^(extends|implements)\s*/, "");
-            }
-            if (implementsNode) {
-                implementedInterfaces = implementsNode.text.split(",").map((i) => i.trim());
-            }
+            node.namedChildren.forEach((child) => {
+                if (child.type === "superclass" || child.type === "extends_interfaces") {
+                    extendedClass = child.text.trim().replace(/^(extends)\s*/, "");
+                }
+                if (child.type === "interfaces") {
+                    implementedInterfaces = child.text
+                        .replace(/^implements\s*/, "")
+                        .split(",")
+                        .map((i) => i.trim());
+                }
+            });
         });
         return { extendedClass, implementedInterfaces };
     }

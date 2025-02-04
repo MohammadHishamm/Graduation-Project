@@ -74,6 +74,7 @@ async function analyzeCode(document, sourceCode) {
             // "FANOUT",
             // "NDU",
             "NAS",
+            "PNAS",
             // "BUR",
             // "NOD",
             // "NODD",

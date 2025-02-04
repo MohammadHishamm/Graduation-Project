@@ -25,6 +25,7 @@ const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
+const JavaPNAS_1 = require("../Metrics/Java/JavaPNAS");
 // import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 // import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 // import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
@@ -87,6 +88,8 @@ class MetricsFactory {
             // return new NDUCalculation();
             case "NAS":
                 return new JavaNAS_1.JavaNumberOfAddedServices();
+            case "PNAS":
+                return new JavaPNAS_1.JavaProportionOfNewAddedServices();
             case "BUR":
             // return new BURCalculation();
             // case "NOD":

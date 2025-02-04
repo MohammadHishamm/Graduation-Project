@@ -28,6 +28,7 @@ import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
 import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
 import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
+import { JavaProportionOfNewAddedServices } from "../Metrics/Java/JavaPNAS";
 // import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 // import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 // import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
@@ -95,6 +96,8 @@ export class MetricsFactory {
       // return new NDUCalculation();
       case "NAS":
         return new JavaNumberOfAddedServices();
+      case "PNAS":
+        return new JavaProportionOfNewAddedServices();
       case "BUR":
       // return new BURCalculation();
       // case "NOD":
@@ -140,7 +143,7 @@ export class MetricsFactory {
   ): MetricCalculator | null {
     switch (metricName) {
       case "LOC":
-        // return new PythonLOCMetric();
+      // return new PythonLOCMetric();
       case "CC":
         return new PythonCyclomaticComplexityMetric();
       case "NOA":

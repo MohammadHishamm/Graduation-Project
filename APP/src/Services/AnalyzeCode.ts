@@ -57,6 +57,7 @@ export async function analyzeCode(
         // "FANOUT",
         // "NDU",
         "NAS",
+        "PNAS",
         // "BUR",
         // "NOD",
         // "NODD",
