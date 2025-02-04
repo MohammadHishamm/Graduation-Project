@@ -51,7 +51,8 @@ async function activate(context) {
     vscode.window.registerTreeDataProvider("codepureTreeView", initialize_1.customTreeProvider);
     console.timeEnd("Extension Execution Time");
 }
-function deactivate() {
+async function deactivate() {
+    await initialize_1.FECFcode.deleteAllResultsFiles();
     console.log("CodePure extension is now deactivated.");
 }
 //# sourceMappingURL=extension.js.map

@@ -73,7 +73,7 @@ export async function analyzeCode(
         await pause(500);
 
         progress.report({
-          message: "Extracting ExtractComponents From Code...",
+          message: "Extracting Components From Code...",
           increment: 30,
         });
         await pause(500);

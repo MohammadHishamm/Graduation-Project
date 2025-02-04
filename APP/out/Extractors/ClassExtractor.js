@@ -49,7 +49,7 @@ class ClassExtractor {
             return {
                 name: node.childForFieldName("name")?.text ?? "Unknown",
                 implementedInterfaces,
-                isAbstract: isAbstract, // Changed here,
+                isAbstract: isAbstract,
                 isFinal: modifiers.some((mod) => mod === "final"),
                 isInterface: node.type === "interface_declaration",
                 AccessLevel,

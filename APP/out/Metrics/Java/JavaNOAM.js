@@ -20,13 +20,13 @@ class JavaNumberOfAccessorMethods extends MetricCalculator_1.MetricCalculator {
         return NOAM;
     }
     findaccessedmethods(Methods) {
-        let NOAM = 0; // Initialize DAC counter
+        let NOAM = 0;
         for (const Method of Methods) {
             if (Method.isAccessor) {
                 NOAM++;
             }
         }
-        return NOAM; // Return the final count
+        return NOAM;
     }
 }
 exports.JavaNumberOfAccessorMethods = JavaNumberOfAccessorMethods;

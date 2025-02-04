@@ -32,7 +32,7 @@ export class JavaNumberOfAccessorMethods extends MetricCalculator {
   }
 
   private findaccessedmethods(Methods: MethodInfo[]): number {
-    let NOAM = 0; // Initialize DAC counter
+    let NOAM = 0; 
 
     for (const Method of Methods) {
       if (Method.isAccessor) {
@@ -40,6 +40,6 @@ export class JavaNumberOfAccessorMethods extends MetricCalculator {
       }
     }
 
-    return NOAM; // Return the final count
+    return NOAM;
   }
 }

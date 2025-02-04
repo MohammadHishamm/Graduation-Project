@@ -25,6 +25,16 @@ export class FileCacheManager {
         this.cache.set(filePath, { hash, parsedComponents });
     }
 
+
+    public found(filePath: string, hash: string): boolean {
+        const cachedEntry = this.cache.get(filePath);
+        if (cachedEntry && cachedEntry.hash === hash) 
+        {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Remove entries for files no longer present in the workspace.
      */

@@ -20,23 +20,25 @@ export class FolderExtractComponentsFromCode {
 
   public async parseAllJavaFiles() {
     const javaFiles = await vscode.workspace.findFiles("**/*.java");
-    const existingComponents = this.getParsedComponentsFromFile();
-    const allParsedComponents: FileParsedComponents[] = [...existingComponents];
+    const allParsedComponents: FileParsedComponents[] = [];
 
     console.log("Cache and file service started...");
-    console.log("Existing Parsed Components:", existingComponents);
 
     for (const fileUri of javaFiles) {
       const filePath = fileUri.fsPath;
       const fileContent = await this.fetchFileContent(fileUri);
       const fileHash = FileCacheManager.computeHash(fileContent);
-
       const cachedComponents = this.cacheManager.get(filePath, fileHash);
-      if (cachedComponents) {
+
+      if (cachedComponents) 
+      {
         console.log(`Cache hit: ${filePath}`);
-      } else {
+      } 
+      else 
+      {
         const parsedComponents = await this.parseFile(fileUri);
         if (parsedComponents) {
+
           const existingIndex = allParsedComponents.findIndex((component) =>
             component.classes.some((classGroup) => classGroup.fileName === filePath)
           );
@@ -78,15 +80,17 @@ export class FolderExtractComponentsFromCode {
     }
   }
 
-  private deleteAllResultsFiles() {
-    try {
-      const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents");
+
   
+  public async deleteAllResultsFiles() {
+    try {
+      const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents").replace(/out[\\\/]?/, "");
+
       // Check if the Results directory exists
       if (fs.existsSync(resultsDir)) {
         // Get all files in the Results directory
         const files = fs.readdirSync(resultsDir);
-  
+
         // Loop through the files and delete each one
         files.forEach((file) => {
           const filePath = path.join(resultsDir, file);
@@ -95,7 +99,7 @@ export class FolderExtractComponentsFromCode {
             console.log(`Deleted file: ${file}`);
           }
         });
-  
+
         console.log("All files deleted from the Results folder.");
       } else {
         console.warn("Results folder does not exist.");
@@ -105,17 +109,22 @@ export class FolderExtractComponentsFromCode {
     }
   }
 
-  public getParsedComponentsFromFile(): FileParsedComponents[] {
+  public async deleteSpecificFile(fileName: string) {
     try {
-      const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json").replace(/out[\\\/]?/, "");
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      return fileContent.trim() ? JSON.parse(fileContent) : [];
+      const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents").replace(/out[\\\/]?/, "");
+      const filePath = path.join(resultsDir, fileName);
+
+      // Check if the specific file exists
+      if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+        fs.unlinkSync(filePath);  // Delete the file
+        console.log(`Deleted file: ${fileName}`);
+      } else {
+        console.warn(`File "${fileName}" does not exist in the Results folder.`);
+      }
     } catch (err) {
-      console.error("Failed to read parsed components from file:", err);
-      return [];
+      console.error(`Failed to delete file "${fileName}":`, err);
     }
   }
-
 
   public getParsedComponentsByFileName(fileName: string): FileParsedComponents | null {
     try {

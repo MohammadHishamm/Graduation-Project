@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
 // ..
 const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
-const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
@@ -24,6 +23,8 @@ const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
+// import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
+// import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
 const JavaPNAS_1 = require("../Metrics/Java/JavaPNAS");
 // import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
@@ -59,7 +60,7 @@ class MetricsFactory {
             case `AMW`:
                 return new JavaAMW_1.JavaAverageMethodWeight();
             case `ATFD`:
-                return new JavaATFD_1.JavaAccessToForeignData();
+            // return new JavaAccessToForeignData();
             case `FDP`:
                 return new JavaFDP_1.JavaAccessofImportData();
             //  case `LAA`:

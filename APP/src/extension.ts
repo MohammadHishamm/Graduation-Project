@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { initializeExtension, customTreeProvider } from "./initialize";
+import { initializeExtension, customTreeProvider  , FECFcode} from "./initialize";
 import { registerCommands } from "./commands";
 import { handleEvents } from "./events";
 
@@ -24,6 +24,7 @@ export async function activate(context: vscode.ExtensionContext) {
   console.timeEnd("Extension Execution Time");
 }
 
-export function deactivate() {
+export async function deactivate() {
+  await FECFcode.deleteAllResultsFiles();
   console.log("CodePure extension is now deactivated.");
 }

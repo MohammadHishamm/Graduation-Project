@@ -54,10 +54,8 @@ class FolderExtractComponentsFromCode {
     }
     async parseAllJavaFiles() {
         const javaFiles = await vscode.workspace.findFiles("**/*.java");
-        const existingComponents = this.getParsedComponentsFromFile();
-        const allParsedComponents = [...existingComponents];
+        const allParsedComponents = [];
         console.log("Cache and file service started...");
-        console.log("Existing Parsed Components:", existingComponents);
         for (const fileUri of javaFiles) {
             const filePath = fileUri.fsPath;
             const fileContent = await this.fetchFileContent(fileUri);
@@ -103,9 +101,9 @@ class FolderExtractComponentsFromCode {
             console.error("Failed to save parsed components to files:", err);
         }
     }
-    deleteAllResultsFiles() {
+    async deleteAllResultsFiles() {
         try {
-            const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents");
+            const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents").replace(/out[\\\/]?/, "");
             // Check if the Results directory exists
             if (fs.existsSync(resultsDir)) {
                 // Get all files in the Results directory
@@ -128,15 +126,21 @@ class FolderExtractComponentsFromCode {
             console.error("Failed to delete files from the Results folder:", err);
         }
     }
-    getParsedComponentsFromFile() {
+    async deleteSpecificFile(fileName) {
         try {
-            const filePath = path.join(__dirname, "..", "src", "Results", "FolderExtractComponentsFromCode.json").replace(/out[\\\/]?/, "");
-            const fileContent = fs.readFileSync(filePath, "utf8");
-            return fileContent.trim() ? JSON.parse(fileContent) : [];
+            const resultsDir = path.join(__dirname, "..", "src", "ExtractedFileComponents").replace(/out[\\\/]?/, "");
+            const filePath = path.join(resultsDir, fileName);
+            // Check if the specific file exists
+            if (fs.existsSync(filePath) && fs.lstatSync(filePath).isFile()) {
+                fs.unlinkSync(filePath); // Delete the file
+                console.log(`Deleted file: ${fileName}`);
+            }
+            else {
+                console.warn(`File "${fileName}" does not exist in the Results folder.`);
+            }
         }
         catch (err) {
-            console.error("Failed to read parsed components from file:", err);
-            return [];
+            console.error(`Failed to delete file "${fileName}":`, err);
         }
     }
     getParsedComponentsByFileName(fileName) {

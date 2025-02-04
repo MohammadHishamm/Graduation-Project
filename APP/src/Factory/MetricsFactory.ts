@@ -2,7 +2,7 @@ import { MetricCalculator } from "../Core/MetricCalculator";
 
 // ..
 import { JavaAverageMethodWeight } from "../Metrics/Java/JavaAMW";
-import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
+// import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
 import { JavaCognitiveComplexityMetric } from "../Metrics/Java/JavaCoC";
 import { JavaDataAbstractionCoupling } from "../Metrics/Java/JavaDAC";
 import { JavaLOCMetric } from "../Metrics/Java/JavaLOCC";
@@ -25,8 +25,8 @@ import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
 import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
-import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
-import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
+// import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
+// import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
 import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
 import { JavaProportionOfNewAddedServices } from "../Metrics/Java/JavaPNAS";
 // import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
@@ -67,7 +67,7 @@ export class MetricsFactory {
       case `AMW`:
         return new JavaAverageMethodWeight();
       case `ATFD`:
-        return new JavaAccessToForeignData();
+        // return new JavaAccessToForeignData();
       case `FDP`:
         return new JavaAccessofImportData();
       //  case `LAA`:

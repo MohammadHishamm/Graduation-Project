@@ -87,7 +87,7 @@ async function analyzeCode(document, sourceCode) {
             progress.report({ message: "Parsing source code...", increment: 20 });
             await (0, utils_1.pause)(500);
             progress.report({
-                message: "Extracting ExtractComponents From Code...",
+                message: "Extracting Components From Code...",
                 increment: 30,
             });
             await (0, utils_1.pause)(500);

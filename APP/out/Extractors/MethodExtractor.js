@@ -138,37 +138,29 @@ class MethodExtractor {
     }
     // Extract Method Information Including All Details
     extractMethods(rootNode, classes) {
-        const methodNodes = rootNode.descendantsOfType("method_declaration");
+        // Collect all method and constructor declarations
+        const methodNodes = [
+            ...rootNode.descendantsOfType("constructor_declaration"),
+            ...rootNode.descendantsOfType("method_declaration")
+        ];
         return methodNodes.map((node) => {
             const modifiers = this.extractMethodModifiers(node);
-            const isOverridden = this.isOverriddenMethod(node);
-            const accessModifier = this.getAccessModifier(modifiers);
             const name = this.extractMethodName(node);
-            const params = this.extractMethodParams(node);
-            const returnType = this.extractMethodReturnType(node);
-            const parentClass = this.findParentClass(node, classes);
-            const isConstructor = this.isConstructorMethod(name, parentClass);
-            const isAccessor = this.isAccessor(node, name);
-            const fieldsUsed = this.getFieldsUsedInMethod(node, name);
-            const annotations = this.extractMethodAnnotations(node);
-            const throwsClause = this.extractThrowsClause(node);
-            const methodBody = this.extractStatements(node);
-            const localVariables = this.extractLocalVariables(node);
-            const methodCalls = this.extractMethodCalls(node);
             return {
                 name,
-                modifiers: accessModifier,
-                params,
-                returnType,
-                isConstructor,
-                isAccessor,
-                isOverridden,
-                fieldsUsed,
-                annotations,
-                throwsClause,
-                methodBody,
-                localVariables,
-                methodCalls,
+                modifiers: this.getAccessModifier(modifiers),
+                params: this.extractMethodParams(node),
+                returnType: this.extractMethodReturnType(node),
+                isConstructor: node.type === "constructor_declaration",
+                isAccessor: this.isAccessor(node, name),
+                isOverridden: this.isOverriddenMethod(node),
+                fieldsUsed: this.getFieldsUsedInMethod(node, name),
+                annotations: this.extractMethodAnnotations(node),
+                throwsClause: this.extractThrowsClause(node),
+                methodBody: this.extractStatements(node),
+                localVariables: this.extractLocalVariables(node),
+                methodCalls: this.extractMethodCalls(node),
+                parent: this.findParentClass(node, classes),
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,
             };
@@ -190,16 +182,25 @@ class MethodExtractor {
         const nameNode = node.childForFieldName("name");
         return nameNode ? nameNode.text : "Unknown";
     }
-    extractMethodReturnType(node) {
-        const returnTypeNode = node.childForFieldName("return_type");
-        return returnTypeNode ? returnTypeNode.text : "void";
+    extractMethodReturnType(methodNode) {
+        // Check if method is void
+        const voidTypeNode = methodNode.childForFieldName("void_type");
+        if (voidTypeNode) {
+            return "void";
+        }
+        const integralTypeNode = methodNode.descendantsOfType("integral_type")[0];
+        if (integralTypeNode) {
+            return integralTypeNode.text;
+        }
+        const typeNode = methodNode.descendantsOfType("type_identifier")[0];
+        if (typeNode) {
+            return typeNode.text;
+        }
+        return "No_Type";
     }
     findParentClass(node, classes) {
         const className = node.parent?.type === "class_declaration" ? node.parent.text : "";
         return classes.find((classInfo) => classInfo.name === className) ?? null;
-    }
-    isConstructorMethod(name, parentClass) {
-        return parentClass ? name === parentClass.name : false;
     }
     isAccessor(rootNode, methodName) {
         let isAccessor = false;
