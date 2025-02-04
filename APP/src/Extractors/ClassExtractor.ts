@@ -2,21 +2,17 @@ import Parser from "tree-sitter";
 
 import { ClassInfo } from "../Interface/ClassInfo";
 
-export class ClassExtractor 
-{  
+export class ClassExtractor {
   // Main function to extract all classes
-  public extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] 
-  {
+  public extractClasses(rootNode: Parser.SyntaxNode): ClassInfo[] {
     let classNodes = rootNode.descendantsOfType("class_declaration");
-    
-    let classInfos:ClassInfo[] = [] ;
-   
-    if(classNodes.length === 0)
-    {
-      const interfaceNode =  rootNode.descendantsOfType("interface_declaration");
 
-      if(interfaceNode.length !== 0)
-      {
+    let classInfos: ClassInfo[] = [];
+
+    if (classNodes.length === 0) {
+      const interfaceNode = rootNode.descendantsOfType("interface_declaration");
+
+      if (interfaceNode.length !== 0) {
         classNodes = interfaceNode;
       }
     }
@@ -33,25 +29,27 @@ export class ClassExtractor
     let implementedInterfaces: string[] = [];
 
     classNodes.forEach((node) => {
-      const extendsNode = node.childForFieldName("superclass");
-      const implementsNode = node.childForFieldName("interfaces");
 
-      if (extendsNode) {
-        extendedClass = extendsNode.text.trim().replace(/^(extends|implements)\s*/, "");
-      }
+      node.namedChildren.forEach((child) => {
+        if (child.type === "superclass" || child.type === "extends_interfaces") {
+          extendedClass = child.text.trim().replace(/^(extends)\s*/, "");
+        }
+        if (child.type === "interfaces") {
+          implementedInterfaces = child.text
+            .replace(/^implements\s*/, "") 
+            .split(",")
+            .map((i) => i.trim());
+        }
 
-      if (implementsNode) {
-        implementedInterfaces = implementsNode.text.split(",").map((i) => i.trim());
-      }
+      });
     });
-
     return { extendedClass, implementedInterfaces };
   }
 
   // Function to extract all class information
   private extractClassInfo(
-    classNodes: Parser.SyntaxNode[], 
-    extendedClass: string | undefined, 
+    classNodes: Parser.SyntaxNode[],
+    extendedClass: string | undefined,
     implementedInterfaces: string[]
   ): ClassInfo[] {
     return classNodes.map((node) => {
@@ -63,7 +61,7 @@ export class ClassExtractor
       const genericParams = this.extractGenericParams(node);
       const hasConstructor = this.hasConstructor(node);
       const bodyNode = node.childForFieldName("body");
-      
+
       return {
         name: node.childForFieldName("name")?.text ?? "Unknown",
         implementedInterfaces,
@@ -88,10 +86,10 @@ export class ClassExtractor
       .map((child) => child.text);
   }
 
-  private extractAbstract(node: Parser.SyntaxNode):  boolean {
+  private extractAbstract(node: Parser.SyntaxNode): boolean {
     const modifiers = node.children.find((child: any) => child.type === 'modifiers');
     if (modifiers && modifiers.children.some((modifier: any) => modifier.type === 'abstract')) {
-        return modifiers.children.some((modifier: any) => modifier.type === 'abstract');
+      return modifiers.children.some((modifier: any) => modifier.type === 'abstract');
     }
     return false;
   }
@@ -99,7 +97,7 @@ export class ClassExtractor
   private getAccessModifier(modifiers: string[]): string {
     const modifier = modifiers.find((mod) => ["public", "private", "protected"].includes(mod));
     return modifier ?? "public";
-}
+  }
 
   // Function to extract annotations from the class
   private extractAnnotations(node: Parser.SyntaxNode): string[] {
@@ -122,12 +120,10 @@ export class ClassExtractor
   // Function to check if the class has a constructor
   private hasConstructor(node: Parser.SyntaxNode): boolean {
     const bodyNode = node.childForFieldName("body");
-    if(bodyNode)
-    {
-        if(bodyNode.descendantsOfType("constructor_declaration").length > 0)
-        {
-            return true;
-        }
+    if (bodyNode) {
+      if (bodyNode.descendantsOfType("constructor_declaration").length > 0) {
+        return true;
+      }
     }
     return false;
   }
