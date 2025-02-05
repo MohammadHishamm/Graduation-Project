@@ -25,9 +25,7 @@ class JavaWeightedMethodCount extends MetricCalculator_1.MetricCalculator {
                 if (statement.includes("if_statement") ||
                     statement.includes("while_statement") ||
                     statement.includes("do_statement") ||
-                    statement.includes("catch_clause") ||
                     statement.includes("case") ||
-                    statement.includes("throw_statement") ||
                     statement.includes("break_statement") ||
                     statement.includes("continue_statement") ||
                     statement.includes("for_statement") ||

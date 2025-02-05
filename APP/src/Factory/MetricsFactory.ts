@@ -108,30 +108,6 @@ export class MetricsFactory {
         return new TCCCalculation();
       case "DIT":
         return new JavaDepthOfInheritanceTree();
-      //       case "FANOUT":
-      //         const javaCode = `
-
-      // public class Dog extends Animal {
-      //     // Overriding the makeSound method from Animal class
-
-      //     static public void makeSound() {
-      //         System.out.println("Dog barks");
-      //     }
-
-      // }
-
-      // `;
-      //         const parser = new ExtractComponentsFromCode(); // Create an instance of CodeParser
-      //         const tree = parser.parseCode(javaCode); // Parse the Java code into a syntax tree
-
-      //         const components = parser.extractComponents(tree); // Extract classes, methods, and fields
-
-      //         console.log("Classes:", components.classes);
-      //         console.log("Methods:", components.methods);
-      //         console.log("Fields:", components.fields);
-      // console.log('WOC:', components.weight);
-      // console.log('Fields:', components.weight);
-
       default:
         return null;
     }

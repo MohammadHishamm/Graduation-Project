@@ -40,6 +40,7 @@ export async function analyzeCode(
       const metricsToCalculate = [
         "LOC",
         "AMW",
+        "CBO",
         // "ATFD",
         "FDP",
         // "LAA",

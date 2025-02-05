@@ -57,6 +57,7 @@ async function analyzeCode(document, sourceCode) {
         const metricsToCalculate = [
             "LOC",
             "AMW",
+            "CBO",
             // "ATFD",
             "FDP",
             // "LAA",

@@ -1,32 +1,26 @@
-import fetch from 'node-fetch';  // Assuming you're using node-fetch for fetch in Node.js
+import fetch from 'node-fetch';  
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv'; 
+import dotenv from 'dotenv';
 
 export class ServerMetricsManager {
 
-    protected readonly serverUrl: string;
-    protected readonly apiKey: string ;  // API_KEY may be undefined if not found in the .env
-    protected readonly filePath: string;
+  protected readonly serverUrl: string;
+  protected readonly apiKey: string;  
+  protected readonly filePath: string;
 
-  constructor() 
-  {
-    
-// Resolve the path to the root .env file, assuming it's located in the APP folder
-this.filePath = path.resolve(__dirname, '..', '.env'); // Goes one level up from 'Services' to 'APP'
-this.filePath = this.filePath.replace(/out[\\\/]?/, "");
+  constructor() {
 
-// Load environment variables from the .env file
-dotenv.config({ path: this.filePath });
+    this.filePath = path.resolve(__dirname, '..', '.env'); 
+    this.filePath = this.filePath.replace(/out[\\\/]?/, "");
 
-// Log the file path to check if it's correct
+    dotenv.config({ path: this.filePath });
 
     this.serverUrl = 'http://localhost:3000';
-    if (!process.env.API_KEY) 
-    {
-        throw new Error('API_KEY is missing in the .env file');
+    if (!process.env.API_KEY) {
+      throw new Error('API_KEY is missing in the .env file');
     }
-    this.apiKey = process.env.API_KEY ;
+    this.apiKey = process.env.API_KEY;
   }
 
   // Function to check if the server is online
@@ -54,7 +48,6 @@ dotenv.config({ path: this.filePath });
     }
   }
 
-  // Function to send metrics file to the server
   async sendMetricsFile() {
     let filePath = path.join(
       __dirname,
@@ -66,7 +59,6 @@ dotenv.config({ path: this.filePath });
 
     filePath = filePath.replace(/out[\\\/]?/, "");
 
-    // Read the file content
     try {
       const fileContent = fs.readFileSync(filePath, 'utf8');
       if (!fileContent.trim()) {
@@ -74,17 +66,15 @@ dotenv.config({ path: this.filePath });
         return;
       }
 
-      // Parse the file content (assuming it is in JSON format)
       const metricsData = JSON.parse(fileContent);
 
-      // Send the entire file content to the server
       const response = await fetch(`${this.serverUrl}/metrics`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': this.apiKey,
         },
-        body: JSON.stringify(metricsData),  // Send the entire JSON data as the body
+        body: JSON.stringify(metricsData),  
       });
 
       if (response.ok) {
