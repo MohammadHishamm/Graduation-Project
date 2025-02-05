@@ -58,7 +58,7 @@ async function analyzeCode(document, sourceCode) {
             "LOC",
             "AMW",
             "CBO",
-            // "ATFD",
+            "ATFD",
             "FDP",
             // "LAA",
             // "NrFE",

@@ -41,7 +41,7 @@ export async function analyzeCode(
         "LOC",
         "AMW",
         "CBO",
-        // "ATFD",
+        "ATFD",
         "FDP",
         // "LAA",
         // "NrFE",

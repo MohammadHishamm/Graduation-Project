@@ -6,7 +6,6 @@ const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
 const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
-// import { NDUCalculation } from "../Metrics/Java/JavaNDU";
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
 const JavaNOAM_1 = require("../Metrics/Java/JavaNOAM");
 const JavaNOM_1 = require("../Metrics/Java/JavaNOM");
@@ -18,24 +17,13 @@ const JavaDIT_1 = require("../Metrics/Java/JavaDIT");
 const JavaNAS_1 = require("../Metrics/Java/JavaNAS");
 const JavaTCC_1 = require("../Metrics/Java/JavaTCC");
 const PythonCC_1 = require("../Metrics/Python/PythonCC");
-// import { PythonLOCMetric } from "../Metrics/Python/PythonLOC";
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
-// import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
-// import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
 const JavaPNAS_1 = require("../Metrics/Java/JavaPNAS");
-// import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
-// import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
-// import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
-// import { JavaLocalityofAttributeAccess } from "../Metrics/Java/JavaLAA";
-// import { JavaNumberofFeatureEnvyMethods } from "../Metrics/Java/JavaNrFE";
-//import { JavaBaseclassOverwritingMethods } from "../Metrics/Java/JavaBOvM";
-// import { BURCalculation } from "../Metrics/Java/JavaBUR";
-// import { NODCalculation } from "../Metrics/Java/JavaNOD";
-// import { NODDCalculation } from "../Metrics/Java/JavaNODD";
+const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 class MetricsFactory {
     // Public static method to create a metric object based on the language and metric name
     static CreateMetric(metricName, language) {
@@ -60,7 +48,7 @@ class MetricsFactory {
             case `AMW`:
                 return new JavaAMW_1.JavaAverageMethodWeight();
             case `ATFD`:
-            // return new JavaAccessToForeignData();
+                return new JavaATFD_1.JavaAccessToForeignData();
             case `FDP`:
                 return new JavaFDP_1.JavaAccessofImportData();
             //  case `LAA`:
