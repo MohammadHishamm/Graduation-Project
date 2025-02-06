@@ -74,6 +74,29 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
                 baseType !== currentClass.name &&
                 !ancestorClasses.has(baseType));
         };
+        fields.forEach((field) => {
+            if (isExternalClass(field.type)) {
+                const fieldName = field.name;
+                methods.forEach((method) => {
+                    method.fieldAccess.forEach((access) => {
+                        if (access.startsWith(fieldName + ".")) {
+                            const accessKey = `${field.type}.${access.split(".")[1]}`;
+                            const currentCount = (accessCount.get(accessKey) || 0) + 1;
+                            accessCount.set(accessKey, currentCount);
+                        }
+                    });
+                    method.methodCalls.forEach((call) => {
+                        const [objName, methodName] = call.split(".");
+                        if (objName === fieldName &&
+                            (methodName.match(/^[sS]et/) || methodName.match(/^[gG]et/))) {
+                            const accessKey = `${field.type}.${methodName}`;
+                            const currentCount = (accessCount.get(accessKey) || 0) + 1;
+                            accessCount.set(accessKey, currentCount);
+                        }
+                    });
+                });
+            }
+        });
         methods.forEach((method) => {
             console.log(`\n[ATFD] Analyzing method: ${method.name}`);
             // Find the foreign object variable name
