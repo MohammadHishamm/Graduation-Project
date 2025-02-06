@@ -85,11 +85,35 @@ export class MethodExtractor {
     } else if (node.type === "throw_statement") {
       bodyStatements.push(node.type);
     }
-
     node.children.forEach((child) => {
       this.extractStatementsRecursively(child, bodyStatements);
     });
   }
+
+// Detect Field Access in Method Body
+private extractFieldAccesses(node: Parser.SyntaxNode): string[] {
+  const fieldAccesses: string[] = [];
+  const bodyNode = node.childForFieldName("body");
+
+  if (bodyNode) {
+    bodyNode.descendantsOfType("field_access").forEach((fieldNode) => {
+      const objectNode = fieldNode.child(0); // Usually the object before the dot
+      const fieldIdentifier = fieldNode.child(2); // Usually the field after the dot
+
+      if (objectNode && fieldIdentifier) {
+        const fieldAccessText = `${objectNode.text}.${fieldIdentifier.text}`;
+        
+        // Exclude System.out or similar print/log calls
+        if (!fieldAccessText.includes("System.out")) {
+          fieldAccesses.push(fieldAccessText);
+        }
+      }
+    });
+  }
+
+  return fieldAccesses;
+}
+
 
   // Call this function instead of looping manually
   private extractStatements(bodyNode: Parser.SyntaxNode): string[] {
@@ -128,22 +152,33 @@ export class MethodExtractor {
   private extractMethodCalls(node: Parser.SyntaxNode): string[] {
     const methodCalls: string[] = [];
     const bodyNode = node.childForFieldName("body");
-
+  
     if (bodyNode) {
       bodyNode.descendantsOfType("method_invocation").forEach((callNode) => {
         const objectNode = callNode.childForFieldName("object");
         const methodNode = callNode.childForFieldName("name");
-
+  
         if (objectNode && methodNode) {
-          methodCalls.push(`${objectNode.text}.${methodNode.text}`);
+          const methodCall = `${objectNode.text}.${methodNode.text}`;
+  
+          // Exclude System.out calls
+          if (!methodCall.includes("System.out")) {
+            methodCalls.push(methodCall);
+          }
         } else if (methodNode) {
-          methodCalls.push(methodNode.text); // For static calls without object
+          const methodCall = methodNode.text;
+  
+          // Exclude System.out calls for static methods
+          if (!methodCall.includes("System.out")) {
+            methodCalls.push(methodCall); // For static calls without object
+          }
         }
       });
     }
-
+  
     return methodCalls;
   }
+  
 
   // Extract Method Information Including All Details
   public extractMethods(
@@ -159,7 +194,7 @@ export class MethodExtractor {
     return methodNodes.map((node) => {
       const modifiers = this.extractMethodModifiers(node);
       const name = this.extractMethodName(node);
-  
+     
       return {
         name,
         modifiers: this.getAccessModifier(modifiers),
@@ -174,6 +209,7 @@ export class MethodExtractor {
         methodBody: this.extractStatements(node),
         localVariables: this.extractLocalVariables(node),
         methodCalls: this.extractMethodCalls(node),
+        fieldAccess:  this.extractFieldAccesses(node),
         parent: this.findParentClass(node , classes),
         startPosition: node.startPosition,
         endPosition: node.endPosition,
