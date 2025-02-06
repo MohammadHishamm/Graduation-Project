@@ -173,7 +173,6 @@ class MethodExtractor {
         return methodNodes.map((node) => {
             const modifiers = this.extractMethodModifiers(node);
             const name = this.extractMethodName(node);
-            this.extractFieldAccesses(node);
             return {
                 name,
                 modifiers: this.getAccessModifier(modifiers),
@@ -188,6 +187,7 @@ class MethodExtractor {
                 methodBody: this.extractStatements(node),
                 localVariables: this.extractLocalVariables(node),
                 methodCalls: this.extractMethodCalls(node),
+                fieldAccess: this.extractFieldAccesses(node),
                 parent: this.findParentClass(node, classes),
                 startPosition: node.startPosition,
                 endPosition: node.endPosition,

@@ -90,7 +90,7 @@ class JavaAccessToForeignData extends MetricCalculator_1.MetricCalculator {
                 }
             }
             // Count field accesses
-            method.fieldsUsed.forEach((fieldAccess) => {
+            method.fieldAccess.forEach((fieldAccess) => {
                 // Check if this field access is through a foreign object
                 for (const [objName, objType] of foreignObjectTypes.entries()) {
                     if (fieldAccess.startsWith(objName + ".")) {
