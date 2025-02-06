@@ -75,7 +75,7 @@ class MethodExtractor {
             const conditionText = node.text || "";
             const booleanOperators = (conditionText.match(/&&|\|\|/g) || []).length;
             if (booleanOperators > 0) {
-                bodyStatements.push("condition: " + conditionText);
+                bodyStatements.push("condition");
             }
         }
         else if (node.type === "catch_clause") {

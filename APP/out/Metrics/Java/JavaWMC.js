@@ -21,20 +21,20 @@ class JavaWeightedMethodCount extends MetricCalculator_1.MetricCalculator {
     calculateWeightedMethodCount(methods) {
         let complexity = 0;
         methods.forEach((method) => {
-            method.methodBody.forEach((statement) => {
-                if (statement.includes("if_statement") ||
-                    statement.includes("while_statement") ||
-                    statement.includes("do_statement") ||
-                    statement.includes("case") ||
-                    statement.includes("break_statement") ||
-                    statement.includes("continue_statement") ||
-                    statement.includes("for_statement") ||
-                    statement.includes("condition") ||
-                    statement.includes("ternary_expression") ||
-                    method) {
-                    complexity++;
-                }
-            });
+            if (method.methodBody.length > 0) {
+                complexity++;
+                method.methodBody.forEach((statement) => {
+                    if (statement === "if_statement" ||
+                        statement === "while_statement" ||
+                        statement === "do_statement" ||
+                        statement === "case" ||
+                        statement === "for_statement" ||
+                        statement === "condition" ||
+                        statement === "ternary_expression") {
+                        complexity++;
+                    }
+                });
+            }
         });
         return complexity;
     }

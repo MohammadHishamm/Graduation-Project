@@ -58,11 +58,11 @@ export class JavaNumberOfAddedServices extends MetricCalculator {
         return true;
       } else {
         if (!isPublic)
-          console.log(`[NAS] Skipped method (not public): ${method.name}`);
+          {console.log(`[NAS] Skipped method (not public): ${method.name}`);}
         if (!isNotConstructor)
-          console.log(`[NAS] Skipped method (constructor): ${method.name}`);
+          {console.log(`[NAS] Skipped method (constructor): ${method.name}`);}
         if (!isNotAccessor)
-          console.log(`[NAS] Skipped method (accessor): ${method.name}`);
+          {console.log(`[NAS] Skipped method (accessor): ${method.name}`);}
         return false;
       }
     });

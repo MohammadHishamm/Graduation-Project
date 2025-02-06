@@ -37,12 +37,15 @@ class JavaNumberOfAddedServices extends MetricCalculator_1.MetricCalculator {
                 return true;
             }
             else {
-                if (!isPublic)
+                if (!isPublic) {
                     console.log(`[NAS] Skipped method (not public): ${method.name}`);
-                if (!isNotConstructor)
+                }
+                if (!isNotConstructor) {
                     console.log(`[NAS] Skipped method (constructor): ${method.name}`);
-                if (!isNotAccessor)
+                }
+                if (!isNotAccessor) {
                     console.log(`[NAS] Skipped method (accessor): ${method.name}`);
+                }
                 return false;
             }
         });

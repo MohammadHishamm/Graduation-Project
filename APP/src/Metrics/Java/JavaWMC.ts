@@ -10,8 +10,7 @@ import { FieldInfo } from '../../Interface/FieldInfo';
 
 export class JavaWeightedMethodCount extends MetricCalculator {
 
-    calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
-    {
+    calculate(node: any, FECFC: FolderExtractComponentsFromCode, Filename: string): number {
         let allClasses: ClassInfo[] = [];
         let allMethods: MethodInfo[] = [];
         let allFields: FieldInfo[] = [];
@@ -30,28 +29,28 @@ export class JavaWeightedMethodCount extends MetricCalculator {
         return this.calculateWeightedMethodCount(allMethods);
     }
 
-    private calculateWeightedMethodCount(methods: MethodInfo[]): number 
-    {
+    private calculateWeightedMethodCount(methods: MethodInfo[]): number {
         let complexity = 0;
 
         methods.forEach((method) => {
-            method.methodBody.forEach((statement) => {
+            if (method.methodBody.length > 0) {
+                complexity++;
 
-                if (
-                    statement.includes("if_statement") ||
-                    statement.includes("while_statement") ||
-                    statement.includes("do_statement") ||
-                    statement.includes("case") ||
-                    statement.includes("break_statement") ||
-                    statement.includes("continue_statement") ||
-                    statement.includes("for_statement") ||
-                    statement.includes("condition") ||
-                    statement.includes("ternary_expression") ||
-                    method
-                ) {
-                    complexity++;
-                }
-            });
+                method.methodBody.forEach((statement) => {
+                    if (
+                        statement === "if_statement" ||
+                        statement === "while_statement" ||
+                        statement === "do_statement" ||
+                        statement === "case" ||
+                        statement === "for_statement" ||
+                        statement === "condition" ||
+                        statement === "ternary_expression"
+                    ) {
+                        complexity++;
+                    }
+                });
+
+            }
         });
 
         return complexity;
