@@ -46,7 +46,7 @@ export class TCCCalculation extends MetricCalculator {
         const methodA = methods[i];
         const fieldsA = methodA.fieldsUsed;
   
-        let key = true;
+        
   
         // Compare methodA with all other methods
         for (let j = 0; j < methods.length; j++) {
@@ -56,13 +56,13 @@ export class TCCCalculation extends MetricCalculator {
   
             // Check for any shared field
             for (const field of fieldsA) {
-              if (fieldsB.includes(field) && key) {
+              if (fieldsB.includes(field)) {
                 console.log(`Shared field found between ${methodA.name} and ${methodB.name}: ${field}`);
                 // Find the field in the class fields
                 for (const classField of fields) {
                   if (classField.name === field) {
                     pairs++; // Increment the pair count when a shared field is found
-                    key = false; // Only count once per pair
+                    // Only count once per pair
                     break;
                   }
                 }
@@ -70,17 +70,15 @@ export class TCCCalculation extends MetricCalculator {
             }
           }
   
-          if (!key) {
-            break; // Exit the loop early once a shared field is found for this pair
-          }
+         
         }
       }
     }
   
     const nummeth = methods.length; //number of methods
   
-    // Calculate TCC: 2 * pairs / (n_methods * (n_methods - 1))
-    const tcc = (2 * pairs) / (nummeth * (nummeth - 1));
+    
+    const tcc = (pairs) / (nummeth * (nummeth - 1));
   
     // Handle edge cases where there are fewer than 2 methods
     if (nummeth <= 1) {
