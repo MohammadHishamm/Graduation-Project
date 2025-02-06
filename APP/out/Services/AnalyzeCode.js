@@ -79,7 +79,7 @@ async function analyzeCode(document, sourceCode) {
             // "BUR",
             // "NOD",
             // "NODD",
-            // "TCC",
+            "TCC",
             "DIT",
         ];
         try {

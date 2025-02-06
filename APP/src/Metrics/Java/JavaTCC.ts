@@ -8,7 +8,7 @@ import { FieldInfo } from "../../Interface/FieldInfo";
 export class TCCCalculation extends MetricCalculator {
   calculate(node: any,  FECFC: FolderExtractComponentsFromCode, Filename: string): number 
   { 
-    let allClasses: ClassInfo[] = [];
+
     let allMethods: MethodInfo[] = [];
     let allFields: FieldInfo[] = [];
 
@@ -19,14 +19,13 @@ export class TCCCalculation extends MetricCalculator {
       const classGroups = fileParsedComponents.classes;
       classGroups.forEach((classGroup) => 
       {
-        allClasses = [...allClasses, ...classGroup.classes];
-        allMethods = [...allMethods, ...classGroup.methods];
-        allFields = [...allFields, ...classGroup.fields];
+        allMethods = allMethods.concat(classGroup.methods);
+        allFields = allFields.concat(classGroup.fields);
       });
     }
     
 
-    const TCC = this.calculateTCC(
+    const  TCC= this.calculateTCC(
       allMethods,
       allFields
     );
@@ -40,47 +39,57 @@ export class TCCCalculation extends MetricCalculator {
     fields: FieldInfo[]
   ): number {
     let pairs = 0;
-
+  
+    // Iterate through all methods
     for (let i = 0; i < methods.length; i++) {
       if (!methods[i].isConstructor) {
         const methodA = methods[i];
-        const fieldsA = methods[i].fieldsUsed;
-
+        const fieldsA = methodA.fieldsUsed;
+  
         let key = true;
+  
+        // Compare methodA with all other methods
         for (let j = 0; j < methods.length; j++) {
-          if (!methods[j].isConstructor && methodA.name !== methods[j].name) 
-        {
-            const fieldsB = methods[j].fieldsUsed;
-
+          if (!methods[j].isConstructor && methodA.name !== methods[j].name) {
+            const methodB = methods[j];
+            const fieldsB = methodB.fieldsUsed;
+  
             // Check for any shared field
             for (const field of fieldsA) {
               if (fieldsB.includes(field) && key) {
-                for (const classfields of fields) {
-                  if (classfields.name !== field) {
-                    pairs++; // Increment shared connections
-                    key = false;
-                    break; // Exit as one shared field is enough
+                console.log(`Shared field found between ${methodA.name} and ${methodB.name}: ${field}`);
+                // Find the field in the class fields
+                for (const classField of fields) {
+                  if (classField.name === field) {
+                    pairs++; // Increment the pair count when a shared field is found
+                    key = false; // Only count once per pair
+                    break;
                   }
                 }
               }
             }
           }
+  
           if (!key) {
-            break;
+            break; // Exit the loop early once a shared field is found for this pair
           }
         }
       }
     }
-
-    // Calculate and return TCC
-    const nummeth = methods.length;
-
-    const tcc = ((pairs - 1) * pairs) / (nummeth * (nummeth - 1));
-
-    if (nummeth === 0 || nummeth === 1) {
-      return nummeth;
+  
+    const nummeth = methods.length; //number of methods
+  
+    // Calculate TCC: 2 * pairs / (n_methods * (n_methods - 1))
+    const tcc = (2 * pairs) / (nummeth * (nummeth - 1));
+  
+    // Handle edge cases where there are fewer than 2 methods
+    if (nummeth <= 1) {
+      return 0;
     } else {
+      console.log(`TCC Calculation: pairs = ${pairs}, nummeth = ${nummeth}, TCC = ${tcc}`);
       return parseFloat(tcc.toFixed(2));
     }
   }
+  
+  
 }

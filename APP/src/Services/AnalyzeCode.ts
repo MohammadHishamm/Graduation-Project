@@ -62,7 +62,7 @@ export async function analyzeCode(
         // "BUR",
         // "NOD",
         // "NODD",
-        // "TCC",
+       "TCC",
         "DIT",
       ];
 
