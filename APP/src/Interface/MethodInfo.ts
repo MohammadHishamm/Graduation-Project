@@ -12,6 +12,7 @@ export interface MethodInfo {
   annotations: string[];
   throwsClause: string[];
   methodBody: string[];
+  fieldAccess: string[];
   localVariables: string[];
   methodCalls: string[];
   startPosition: Parser.Point;
