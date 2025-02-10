@@ -57,16 +57,16 @@ export class MetricsFactory {
         return new JavaWeightOfAClass();
       case `AMW`:
         return new JavaAverageMethodWeight();
-      case `ATFD`:
-        return new JavaAccessToForeignData();
+      // case `ATFD`:
+      //   return new JavaAccessToForeignData();
       case `FDP`:
         return new JavaAccessofImportData();
       //  case `LAA`:
       // return new JavaLocalityofAttributeAccess();
       // case `NrFE`:
       // return new JavaNumberofFeatureEnvyMethods();
-      case `CBO`:
-        return new JavaCouplingBetweenObjects();
+      // case `CBO`:
+      //   return new JavaCouplingBetweenObjects();
       case `DAC`:
         return new JavaDataAbstractionCoupling();
       case "NOA":
@@ -83,13 +83,13 @@ export class MetricsFactory {
         return new JavaNumberOfProtectedMethods();
       // case "CognitiveComplexity":
       //   return new JavaCognitiveComplexityMetric();
-      case "NDU":
+      // case "NDU":
       // return new NDUCalculation();
       case "NAS":
         return new JavaNumberOfAddedServices();
       case "PNAS":
         return new JavaProportionOfNewAddedServices();
-      case "BUR":
+      // case "BUR":
       // return new BURCalculation();
       // case "NOD":
       //   return new NODCalculation();
