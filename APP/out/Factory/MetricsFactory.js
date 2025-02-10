@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MetricsFactory = void 0;
 // ..
 const JavaAMW_1 = require("../Metrics/Java/JavaAMW");
-const JavaDAC_1 = require("../Metrics/Java/JavaDAC");
 const JavaLOCC_1 = require("../Metrics/Java/JavaLOCC");
 const JavaNAbsm_1 = require("../Metrics/Java/JavaNAbsm");
 const JavaNOA_1 = require("../Metrics/Java/JavaNOA");
@@ -20,10 +19,8 @@ const PythonCC_1 = require("../Metrics/Python/PythonCC");
 const PythonNOA_1 = require("../Metrics/Python/PythonNOA");
 const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
-const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
 const JavaPNAS_1 = require("../Metrics/Java/JavaPNAS");
-const JavaATFD_1 = require("../Metrics/Java/JavaATFD ");
 class MetricsFactory {
     // Public static method to create a metric object based on the language and metric name
     static CreateMetric(metricName, language) {
@@ -47,18 +44,18 @@ class MetricsFactory {
                 return new JavaWOC_1.JavaWeightOfAClass();
             case `AMW`:
                 return new JavaAMW_1.JavaAverageMethodWeight();
-            case `ATFD`:
-                return new JavaATFD_1.JavaAccessToForeignData();
+            // case `ATFD`:
+            //   return new JavaAccessToForeignData();
             case `FDP`:
                 return new JavaFDP_1.JavaAccessofImportData();
             //  case `LAA`:
             // return new JavaLocalityofAttributeAccess();
             // case `NrFE`:
             // return new JavaNumberofFeatureEnvyMethods();
-            case `CBO`:
-                return new JavaCBO_1.JavaCouplingBetweenObjects();
-            case `DAC`:
-                return new JavaDAC_1.JavaDataAbstractionCoupling();
+            // case `CBO`:
+            //   return new JavaCouplingBetweenObjects();
+            // case `DAC`:
+            //   return new JavaDataAbstractionCoupling();
             case "NOA":
                 return new JavaNOA_1.JavaNumberOfAttributes();
             case "NOM":
@@ -73,13 +70,13 @@ class MetricsFactory {
                 return new JavaNProtM_1.JavaNumberOfProtectedMethods();
             // case "CognitiveComplexity":
             //   return new JavaCognitiveComplexityMetric();
-            case "NDU":
+            // case "NDU":
             // return new NDUCalculation();
             case "NAS":
                 return new JavaNAS_1.JavaNumberOfAddedServices();
             case "PNAS":
                 return new JavaPNAS_1.JavaProportionOfNewAddedServices();
-            case "BUR":
+            // case "BUR":
             // return new BURCalculation();
             // case "NOD":
             //   return new NODCalculation();
