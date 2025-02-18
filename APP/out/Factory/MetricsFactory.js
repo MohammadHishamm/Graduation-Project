@@ -21,6 +21,7 @@ const PythonNOAM_1 = require("../Metrics/Python/PythonNOAM");
 const PythonNOM_1 = require("../Metrics/Python/PythonNOM");
 const JavaFDP_1 = require("../Metrics/Java/JavaFDP");
 const JavaPNAS_1 = require("../Metrics/Java/JavaPNAS");
+const JavaCBO_1 = require("../Metrics/Java/JavaCBO");
 class MetricsFactory {
     // Public static method to create a metric object based on the language and metric name
     static CreateMetric(metricName, language) {
@@ -52,8 +53,8 @@ class MetricsFactory {
             // return new JavaLocalityofAttributeAccess();
             // case `NrFE`:
             // return new JavaNumberofFeatureEnvyMethods();
-            // case `CBO`:
-            //   return new JavaCouplingBetweenObjects();
+            case `CBO`:
+                return new JavaCBO_1.JavaCouplingBetweenObjects();
             // case `DAC`:
             //   return new JavaDataAbstractionCoupling();
             case "NOA":

@@ -24,11 +24,11 @@ import { PythonCyclomaticComplexityMetric } from "../Metrics/Python/PythonCC";
 import { PythonNumberofAttributesMetric } from "../Metrics/Python/PythonNOA";
 import { PythonNumberOfAccessorMethods } from "../Metrics/Python/PythonNOAM";
 import { PythonNumberOfMethodsMetric } from "../Metrics/Python/PythonNOM";
-import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 
 import { JavaAccessofImportData } from "../Metrics/Java/JavaFDP";
 import { JavaProportionOfNewAddedServices } from "../Metrics/Java/JavaPNAS";
 import { JavaAccessToForeignData } from "../Metrics/Java/JavaATFD ";
+import { JavaCouplingBetweenObjects } from "../Metrics/Java/JavaCBO";
 
 export class MetricsFactory {
   // Public static method to create a metric object based on the language and metric name
@@ -65,8 +65,8 @@ export class MetricsFactory {
       // return new JavaLocalityofAttributeAccess();
       // case `NrFE`:
       // return new JavaNumberofFeatureEnvyMethods();
-      // case `CBO`:
-      //   return new JavaCouplingBetweenObjects();
+      case `CBO`:
+        return new JavaCouplingBetweenObjects();
       // case `DAC`:
       //   return new JavaDataAbstractionCoupling();
       case "NOA":
